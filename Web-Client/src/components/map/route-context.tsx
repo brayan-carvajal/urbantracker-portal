@@ -1,29 +1,56 @@
 import React, { createContext, useContext, useState } from 'react';
 
-interface RouteContextType {
+interface RouteData {
+  id: number;
   outboundPoints: [number, number][] | null;
   returnPoints: [number, number][] | null;
-  setOutboundPoints: React.Dispatch<React.SetStateAction<[number, number][] | null>>;
-  setReturnPoints: React.Dispatch<React.SetStateAction<[number, number][] | null>>;
-  selectedRoute: number | null;
-  setSelectedRoute: React.Dispatch<React.SetStateAction<number | null>>;
+}
+
+interface RouteContextType {
+  routes: RouteData[];
+  setRoutes: React.Dispatch<React.SetStateAction<RouteData[]>>;
+  selectedRoutes: number[];
+  setSelectedRoutes: React.Dispatch<React.SetStateAction<number[]>>;
+  addRoute: (routeId: number, outboundPoints: [number, number][] | null, returnPoints: [number, number][] | null) => void;
+  removeRoute: (routeId: number) => void;
+  clearRoutes: () => void;
 }
 
 const RouteContext = createContext<RouteContextType | null>(null);
 
 export function RouteProvider({ children }: { children: React.ReactNode }) {
-  const [outboundPoints, setOutboundPoints] = useState<[number, number][] | null>(null);
-  const [returnPoints, setReturnPoints] = useState<[number, number][] | null>(null);
-  const [selectedRoute, setSelectedRoute] = useState<number | null>(null);
+  const [routes, setRoutes] = useState<RouteData[]>([]);
+  const [selectedRoutes, setSelectedRoutes] = useState<number[]>([]);
+
+  const addRoute = (routeId: number, outboundPoints: [number, number][] | null, returnPoints: [number, number][] | null) => {
+    setRoutes(prev => {
+      const existing = prev.find(r => r.id === routeId);
+      if (existing) {
+        return prev.map(r => r.id === routeId ? { ...r, outboundPoints, returnPoints } : r);
+      }
+      return [...prev, { id: routeId, outboundPoints, returnPoints }];
+    });
+  };
+
+  const removeRoute = (routeId: number) => {
+    setRoutes(prev => prev.filter(r => r.id !== routeId));
+    setSelectedRoutes(prev => prev.filter(id => id !== routeId));
+  };
+
+  const clearRoutes = () => {
+    setRoutes([]);
+    setSelectedRoutes([]);
+  };
 
   return (
     <RouteContext.Provider value={{
-      outboundPoints,
-      returnPoints,
-      setOutboundPoints,
-      setReturnPoints,
-      selectedRoute,
-      setSelectedRoute
+      routes,
+      setRoutes,
+      selectedRoutes,
+      setSelectedRoutes,
+      addRoute,
+      removeRoute,
+      clearRoutes
     }}>
       {children}
     </RouteContext.Provider>
@@ -40,7 +67,10 @@ export function useRoute() {
   const ctx = useContext(RouteContext);
   if (!ctx) throw new Error('useRoute debe usarse dentro de RouteProvider');
   return {
-    selectedRoute: ctx.selectedRoute,
-    setSelectedRoute: ctx.setSelectedRoute
+    selectedRoutes: ctx.selectedRoutes,
+    setSelectedRoutes: ctx.setSelectedRoutes,
+    addRoute: ctx.addRoute,
+    removeRoute: ctx.removeRoute,
+    clearRoutes: ctx.clearRoutes
   };
 }

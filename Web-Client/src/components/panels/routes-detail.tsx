@@ -3,7 +3,7 @@ import { Bus } from "lucide-react";
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { useVehiclePositions } from '../map/vehicle-context';
-import { useRoutePoints } from '../map/route-context';
+import { useRoutePoints, useRoute } from '../map/route-context';
 
 // Interface que define la estructura de una ruta de transporte público
 export interface Route {
@@ -38,10 +38,10 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
   const [telemetry, setTelemetry] = useState<string | null>(null);
   const [parseError, setParseError] = useState<string | null>(null);
   const { setVehiclePositions } = useVehiclePositions();
-  const { setOutboundPoints, setReturnPoints } = useRoutePoints();
+  const { addRoute } = useRoute();
 
   useEffect(() => {
-    if (route.start) {
+    if (route && route.start && route.end) {
       setFullRoute(route);
       return;
     }
@@ -70,8 +70,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
           .map((w: any) => [w.longitude, w.latitude] as [number, number]);
 
         // Setear puntos de ruta en el contexto
-        setOutboundPoints(outboundPoints);
-        setReturnPoints(returnPoints);
+        addRoute(route.id, outboundPoints, returnPoints);
 
         setFullRoute({
           ...route,
@@ -133,10 +132,8 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
   // Limpiar puntos de ruta al desmontar el componente (cuando se deselecciona la ruta)
   useEffect(() => {
     return () => {
-      setOutboundPoints(null);
-      setReturnPoints(null);
     };
-  }, [setOutboundPoints, setReturnPoints]);
+  }, []);
 
   if (loading) return <div className="text-zinc-100">Cargando detalle...</div>;
   if (error) return <div className="text-red-500">Error: {error}</div>;
@@ -162,7 +159,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
             <img src={fullRoute.imageStart} alt="Ruta inicio" className="w-24 h-24 object-contain mb-1 rounded" />
             <div className="flex items-center gap-1 mt-2">
               <span className="bg-green-500 w-3 h-3 rounded-full" />
-              <span className="text-xs text-zinc-400 font-semibold">Inicia</span>
+              <span className="text-xs text-zinc-400 font-semibold">Ida</span>
             </div>
             <span className="text-xs text-zinc-100 text-center">{fullRoute.start}</span>
           </div>
@@ -171,7 +168,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
             <img src={fullRoute.imageEnd} alt="Ruta termina" className="w-24 h-24 object-contain mb-1 rounded" />
             <div className="flex items-center gap-1 mt-2">
               <span className="bg-red-500 w-3 h-3 rounded-full" />
-              <span className="text-xs text-zinc-400 font-semibold">Termina</span>
+              <span className="text-xs text-zinc-400 font-semibold">Vuelta</span>
             </div>
             <span className="text-xs text-zinc-100 text-center">{fullRoute.end}</span>
           </div>
@@ -186,7 +183,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
           <div className="flex gap-2 mb-1 items-start">
             <span className="bg-green-500 w-3 h-3 rounded-full flex-shrink-0 mt-1" />
             <div className="flex flex-col min-w-0 max-w-full">
-              <span className="text-xs text-zinc-400 font-medium flex-shrink-0">Inicia:</span>
+              <span className="text-xs text-zinc-400 font-medium flex-shrink-0">Ida:</span>
               <span className="text-xs text-zinc-100 break-words whitespace-pre-line overflow-hidden max-w-full" style={{ display: 'block', whiteSpace: 'pre-line', wordBreak: 'break-word' }}>{fullRoute.startDetail}</span>
             </div>
           </div>
@@ -194,7 +191,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
           <div className="flex gap-2 items-start">
             <span className="bg-red-500 w-3 h-3 rounded-full flex-shrink-0 mt-1" />
             <div className="flex flex-col min-w-0 max-w-full">
-              <span className="text-xs text-zinc-400 font-medium flex-shrink-0">Termina:</span>
+              <span className="text-xs text-zinc-400 font-medium flex-shrink-0">Vuelta:</span>
               <span className="text-xs text-zinc-100 break-words whitespace-pre-line overflow-hidden max-w-full" style={{ display: 'block', whiteSpace: 'pre-line', wordBreak: 'break-word' }}>{fullRoute.endDetail}</span>
             </div>
           </div>

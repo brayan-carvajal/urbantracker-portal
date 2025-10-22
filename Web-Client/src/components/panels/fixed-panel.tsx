@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { SearchBar } from "components/shared/search-bar"
 import { RoutesPanel } from "./routes-panel"
@@ -13,11 +14,12 @@ import { useRouter } from "next/navigation"
 export function FixedPanel() {
   const { activePanel } = usePanelActive();
   const { isPanelCollapsed, togglePanelCollapse } = usePanelCollapse();
-  const { selectedRoute, setSelectedRoute } = useRoute();
+  const { selectedRoutes } = useRoute();
   const router = useRouter();
+  const [detailSelected, setDetailSelected] = React.useState<number | null>(null);
 
   const handleRouteSelection = (routeId: number | null) => {
-    setSelectedRoute(routeId);
+    setDetailSelected(routeId);
     if (routeId !== null) {
       router.push(`/map/routes/${routeId}`);
     } else {
@@ -28,13 +30,13 @@ export function FixedPanel() {
   const renderPanel = () => {
     switch (activePanel) {
       case "routes":
-        return <RoutesPanel showTitle selected={selectedRoute} setSelected={handleRouteSelection} />
+        return <RoutesPanel showTitle selected={detailSelected} setSelected={handleRouteSelection} />
       case "stop-info":
         return <StopInfoPanel />
       case "general-info":
         return <GeneralInfoPanel />
       default:
-        return <RoutesPanel showTitle selected={selectedRoute} setSelected={handleRouteSelection} />
+        return <RoutesPanel showTitle selected={detailSelected} setSelected={handleRouteSelection} />
     }
   }
 

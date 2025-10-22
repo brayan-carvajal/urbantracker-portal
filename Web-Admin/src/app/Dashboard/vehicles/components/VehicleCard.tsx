@@ -1,8 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Car, Edit, Trash2 } from "lucide-react"
-import { Vehicle } from "../hooks/useVehicles"
+import { Car, Edit, Trash2, Calendar, Users } from "lucide-react"
+import { Vehicle } from "../types/vehiculeTypes"
 
 interface VehicleCardProps {
   vehicle: Vehicle
@@ -11,17 +11,27 @@ interface VehicleCardProps {
 }
 
 export function VehicleCard({ vehicle, onEdit, onDelete }: VehicleCardProps) {
-  const getStatusStyles = (status: Vehicle['status']) => {
-    const styles = {
-      "Operational": "bg-green-600 text-white hover:bg-green-700",
-      "En Ruta": "bg-blue-600 text-white hover:bg-blue-700",
-      "Fuera de Servicio": "bg-red-600 text-white hover:bg-red-700"
+  const getStatusInSpanish = (status: string): string => {
+    switch (status) {
+      case 'ACTIVE':
+        return 'Activo';
+      case 'INACTIVE':
+        return 'Inactivo';
+      default:
+        return status;
     }
-    return styles[status]
+  };
+
+  const getStatusStyles = (status: Vehicle['status']) => {
+    const styles: Record<string, string> = {
+      "ACTIVE": "bg-green-600 text-white hover:bg-green-700",
+      "INACTIVE": "bg-red-600 text-white hover:bg-red-700"
+    }
+    return styles[status] || "bg-gray-600 text-white hover:bg-gray-700"
   }
 
   return (
-    <Card className="bg-gray-900 border-gray-800 hover:bg-gray-800 transition-all duration-300 hover:scale-[1.02]">
+    <Card className="bg-zinc-900 border-zinc-800 hover:bg-zinc-800 transition-all duration-300 hover:scale-[1.02]">
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-6">
@@ -30,30 +40,27 @@ export function VehicleCard({ vehicle, onEdit, onDelete }: VehicleCardProps) {
             </div>
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <h3 className="text-xl font-bold text-white">{vehicle.licensePlate}</h3>
+                <h3 className="text-xl font-bold text-white">
+                  {vehicle.licencePlate}
+                </h3>
                 <Badge className={getStatusStyles(vehicle.status)}>
-                  {vehicle.status}
+                  {getStatusInSpanish(vehicle.status)}
                 </Badge>
               </div>
-              <div className="text-gray-400">
-                <span className="font-medium text-white">
-                  {vehicle.brand} {vehicle.model}
+              <div className="text-zinc-400">
+                <span className="font-medium text-white flex items-center gap-2">
+                  <Car className="h-4 w-4 text-white" /> Marca/Modelo: {vehicle.brand} {vehicle.model}
                 </span>
-                <span className="mx-2">•</span>
-                <span>{vehicle.type}</span>
+
+                <span className="font-medium text-white flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-white" /> Año: {vehicle.year}
+                </span>
               </div>
-              <div className="flex gap-6 text-sm text-gray-400">
-                <div className="flex items-center gap-2">
-                  <Car className="h-4 w-4" />
-                  <span>{vehicle.mileage}</span>
-                </div>
+              <div className="text-sm">
+                <span className="font-medium text-white flex items-center gap-2">
+                  <Users className="h-4 w-4 text-white" /> <span className="text-emerald-500">Capacidad: {vehicle.passengerCapacity} pasajeros</span>
+                </span>
               </div>
-              {vehicle.driver && (
-                <div className="text-sm">
-                  <span className="font-medium text-gray-400">Assigned driver: </span>
-                  <span className="text-emerald-500">{vehicle.driver}</span>
-                </div>
-              )}
             </div>
           </div>
           <div className="flex gap-2">
@@ -61,10 +68,10 @@ export function VehicleCard({ vehicle, onEdit, onDelete }: VehicleCardProps) {
               variant="outline"
               size="sm"
               onClick={() => onEdit(vehicle)}
-              className="border-gray-700 text-white hover:bg-gray-800"
+              className="flex items-center gap-2 hover:bg-accent/10 hover:text-accent transition-all duration-200"
             >
               <Edit className="h-4 w-4 mr-2" />
-              Edit
+              Editar
             </Button>
             <Button
               variant="outline"
@@ -73,11 +80,11 @@ export function VehicleCard({ vehicle, onEdit, onDelete }: VehicleCardProps) {
               className="border-red-700 text-red-500 hover:bg-red-900/20"
             >
               <Trash2 className="h-4 w-4 mr-2" />
-              Delete
+              Eliminar
             </Button>
           </div>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
