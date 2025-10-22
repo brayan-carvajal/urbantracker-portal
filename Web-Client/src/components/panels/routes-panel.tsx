@@ -3,7 +3,6 @@ import { Bus } from "lucide-react";
 import { RoutesDetail, Route } from "./routes-detail";
 import { useRoute } from "../map/route-context";
 
-// Interface para la respuesta del backend
 interface RouteResDto {
   id: number;
   numberRoute: string;
@@ -19,7 +18,7 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
   const [routes, setRoutes] = useState<Route[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { selectedRoutes, setSelectedRoutes, addRoute } = useRoute();
+  const { selectedRoutes, setSelectedRoutes, focusedRoute, setFocusedRoute, addRoute, removeRoute } = useRoute();
 
   useEffect(() => {
     const fetchRoutes = async () => {
@@ -74,7 +73,7 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
         </div>
       )}
 
-      {/* Si no hay ruta seleccionada, mostrar la lista de rutas */}
+      {/* Si no hay ruta seleccionada para detalle, mostrar la lista de rutas */}
       {selected === null ? (
         <div className="space-y-3">
           {selectedRoutes.length > 0 && (
@@ -85,18 +84,30 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
               </div>
             </div>
           )}
+          {focusedRoute !== null && (
+            <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-3 mb-4">
+              <div className="flex items-center gap-2 text-green-300 text-sm font-medium">
+                <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+                Ruta enfocada para vista detallada
+              </div>
+            </div>
+          )}
           {routes.map((route) => {
             const isSelected = selectedRoutes.includes(route.id);
+            const isFocused = focusedRoute === route.id;
             return (
               // Tarjeta resumen de cada ruta
               <div
                 key={route.id}
                 className={`bg-zinc-800 text-zinc-100 p-4 rounded-xl w-full font-sans border flex flex-col shadow-sm transition-all duration-200 hover:shadow-xl hover:scale-[1.02] cursor-pointer ${
-                  isSelected ? 'border-blue-500 bg-zinc-700' : 'border-zinc-700'
+                  isSelected ? 'border-blue-500 bg-zinc-700' : isFocused ? 'border-green-500 bg-zinc-700' : 'border-zinc-700'
                 }`}
-                onClick={() => {
-                  setSelected(route.id);
-                  setSelectedRoutes([route.id]);
+                onClick={(e) => {
+                  // Solo mostrar detalles si no se hizo clic en el checkbox
+                  if (!(e.target as HTMLElement).closest('input[type="checkbox"]')) {
+                    setSelected(route.id);
+                    setFocusedRoute(route.id);
+                  }
                 }}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -104,16 +115,49 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
                     <input
                       type="checkbox"
                       checked={isSelected}
-                      onChange={(e) => {
-                        e.stopPropagation();
-                        if (e.target.checked) {
-                          setSelectedRoutes(prev => [...prev, route.id]);
+                      onClick={(e) => e.stopPropagation()} // Evitar que el clic en el checkbox propague al div padre
+                      onChange={async (e) => {
+                        const input = e.target as HTMLInputElement;
+                        const checked = input.checked;
+                        const maxRoutes = 6; // Límite de rutas seleccionables
+
+                        if (checked) {
+                          if (selectedRoutes.length < maxRoutes) {
+                            // Añadir visualmente la selección
+                            setSelectedRoutes(prev => [...prev, route.id]);
+                            try {
+                              // Cargar geometría inmediatamente para que el mapa la muestre
+                              const resp = await fetch(`http://localhost:8080/api/v1/public/route/${route.id}/GEOMETRY`);
+                              if (!resp.ok) throw new Error('Error al cargar geometría de ruta');
+                              const data = await resp.json();
+                              const waypoints = data.data.waypoints || [];
+
+                              const outboundPoints = waypoints
+                                .filter((w: any) => w.destine === 'OUTBOUND')
+                                .sort((a: any, b: any) => a.sequence - b.sequence)
+                                .map((w: any) => [w.longitude, w.latitude] as [number, number]);
+
+                              const returnPoints = waypoints
+                                .filter((w: any) => w.destine === 'RETURN')
+                                .sort((a: any, b: any) => a.sequence - b.sequence)
+                                .map((w: any) => [w.longitude, w.latitude] as [number, number]);
+
+                              addRoute(route.id, outboundPoints, returnPoints);
+                            } catch (err) {
+                              console.error('No se pudo cargar geometría al seleccionar checkbox:', err);
+                              // Añadir la ruta sin puntos para mantener el id en el contexto; el detalle podrá actualizarla luego
+                              addRoute(route.id, null, null);
+                            }
+                          } else {
+                            alert('Solo puedes seleccionar hasta ' + maxRoutes + ' rutas para comparar');
+                            // Revertir visualmente el cambio
+                            input.checked = false;
+                            return;
+                          }
                         } else {
+                          // Remover de rutas seleccionadas y del contexto para que deje de mostrarse
                           setSelectedRoutes(prev => prev.filter(id => id !== route.id));
-                        }
-                        // Clear detail selection when using checkboxes for multi-selection
-                        if (selected !== null) {
-                          setSelected(null);
+                          removeRoute(route.id);
                         }
                       }}
                       className="w-4 h-4 text-blue-600 bg-zinc-700 border-zinc-600 rounded focus:ring-blue-500 focus:ring-2"

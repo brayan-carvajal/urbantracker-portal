@@ -11,6 +11,8 @@ interface RouteContextType {
   setRoutes: React.Dispatch<React.SetStateAction<RouteData[]>>;
   selectedRoutes: number[];
   setSelectedRoutes: React.Dispatch<React.SetStateAction<number[]>>;
+  focusedRoute: number | null;
+  setFocusedRoute: React.Dispatch<React.SetStateAction<number | null>>;
   addRoute: (routeId: number, outboundPoints: [number, number][] | null, returnPoints: [number, number][] | null) => void;
   removeRoute: (routeId: number) => void;
   clearRoutes: () => void;
@@ -21,6 +23,7 @@ const RouteContext = createContext<RouteContextType | null>(null);
 export function RouteProvider({ children }: { children: React.ReactNode }) {
   const [routes, setRoutes] = useState<RouteData[]>([]);
   const [selectedRoutes, setSelectedRoutes] = useState<number[]>([]);
+  const [focusedRoute, setFocusedRoute] = useState<number | null>(null);
 
   const addRoute = (routeId: number, outboundPoints: [number, number][] | null, returnPoints: [number, number][] | null) => {
     setRoutes(prev => {
@@ -48,6 +51,8 @@ export function RouteProvider({ children }: { children: React.ReactNode }) {
       setRoutes,
       selectedRoutes,
       setSelectedRoutes,
+      focusedRoute,
+      setFocusedRoute,
       addRoute,
       removeRoute,
       clearRoutes
@@ -69,6 +74,8 @@ export function useRoute() {
   return {
     selectedRoutes: ctx.selectedRoutes,
     setSelectedRoutes: ctx.setSelectedRoutes,
+    focusedRoute: ctx.focusedRoute,
+    setFocusedRoute: ctx.setFocusedRoute,
     addRoute: ctx.addRoute,
     removeRoute: ctx.removeRoute,
     clearRoutes: ctx.clearRoutes

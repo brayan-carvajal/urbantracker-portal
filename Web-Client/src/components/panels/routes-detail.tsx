@@ -41,10 +41,11 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
   const { addRoute } = useRoute();
 
   useEffect(() => {
-    if (route && route.start && route.end) {
+    // Aseguramos que la ruta se muestre en el mapa cuando se ven los detalles
+    if (route) {
       setFullRoute(route);
-      return;
     }
+    
     const fetchDetail = async () => {
       setLoading(true);
       try {
@@ -132,6 +133,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
   // Limpiar puntos de ruta al desmontar el componente (cuando se deselecciona la ruta)
   useEffect(() => {
     return () => {
+      // Do not clear routes here - let the context manage route cleanup
     };
   }, []);
 

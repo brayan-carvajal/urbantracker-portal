@@ -20,9 +20,10 @@ export function FixedPanel() {
 
   const handleRouteSelection = (routeId: number | null) => {
     setDetailSelected(routeId);
-    if (routeId !== null) {
+    // Only navigate if we're not already in detail view
+    if (routeId !== null && !window.location.pathname.includes(`/map/routes/${routeId}`)) {
       router.push(`/map/routes/${routeId}`);
-    } else {
+    } else if (routeId === null) {
       router.push("/map/routes");
     }
   };

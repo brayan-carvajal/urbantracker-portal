@@ -6,6 +6,12 @@ import { useRoutePoints, useRoute } from "./route-context";
 import { useVehiclePositions } from "./vehicle-context";
 import { VehicleMarker } from "./vehicle-marker";
 
+interface RouteData {
+  id: number;
+  outboundPoints: [number, number][] | null;
+  returnPoints: [number, number][] | null;
+}
+
 // Contexto para exponer el ref del mapa
 const MapboxRefContext = createContext<React.MutableRefObject<MapRef | null> | null>(null);
 export function useMapboxRef() {
@@ -18,7 +24,7 @@ const MapViewComponent = ({ children }: { children?: React.ReactNode }) => {
   const { isPanelCollapsed } = usePanelCollapse();
   const { vehiclePositions } = useVehiclePositions();
   const { routes, selectedRoutes } = useRoutePoints();
-  const { addRoute } = useRoute();
+  const { focusedRoute } = useRoute();
   const mapRef = useRef<MapRef | null>(null);
   const accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
   const [mapLoaded, setMapLoaded] = React.useState(false);
@@ -52,11 +58,25 @@ const MapViewComponent = ({ children }: { children?: React.ReactNode }) => {
 
   // Center map on selected routes when route points are loaded
   useEffect(() => {
-    if (mapRef.current && selectedRoutes.length > 0) {
-      const selectedRouteData = routes.filter(route => selectedRoutes.includes(route.id));
-      const allPoints: [number, number][] = [];
+    if (mapRef.current) {
+      let routesToCenter: RouteData[] = [];
+      let allPoints: [number, number][] = [];
 
-      selectedRouteData.forEach(route => {
+      // Prefer centering on all selected routes. If there's a focused route that's not
+      // already selected, include it as well so both types are visible.
+      if (selectedRoutes.length > 0) {
+        routesToCenter = routes.filter(route => selectedRoutes.includes(route.id));
+        if (focusedRoute !== null && !selectedRoutes.includes(focusedRoute)) {
+          const focusedRouteData = routes.find(route => route.id === focusedRoute);
+          if (focusedRouteData) routesToCenter.push(focusedRouteData);
+        }
+      } else if (focusedRoute !== null) {
+        // No selected routes: show only the focused route
+        const focusedRouteData = routes.find(route => route.id === focusedRoute);
+        if (focusedRouteData) routesToCenter = [focusedRouteData];
+      }
+
+      routesToCenter.forEach(route => {
         if (route.outboundPoints) allPoints.push(...route.outboundPoints);
         if (route.returnPoints) allPoints.push(...route.returnPoints);
       });
@@ -82,7 +102,7 @@ const MapViewComponent = ({ children }: { children?: React.ReactNode }) => {
         });
       }
     }
-  }, [routes, selectedRoutes]);
+  }, [routes, selectedRoutes, focusedRoute]);
 
   // Fixed colors: green for outbound, red for return
   const outboundColor = "#5BE201";
@@ -91,20 +111,32 @@ const MapViewComponent = ({ children }: { children?: React.ReactNode }) => {
   // Memoizar los datos del mapa para múltiples rutas con optimización de rendimiento
   const routeSources = useMemo(() => {
     const sources: any[] = [];
-    // Limitar a máximo 6 rutas para mejor rendimiento
-    const limitedRoutes = selectedRoutes.slice(0, 6);
+    // Determine which routes to display based on mode. Show selected routes first.
+    let routesToDisplay: RouteData[] = [];
 
-    limitedRoutes.forEach((routeId, index) => {
-      const route = routes.find(r => r.id === routeId);
-      if (!route) return;
+    if (selectedRoutes.length > 0) {
+      routesToDisplay = routes.filter(route => selectedRoutes.includes(route.id));
+      // If there's a focused route that's not in the selected list, include it too
+      if (focusedRoute !== null && !selectedRoutes.includes(focusedRoute)) {
+        const focusedRouteData = routes.find(r => r.id === focusedRoute);
+        if (focusedRouteData) routesToDisplay.push(focusedRouteData);
+      }
+      // Limit total number of displayed routes for performance
+      routesToDisplay = routesToDisplay.slice(0, 6);
+    } else if (focusedRoute !== null) {
+      const focusedRouteData = routes.find(r => r.id === focusedRoute);
+      if (focusedRouteData) routesToDisplay = [focusedRouteData];
+    }
+
+    routesToDisplay.forEach((route, index) => {
 
       if (route.outboundPoints && route.outboundPoints.length >= 2) {
         sources.push({
-          id: `route-${routeId}-outbound-${index}`,
+          id: `route-${route.id}-outbound-${index}`,
           type: "geojson" as const,
           data: {
             type: "Feature" as const,
-            properties: { routeId, direction: "outbound", color: outboundColor, routeIndex: index },
+            properties: { routeId: route.id, direction: "outbound", color: outboundColor, routeIndex: index },
             geometry: {
               type: "LineString" as const,
               coordinates: route.outboundPoints,
@@ -115,11 +147,11 @@ const MapViewComponent = ({ children }: { children?: React.ReactNode }) => {
 
       if (route.returnPoints && route.returnPoints.length >= 2) {
         sources.push({
-          id: `route-${routeId}-return-${index}`,
+          id: `route-${route.id}-return-${index}`,
           type: "geojson" as const,
           data: {
             type: "Feature" as const,
-            properties: { routeId, direction: "return", color: returnColor, routeIndex: index },
+            properties: { routeId: route.id, direction: "return", color: returnColor, routeIndex: index },
             geometry: {
               type: "LineString" as const,
               coordinates: route.returnPoints,
@@ -129,7 +161,7 @@ const MapViewComponent = ({ children }: { children?: React.ReactNode }) => {
       }
     });
     return sources;
-  }, [routes, selectedRoutes]);
+  }, [routes, selectedRoutes, focusedRoute]);
 
   const vehicleMarkers = useMemo(() => {
     if (!vehiclePositions) return [];
