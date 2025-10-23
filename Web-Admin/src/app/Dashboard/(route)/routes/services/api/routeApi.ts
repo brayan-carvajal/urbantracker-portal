@@ -46,22 +46,22 @@ export class RoutesApi {
     );
   }
 
+  static async createRouteWithImages(
+    routeData: CompleteRouteData
+  ): Promise<CrudResponse<RouteResponse>> {
+    const formData = this.createFormData(routeData);
+    return apiClient.postFormData<CrudResponse<RouteResponse>>(
+      API_ENDPOINTS.ROUTES,
+      formData
+    );
+  }
+
   static async deleteRoute(id: number): Promise<CrudResponse<void>> {
     return apiClient.delete<CrudResponse<void>>(
       `${API_ENDPOINTS.ROUTES}/${id}`
     );
   }
 
-  static async createRouteWithImages(
-    routeData: CompleteRouteData
-  ): Promise<CrudResponse<RouteResponse>> {
-    const formData = this.createFormData(routeData);
-
-    return apiClient.postFormData<CrudResponse<RouteResponse>>(
-      `${API_ENDPOINTS.ROUTES}/with-images`,
-      formData
-    );
-  }
 
   private static createFormData(routeData: CompleteRouteData): FormData {
     const formData = new FormData();
