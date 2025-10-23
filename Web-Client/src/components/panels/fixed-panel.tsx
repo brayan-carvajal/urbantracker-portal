@@ -9,35 +9,43 @@ import { GeneralInfoPanel } from "./general-info-panel"
 import { usePanelActive } from "components/panels/panel-active-context"
 import { usePanelCollapse } from "components/panels/panel-collapse-context"
 import { useRoute } from "components/map/route-context"
-import { useRouter } from "next/navigation"
+import { useRouter, useParams } from "next/navigation"
+
 
 export function FixedPanel() {
   const { activePanel } = usePanelActive();
   const { isPanelCollapsed, togglePanelCollapse } = usePanelCollapse();
   const { selectedRoutes } = useRoute();
   const router = useRouter();
-  const [detailSelected, setDetailSelected] = React.useState<number | null>(null);
+  const params = useParams();
+  // Derivar selección del parámetro de la URL
+  const detailSelected = params?.id ? parseInt(params.id as string, 10) : null;
 
-  const handleRouteSelection = (routeId: number | null) => {
-    setDetailSelected(routeId);
-    // Only navigate if we're not already in detail view
-    if (routeId !== null && !window.location.pathname.includes(`/map/routes/${routeId}`)) {
-      router.push(`/map/routes/${routeId}`);
-    } else if (routeId === null) {
-      router.push("/map/routes");
+  // Solo navega si el usuario lo pide (click en volver o selección directa)
+  const handleRouteSelection = (routeId: number | null, userAction = false) => {
+    // Solo navega si es acción del usuario
+    if (userAction) {
+      if (routeId !== null && !window.location.pathname.includes(`/map/routes/${routeId}`)) {
+        console.log('[FixedPanel] navigating to detail route:', routeId);
+        router.push(`/map/routes/${routeId}`);
+      } else if (routeId === null) {
+        console.log('[FixedPanel] navigating back to routes list');
+        router.push("/map/routes");
+      }
     }
   };
 
   const renderPanel = () => {
     switch (activePanel) {
       case "routes":
-        return <RoutesPanel showTitle selected={detailSelected} setSelected={handleRouteSelection} />
+        // Pasar userAction=true solo en click explícito de usuario
+        return <RoutesPanel showTitle selected={detailSelected} setSelected={(id) => handleRouteSelection(id, true)} />
       case "stop-info":
         return <StopInfoPanel />
       case "general-info":
         return <GeneralInfoPanel />
       default:
-        return <RoutesPanel showTitle selected={detailSelected} setSelected={handleRouteSelection} />
+        return <RoutesPanel showTitle selected={detailSelected} setSelected={(id) => handleRouteSelection(id, true)} />
     }
   }
 
@@ -77,3 +85,4 @@ export function FixedPanel() {
     </div>
   );
 }
+

@@ -18,7 +18,7 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
   const [routes, setRoutes] = useState<Route[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { selectedRoutes, setSelectedRoutes, focusedRoute, setFocusedRoute, addRoute, removeRoute } = useRoute();
+  const { selectedRoutes, setSelectedRoutes, focusedRoute, setFocusedRoute, addRoute, removeRoute, loadRoute, routes: contextRoutes } = useRoute();
 
   useEffect(() => {
     const fetchRoutes = async () => {
@@ -84,29 +84,30 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
               </div>
             </div>
           )}
-          {focusedRoute !== null && (
-            <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-3 mb-4">
-              <div className="flex items-center gap-2 text-green-300 text-sm font-medium">
-                <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-                Ruta enfocada para vista detallada
-              </div>
-            </div>
-          )}
           {routes.map((route) => {
             const isSelected = selectedRoutes.includes(route.id);
-            const isFocused = focusedRoute === route.id;
             return (
               // Tarjeta resumen de cada ruta
               <div
                 key={route.id}
                 className={`bg-zinc-800 text-zinc-100 p-4 rounded-xl w-full font-sans border flex flex-col shadow-sm transition-all duration-200 hover:shadow-xl hover:scale-[1.02] cursor-pointer ${
-                  isSelected ? 'border-blue-500 bg-zinc-700' : isFocused ? 'border-green-500 bg-zinc-700' : 'border-zinc-700'
+                  isSelected ? 'border-blue-500 bg-zinc-700'  : 'border-zinc-700'
                 }`}
-                onClick={(e) => {
+                onClick={async (e) => {
                   // Solo mostrar detalles si no se hizo clic en el checkbox
                   if (!(e.target as HTMLElement).closest('input[type="checkbox"]')) {
-                    setSelected(route.id);
-                    setFocusedRoute(route.id);
+                    try {
+                      // Usar la función del contexto que carga y cachea la geometría
+                      await loadRoute(route.id);
+                      console.log('[RoutesPanel] card clicked, setting focused and selected ->', route.id);
+                      setFocusedRoute(route.id);
+                      setSelected(route.id);
+                    } catch (err) {
+                      console.error('Error al cargar el detalle de la ruta via loadRoute:', err);
+                      console.log('[RoutesPanel] loadRoute failed but still setting focused/selected ->', route.id);
+                      setFocusedRoute(route.id);
+                      setSelected(route.id);
+                    }
                   }
                 }}
               >
@@ -124,28 +125,14 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
                         if (checked) {
                           if (selectedRoutes.length < maxRoutes) {
                             // Añadir visualmente la selección
+                            console.log('[RoutesPanel] checkbox checked, adding to selectedRoutes ->', route.id);
                             setSelectedRoutes(prev => [...prev, route.id]);
                             try {
-                              // Cargar geometría inmediatamente para que el mapa la muestre
-                              const resp = await fetch(`http://localhost:8080/api/v1/public/route/${route.id}/GEOMETRY`);
-                              if (!resp.ok) throw new Error('Error al cargar geometría de ruta');
-                              const data = await resp.json();
-                              const waypoints = data.data.waypoints || [];
-
-                              const outboundPoints = waypoints
-                                .filter((w: any) => w.destine === 'OUTBOUND')
-                                .sort((a: any, b: any) => a.sequence - b.sequence)
-                                .map((w: any) => [w.longitude, w.latitude] as [number, number]);
-
-                              const returnPoints = waypoints
-                                .filter((w: any) => w.destine === 'RETURN')
-                                .sort((a: any, b: any) => a.sequence - b.sequence)
-                                .map((w: any) => [w.longitude, w.latitude] as [number, number]);
-
-                              addRoute(route.id, outboundPoints, returnPoints);
+                              // Delegar la carga al contexto (caché dentro de loadRoute)
+                              await loadRoute(route.id);
                             } catch (err) {
                               console.error('No se pudo cargar geometría al seleccionar checkbox:', err);
-                              // Añadir la ruta sin puntos para mantener el id en el contexto; el detalle podrá actualizarla luego
+                              // loadRoute ya añade la ruta sin puntos en caso de error, pero mantener fallback
                               addRoute(route.id, null, null);
                             }
                           } else {
@@ -156,6 +143,7 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
                           }
                         } else {
                           // Remover de rutas seleccionadas y del contexto para que deje de mostrarse
+                          console.log('[RoutesPanel] checkbox unchecked, removing ->', route.id);
                           setSelectedRoutes(prev => prev.filter(id => id !== route.id));
                           removeRoute(route.id);
                         }
