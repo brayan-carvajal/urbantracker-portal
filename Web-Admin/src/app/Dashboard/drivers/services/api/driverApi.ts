@@ -7,7 +7,13 @@ const apiClient = new ApiClient('http://localhost:8080');
 
 export class DriversApi {
   static async getAllDrivers(): Promise<CrudResponse<DriverApiResponse[]>> {
-    return apiClient.get<CrudResponse<DriverApiResponse[]>>(API_ENDPOINTS.DRIVERS);
+    try {
+      const response = await apiClient.get<CrudResponse<DriverApiResponse[]>>(API_ENDPOINTS.DRIVERS);
+      return response;
+    } catch (error: any) {
+      console.error('Error fetching drivers:', error);
+      throw new Error(error.message || 'Error al obtener los conductores');
+    }
   }
 
   static async getDriverById(id: number): Promise<CrudResponse<DriverApiResponse>> {
@@ -23,6 +29,15 @@ export class DriversApi {
   }
 
   static async deleteDriver(id: number): Promise<CrudResponse<void>> {
-    return apiClient.delete<CrudResponse<void>>(`${API_ENDPOINTS.DRIVERS}/${id}`);
+    try {
+      const response = await apiClient.delete<CrudResponse<void>>(`${API_ENDPOINTS.DRIVERS}/${id}`);
+      if (!response.success) {
+        throw new Error(response.message || 'Error al eliminar el conductor');
+      }
+      return response;
+    } catch (error: any) {
+      console.error('API Error:', error);
+      throw new Error(error.message || 'Error al comunicarse con el servidor');
+    }
   }
 }

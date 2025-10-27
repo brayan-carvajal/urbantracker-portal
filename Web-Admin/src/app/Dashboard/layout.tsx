@@ -18,6 +18,7 @@ import type React from "react";
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { DashboardHeader } from "./components/DashboardHeader";
+import { DriverProvider } from "./drivers/context/DriverContext";
 import "../globals.css";
 
 // Create a client
@@ -48,8 +49,19 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   {
     title: "Administrar Conductores",
-    href: "/Dashboard/drivers",
     icon: Users,
+    subItems: [
+      {
+        title: "Conductores",
+        href: "/Dashboard/drivers",
+        icon: Users,
+      },
+      {
+        title: "Horarios de Conductores",
+        href: "/Dashboard/driver-schedule",
+        icon: Clock,
+      },
+    ],
   },
   {
     title: "Administrar Empresas",
@@ -274,7 +286,9 @@ export default function DashboardLayout({
 
           {/* Page content */}
           <main className="p-8 bg-zinc-900">
-            {children}
+            <DriverProvider>
+              {children}
+            </DriverProvider>
           </main>
         </div>
       </div>

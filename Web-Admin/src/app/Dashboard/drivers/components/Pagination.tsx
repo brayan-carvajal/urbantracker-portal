@@ -29,7 +29,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   onItemsPerPageChange,
   isLoading = false,
   showItemsPerPageSelect = true,
-  itemsPerPageOptions = [5, 10, 20, 50],
+  itemsPerPageOptions = [5, 10, 20, 50]
 }) => {
   const { 
     currentPage, 

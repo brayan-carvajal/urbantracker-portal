@@ -17,13 +17,16 @@ export class ApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const url = `${this.baseURL}${endpoint}`;
+    const url = `${this.baseURL}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
+    
+    // Obtener el token actual
+    const currentToken = localStorage.getItem("token");
 
     const config: RequestInit = {
       headers: {
         "Content-Type": "application/json",
         ...options.headers,
-        Authorization: token ? `Bearer ${token}` : "",
+        ...(currentToken ? { Authorization: `Bearer ${currentToken}` } : {}),
       },
       ...options,
     };

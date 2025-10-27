@@ -10,7 +10,7 @@ import { RouteScheduleFilters } from './components/RouteScheduleFilters';
 import { StatisticsCards } from './components/StatisticsCards';
 import { DeleteConfirmationModal } from './components/DeleteConfirmationModal';
 import RouteScheduleFormManager from './components/RouteScheduleFormManager';
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import Pagination from '../routes/components/Pagination';
 import { RouteScheduleResponse, RouteScheduleRequest, BulkRouteScheduleRequest } from './types/routeScheduleTypes';
 import { RouteResponse } from '../routes/types/routeTypes';
@@ -183,6 +183,9 @@ export default function RouteSchedulePage() {
       {/* Form Modal */}
       <Sheet open={isFormModalOpen} onOpenChange={handleCloseFormModal}>
         <SheetContent side="right" className="bg-zinc-900 text-white w-full sm:max-w-2xl p-4">
+          <SheetTitle className="text-lg font-semibold mb-4">
+            {editingSchedules.length > 0 ? 'Editar Horario' : 'Crear Horario'}
+          </SheetTitle>
           <RouteScheduleFormManager
             onSave={handleSaveSchedule}
             editingSchedules={editingSchedules}
