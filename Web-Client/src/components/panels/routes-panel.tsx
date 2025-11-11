@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Bus } from "lucide-react";
 import { RoutesDetail, Route } from "./routes-detail";
+import { useRoute } from "../map/route-context";
 
-// Interface para la respuesta del backend
 interface RouteResDto {
   id: number;
   numberRoute: string;
@@ -18,6 +18,7 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
   const [routes, setRoutes] = useState<Route[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { selectedRoutes, setSelectedRoutes, focusedRoute, setFocusedRoute, addRoute, removeRoute, loadRoute, routes: contextRoutes } = useRoute();
 
   useEffect(() => {
     const fetchRoutes = async () => {
@@ -25,12 +26,12 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
         const response = await fetch('http://localhost:8080/api/v1/public/route');
         if (!response.ok) throw new Error('Error al cargar rutas');
         const data = await response.json();
-        // Asumir que data.data es el array de RouteResDto
+        
         const mappedRoutes: Route[] = data.data.map((r: RouteResDto) => ({
           id: r.id,
           name: r.numberRoute,
           description: r.description,
-          start: '', // Se cargará en detalle
+          start: '', 
           end: '',
           imageStart: r.outboundImageUrl,
           imageEnd: r.returnImageUrl,
@@ -67,48 +68,116 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
             </button>
           )}
           <h2 className="text-lg font-semibold text-zinc-100">
-            {selected === null ? "Rutas recomendadas" : "Ruta seleccionada"}
+            {selected === null ? "Rutas recomendadas" : `Ruta ${routes.find(r => r.id === selected)?.name || selected}`}
           </h2>
         </div>
       )}
 
-      {/* Si no hay ruta seleccionada, mostrar la lista de rutas */}
+      {/* Si no hay ruta seleccionada para detalle, mostrar la lista de rutas */}
       {selected === null ? (
         <div className="space-y-3">
-          {routes.map((route) => (
-            // Tarjeta resumen de cada ruta
-            <div
-              key={route.id}
-              className="bg-zinc-800 text-zinc-100 p-4 rounded-xl w-full font-sans border border-zinc-700 flex flex-col shadow-sm transition-all duration-200 hover:shadow-xl hover:scale-[1.02] cursor-pointer"
-              onClick={() => setSelected(route.id)}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex flex-col">
-                  <h4 className="text-base font-semibold leading-tight text-zinc-100">{route.name}</h4>
-                  <p className="text-xs text-zinc-400 leading-tight">{route.description}</p>
-                </div>
-                <div className="flex items-center justify-center -ml-2">
-                  {/* Imagen del bus */}
-                  <img src="/bus-img.png" alt="Bus" className="w-30 h-10 object-contain" />
-                </div>
-              </div>
-              <div className="border-t border-zinc-700 my-2" />
-              <div className="flex flex-col gap-1">
-                {/* Línea de información de inicio */}
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-green-500 rounded-full border border-zinc-700" />
-                  <span className="text-xs text-zinc-400 font-medium">Comienza:</span>
-                  <span className="text-xs text-zinc-100">{route.start || 'Cargando...'}</span>
-                </div>
-                {/* Línea de información de fin */}
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-red-500 rounded-full border border-zinc-700" />
-                  <span className="text-xs text-zinc-400 font-medium">Termina:</span>
-                  <span className="text-xs text-zinc-100">{route.end || 'Cargando...'}</span>
-                </div>
+          {selectedRoutes.length > 0 && (
+            <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3 mb-4">
+              <div className="flex items-center gap-2 text-blue-300 text-sm font-medium">
+                <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
+                {selectedRoutes.length} ruta{selectedRoutes.length !== 1 ? 's' : ''} seleccionada{selectedRoutes.length !== 1 ? 's' : ''} para comparación
               </div>
             </div>
-          ))}
+          )}
+          {routes.map((route) => {
+            const isSelected = selectedRoutes.includes(route.id);
+            return (
+              // Tarjeta resumen de cada ruta
+              <div
+                key={route.id}
+                className={`bg-zinc-800 text-zinc-100 p-4 rounded-xl w-full font-sans border flex flex-col shadow-sm transition-all duration-200 hover:shadow-xl hover:scale-[1.02] cursor-pointer ${
+                  isSelected ? 'border-blue-500 bg-zinc-700'  : 'border-zinc-700'
+                }`}
+                onClick={async (e) => {
+                  // Solo mostrar detalles si no se hizo clic en el checkbox
+                  if (!(e.target as HTMLElement).closest('input[type="checkbox"]')) {
+                    try {
+                      // Usar la función del contexto que carga y cachea la geometría
+                      await loadRoute(route.id);
+                      console.log('[RoutesPanel] card clicked, setting focused and selected ->', route.id);
+                      setFocusedRoute(route.id);
+                      setSelected(route.id);
+                    } catch (err) {
+                      console.error('Error al cargar el detalle de la ruta via loadRoute:', err);
+                      console.log('[RoutesPanel] loadRoute failed but still setting focused/selected ->', route.id);
+                      setFocusedRoute(route.id);
+                      setSelected(route.id);
+                    }
+                  }
+                }}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onClick={(e) => e.stopPropagation()} // Evitar que el clic en el checkbox propague al div padre
+                      onChange={async (e) => {
+                        const input = e.target as HTMLInputElement;
+                        const checked = input.checked;
+                        const maxRoutes = 6; // Límite de rutas seleccionables
+
+                        if (checked) {
+                          if (selectedRoutes.length < maxRoutes) {
+                            // Añadir visualmente la selección
+                            console.log('[RoutesPanel] checkbox checked, adding to selectedRoutes ->', route.id);
+                            setSelectedRoutes(prev => [...prev, route.id]);
+                            try {
+                              // Delegar la carga al contexto (caché dentro de loadRoute)
+                              await loadRoute(route.id);
+                            } catch (err) {
+                              console.error('No se pudo cargar geometría al seleccionar checkbox:', err);
+                              // loadRoute ya añade la ruta sin puntos en caso de error, pero mantener fallback
+                              addRoute(route.id, null, null);
+                            }
+                          } else {
+                            alert('Solo puedes seleccionar hasta ' + maxRoutes + ' rutas para comparar');
+                            // Revertir visualmente el cambio
+                            input.checked = false;
+                            return;
+                          }
+                        } else {
+                          // Remover de rutas seleccionadas y del contexto para que deje de mostrarse
+                          console.log('[RoutesPanel] checkbox unchecked, removing ->', route.id);
+                          setSelectedRoutes(prev => prev.filter(id => id !== route.id));
+                          removeRoute(route.id);
+                        }
+                      }}
+                      className="w-4 h-4 text-blue-600 bg-zinc-700 border-zinc-600 rounded focus:ring-blue-500 focus:ring-2"
+                    />
+                    <h4 className="text-base font-semibold leading-tight text-zinc-100">{route.name}</h4>
+                  </div>
+                  <div className="flex items-center justify-center -ml-2">
+                    {/* Imagen del bus */}
+                    <img src="/bus-img.png" alt="Bus" className="w-30 h-10 object-contain" />
+                  </div>
+                </div>
+                <div className="flex flex-col">
+                  <p className="text-xs text-zinc-400 leading-tight">{route.description}</p>
+                </div>
+                <div className="border-t border-zinc-700 my-2" />
+               <div className="flex flex-col gap-1">
+                 {/* Línea de información de inicio */}
+                 <div className="flex items-center gap-2">
+                   <div className="w-3 h-3 bg-green-500 rounded-full border border-zinc-700" />
+                   <span className="text-xs text-zinc-400 font-medium">Ida:</span>
+                   <span className="text-xs text-zinc-100">{route.start || 'Cargando...'}</span>
+                 </div>
+                 {/* Línea de información de fin */}
+                 <div className="flex items-center gap-2">
+                   <div className="w-3 h-3 bg-red-500 rounded-full border border-zinc-700" />
+                   <span className="text-xs text-zinc-400 font-medium">Vuelta:</span>
+                   <span className="text-xs text-zinc-100">{route.end || 'Cargando...'}</span>
+                 </div>
+               </div>
+             </div>
+           );
+         })}
         </div>
       ) : (
         // Si hay una ruta seleccionada, mostrar el detalle usando el componente importado

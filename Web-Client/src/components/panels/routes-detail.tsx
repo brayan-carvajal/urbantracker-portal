@@ -3,7 +3,7 @@ import { Bus } from "lucide-react";
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { useVehiclePositions } from '../map/vehicle-context';
-import { useRoutePoints } from '../map/route-context';
+import { useRoutePoints, useRoute } from '../map/route-context';
 
 // Interface que define la estructura de una ruta de transporte público
 export interface Route {
@@ -38,25 +38,55 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
   const [telemetry, setTelemetry] = useState<string | null>(null);
   const [parseError, setParseError] = useState<string | null>(null);
   const { setVehiclePositions } = useVehiclePositions();
-  const { setOutboundPoints, setReturnPoints } = useRoutePoints();
+    const { addRoute, routes: contextRoutes, setFocusedRoute } = useRoute();
 
   useEffect(() => {
-    if (route.start) {
-      setFullRoute(route);
+    // Establecer ruta básica
+    setFullRoute(route);
+
+    // Comprobar si ya tenemos los datos de la ruta en el contexto
+    const existingRoute = contextRoutes.find(r => r.id === route.id);
+    if (existingRoute?.outboundPoints && existingRoute?.returnPoints) {
+      // Construir start/end desde los puntos cached
+      const firstOut = existingRoute.outboundPoints[0];
+      const lastOut = existingRoute.outboundPoints[existingRoute.outboundPoints.length - 1];
+      if (firstOut && lastOut) {
+        setFullRoute({
+          ...route,
+          start: `${firstOut[1]}, ${firstOut[0]}`,
+          end: `${lastOut[1]}, ${lastOut[0]}`,
+          startDetail: `Inicio: ${firstOut[1]}, ${firstOut[0]}`,
+          endDetail: `Fin: ${lastOut[1]}, ${lastOut[0]}`,
+          imageStart: route.imageStart ? `/${route.imageStart}` : '/ruta1.png',
+          imageEnd: route.imageEnd ? `/${route.imageEnd}` : '/ruta2.png',
+        });
+      }
       return;
     }
+
     const fetchDetail = async () => {
       setLoading(true);
       try {
         const response = await fetch(`http://localhost:8080/api/v1/public/route/${route.id}/GEOMETRY`);
         if (!response.ok) throw new Error('Error al cargar detalle de ruta');
-        const data = await response.json();
+        let data: any;
+        try {
+          data = await response.json();
+        } catch (jsonErr) {
+          const raw = await response.text().catch(() => '<unreadable>');
+          throw jsonErr;
+        }
         // Asumir data.data es RouteDetailsResDto
-        const detail = data.data;
+        const detail = data.data || {};
         // Mapear waypoints a start/end
-        const waypoints = detail.waypoints;
-        const first = waypoints.find((w: any) => w.sequence === 1);
-        const last = waypoints.reduce((prev: any, curr: any) => curr.sequence > prev.sequence ? curr : prev);
+        const waypoints = detail.waypoints || [];
+        if (!Array.isArray(waypoints) || waypoints.length === 0) {
+          setError('No hay puntos de ruta disponibles');
+          setLoading(false);
+          return;
+        }
+        const first = waypoints.find((w: any) => w.sequence === 1) || waypoints[0];
+        const last = waypoints.reduce((prev: any, curr: any) => (prev && curr && curr.sequence > prev.sequence) ? curr : prev, waypoints[0] || first);
 
         // Separar puntos outbound y return
         const outboundPoints = waypoints
@@ -70,24 +100,27 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
           .map((w: any) => [w.longitude, w.latitude] as [number, number]);
 
         // Setear puntos de ruta en el contexto
-        setOutboundPoints(outboundPoints);
-        setReturnPoints(returnPoints);
+        addRoute(route.id, outboundPoints, returnPoints);
 
-        setFullRoute({
-          ...route,
-          start: `${first.latitude}, ${first.longitude}`,
-          end: `${last.latitude}, ${last.longitude}`,
-          startDetail: `Inicio: ${first.latitude}, ${first.longitude}`,
-          endDetail: `Fin: ${last.latitude}, ${last.longitude}`,
-        });
+        if (first && last) {
+          setFullRoute({
+            ...route,
+            start: `${first.latitude}, ${first.longitude}`,
+            end: `${last.latitude}, ${last.longitude}`,
+            startDetail: `Inicio: ${first.latitude}, ${first.longitude}`,
+            endDetail: `Fin: ${last.latitude}, ${last.longitude}`,
+            imageStart: route.imageStart ? `/${route.imageStart}` : '/ruta1.png', // Default fallback
+            imageEnd: route.imageEnd ? `/${route.imageEnd}` : '/ruta2.png', // Default fallback
+          });
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Error desconocido');
-      } finally {0 
+      } finally {
         setLoading(false);
       }
     };
     fetchDetail();
-  }, [route]);
+  }, [route.id, addRoute, contextRoutes]);
 
   useEffect(() => {
     if (!fullRoute) {
@@ -126,21 +159,27 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
       client.deactivate();
       // Limpiar posiciones al desmontar
       setVehiclePositions(new Map());
-      // No limpiar rutas para mantenerlas visibles
+      
     };
   }, [fullRoute, setVehiclePositions]);
 
-  // Limpiar puntos de ruta al desmontar el componente (cuando se deselecciona la ruta)
+  // Mantener el foco en esta ruta mientras el componente esta montado
   useEffect(() => {
+    setFocusedRoute(route.id);
     return () => {
-      setOutboundPoints(null);
-      setReturnPoints(null);
+      setFocusedRoute(null);
     };
-  }, [setOutboundPoints, setReturnPoints]);
+  }, [route.id, setFocusedRoute]);
 
   if (loading) return <div className="text-zinc-100">Cargando detalle...</div>;
-  if (error) return <div className="text-red-500">Error: {error}</div>;
-  if (!fullRoute) return null;
+  if (error) return (
+    <div className="text-red-500">
+      Error: {error}
+      <br />
+      <button className="mt-2 px-2 py-1 bg-zinc-700 text-zinc-100 rounded" onClick={() => window.location.reload()}>Reintentar</button>
+    </div>
+  );
+  if (!fullRoute) return <div className="text-zinc-100">Esperando datos de la ruta...</div>;
 
   return (
     <div className="space-y-4 overflow-y-auto hide-scrollbar p-1">
@@ -162,7 +201,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
             <img src={fullRoute.imageStart} alt="Ruta inicio" className="w-24 h-24 object-contain mb-1 rounded" />
             <div className="flex items-center gap-1 mt-2">
               <span className="bg-green-500 w-3 h-3 rounded-full" />
-              <span className="text-xs text-zinc-400 font-semibold">Inicia</span>
+              <span className="text-xs text-zinc-400 font-semibold">Ida</span>
             </div>
             <span className="text-xs text-zinc-100 text-center">{fullRoute.start}</span>
           </div>
@@ -171,7 +210,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
             <img src={fullRoute.imageEnd} alt="Ruta termina" className="w-24 h-24 object-contain mb-1 rounded" />
             <div className="flex items-center gap-1 mt-2">
               <span className="bg-red-500 w-3 h-3 rounded-full" />
-              <span className="text-xs text-zinc-400 font-semibold">Termina</span>
+              <span className="text-xs text-zinc-400 font-semibold">Vuelta</span>
             </div>
             <span className="text-xs text-zinc-100 text-center">{fullRoute.end}</span>
           </div>
@@ -186,7 +225,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
           <div className="flex gap-2 mb-1 items-start">
             <span className="bg-green-500 w-3 h-3 rounded-full flex-shrink-0 mt-1" />
             <div className="flex flex-col min-w-0 max-w-full">
-              <span className="text-xs text-zinc-400 font-medium flex-shrink-0">Inicia:</span>
+              <span className="text-xs text-zinc-400 font-medium flex-shrink-0">Ida:</span>
               <span className="text-xs text-zinc-100 break-words whitespace-pre-line overflow-hidden max-w-full" style={{ display: 'block', whiteSpace: 'pre-line', wordBreak: 'break-word' }}>{fullRoute.startDetail}</span>
             </div>
           </div>
@@ -194,7 +233,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
           <div className="flex gap-2 items-start">
             <span className="bg-red-500 w-3 h-3 rounded-full flex-shrink-0 mt-1" />
             <div className="flex flex-col min-w-0 max-w-full">
-              <span className="text-xs text-zinc-400 font-medium flex-shrink-0">Termina:</span>
+              <span className="text-xs text-zinc-400 font-medium flex-shrink-0">Vuelta:</span>
               <span className="text-xs text-zinc-100 break-words whitespace-pre-line overflow-hidden max-w-full" style={{ display: 'block', whiteSpace: 'pre-line', wordBreak: 'break-word' }}>{fullRoute.endDetail}</span>
             </div>
           </div>

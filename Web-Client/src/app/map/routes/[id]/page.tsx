@@ -7,8 +7,7 @@ import { useRoute, useRoutePoints } from "components/map/route-context";
 
 export default function RouteDetailPage() {
   const params = useParams();
-  const { setSelectedRoute } = useRoute();
-  const { setOutboundPoints, setReturnPoints } = useRoutePoints();
+  const { setSelectedRoutes, setFocusedRoute, addRoute } = useRoute();
 
   useEffect(() => {
     const routeId = params.id as string;
@@ -16,12 +15,14 @@ export default function RouteDetailPage() {
       // Convertir el ID de string a number y seleccionar la ruta
       const id = parseInt(routeId, 10);
       if (!isNaN(id)) {
-        setSelectedRoute(id);
+        // No sobrescribimos selectedRoutes aquí para no perder selecciones previas.
+        setFocusedRoute(id);
+
         // Cargar los puntos de ruta desde la API
         loadRouteGeometry(id);
       }
     }
-  }, [params.id, setSelectedRoute]);
+  }, [params.id, setSelectedRoutes, setFocusedRoute]);
 
   const loadRouteGeometry = async (routeId: number) => {
     try {
@@ -43,8 +44,7 @@ export default function RouteDetailPage() {
         .map((w: any) => [w.longitude, w.latitude] as [number, number]);
 
       // Setear puntos de ruta en el contexto
-      setOutboundPoints(outboundPoints);
-      setReturnPoints(returnPoints);
+      addRoute(routeId, outboundPoints, returnPoints);
     } catch (error) {
       console.error('Error loading route geometry:', error);
     }
