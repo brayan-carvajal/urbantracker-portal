@@ -48,7 +48,7 @@ pipeline {
             steps {
                 sh '''
                     echo "🔍 Verificando herramientas..."
-                    docker --version || echo "Docker no disponible en este entorno"
+                    sudo docker --version || echo "Docker no disponible en este entorno"
                     echo "✅ Node.js se usará dentro de contenedores Docker"
                 '''
             }
@@ -60,7 +60,7 @@ pipeline {
                     script {
                         echo "📦 Compilando Web-Admin con Node.js en contenedor Docker..."
                         sh '''
-                            docker run --rm -v "$WORKSPACE/Frontend/Web-Admin":/app -w /app node:18-alpine sh -c "
+                            sudo docker run --rm -v "$WORKSPACE/Frontend/Web-Admin":/app -w /app node:18-alpine sh -c "
                                 npm install || npm ci
                                 npm run lint || echo 'Linting falló pero continuando...'
                                 npm run build
@@ -77,7 +77,7 @@ pipeline {
                     script {
                         echo "📦 Compilando Web-Client con Node.js en contenedor Docker..."
                         sh '''
-                            docker run --rm -v "$WORKSPACE/Frontend/Web-Client":/app -w /app node:18-alpine sh -c "
+                            sudo docker run --rm -v "$WORKSPACE/Frontend/Web-Client":/app -w /app node:18-alpine sh -c "
                                 npm install || npm ci
                                 npm run lint || echo 'Linting falló pero continuando...'
                                 npm run build
@@ -94,15 +94,15 @@ pipeline {
                     echo "🐳 Construyendo imagen Docker del frontend-admin..."
                     def commit = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
                     env.IMAGE_TAG_ADMIN = "${IMAGE_BASE_ADMIN}:${env.ENVIRONMENT}-${commit}"
-                    
+
                     // Usar Dockerfile desde la carpeta correcta
                     def dockerfilePath = "Frontend/Web-Admin/Dockerfile"
                     if (fileExists("${env.ENV_DIR}/Dockerfile.app")) {
                         dockerfilePath = "${env.ENV_DIR}/Dockerfile.app"
                     }
-                    
+
                     sh """
-                        docker build -t ${env.IMAGE_TAG_ADMIN} -f ${dockerfilePath} Frontend/Web-Admin/
+                        sudo docker build -t ${env.IMAGE_TAG_ADMIN} -f ${dockerfilePath} Frontend/Web-Admin/
                     """
                     echo "✅ Imagen creada: ${env.IMAGE_TAG_ADMIN}"
                 }
@@ -115,15 +115,15 @@ pipeline {
                     echo "🐳 Construyendo imagen Docker del frontend-client..."
                     def commit = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
                     env.IMAGE_TAG_CLIENT = "${IMAGE_BASE_CLIENT}:${env.ENVIRONMENT}-${commit}"
-                    
+
                     // Usar Dockerfile desde la carpeta correcta
                     def dockerfilePath = "Frontend/Web-Client/Dockerfile"
                     if (fileExists("${env.ENV_DIR}/Dockerfile.client")) {
                         dockerfilePath = "${env.ENV_DIR}/Dockerfile.client"
                     }
-                    
+
                     sh """
-                        docker build -t ${env.IMAGE_TAG_CLIENT} -f ${dockerfilePath} Frontend/Web-Client/
+                        sudo docker build -t ${env.IMAGE_TAG_CLIENT} -f ${dockerfilePath} Frontend/Web-Client/
                     """
                     echo "✅ Imagen creada: ${env.IMAGE_TAG_CLIENT}"
                 }
@@ -135,7 +135,7 @@ pipeline {
                 script {
                     def netName = "${NETWORK_PREFIX}-${env.ENVIRONMENT}"
                     echo "🌐 Creando red ${netName} ..."
-                    sh "docker network create ${netName} || echo '✅ Red ya existe'"
+                    sh "sudo docker network create ${netName} || echo '✅ Red ya existe'"
                 }
             }
         }
@@ -150,10 +150,10 @@ pipeline {
                         def networkName = "${NETWORK_PREFIX}-${env.ENVIRONMENT}"
                         def containerName = "urbantracker-frontend-admin-${env.ENVIRONMENT}"
                         sh """
-                            docker stop ${containerName} || true
-                            docker rm ${containerName} || true
+                            sudo docker stop ${containerName} || true
+                            sudo docker rm ${containerName} || true
                             sleep 3
-                            docker run -d \\
+                            sudo docker run -d \\
                                 --name ${containerName} \\
                                 --network ${networkName} \\
                                 -p 3000:3000 \\
@@ -176,10 +176,10 @@ pipeline {
                         def networkName = "${NETWORK_PREFIX}-${env.ENVIRONMENT}"
                         def containerName = "urbantracker-frontend-client-${env.ENVIRONMENT}"
                         sh """
-                            docker stop ${containerName} || true
-                            docker rm ${containerName} || true
+                            sudo docker stop ${containerName} || true
+                            sudo docker rm ${containerName} || true
                             sleep 3
-                            docker run -d \\
+                            sudo docker run -d \\
                                 --name ${containerName} \\
                                 --network ${networkName} \\
                                 -p 3001:3000 \\
@@ -200,11 +200,11 @@ pipeline {
                         sleep 20
                         echo "⏱️ Esperando 20 segundos para inicialización..."
                         echo "📊 Estado de contenedores:"
-                        docker ps -a --filter "name=urbantracker-frontend" || echo "Docker no disponible"
+                        sudo docker ps -a --filter "name=urbantracker-frontend" || echo "Docker no disponible"
                         echo "📋 Logs del frontend-admin (últimas 20 líneas):"
-                        docker logs urbantracker-frontend-admin-develop --tail 20 2>/dev/null || echo "Contenedor admin no encontrado"
+                        sudo docker logs urbantracker-frontend-admin-develop --tail 20 2>/dev/null || echo "Contenedor admin no encontrado"
                         echo "📋 Logs del frontend-client (últimas 20 líneas):"
-                        docker logs urbantracker-frontend-client-develop --tail 20 2>/dev/null || echo "Contenedor client no encontrado"
+                        sudo docker logs urbantracker-frontend-client-develop --tail 20 2>/dev/null || echo "Contenedor client no encontrado"
                         echo "🔍 Intentando health check admin..."
                         curl -sS --connect-timeout 5 --max-time 10 http://localhost:3000 && {
                             echo "✅ Frontend-admin respondiendo correctamente"
@@ -233,8 +233,8 @@ pipeline {
         failure {
             echo "💥 Error durante deploy"
             sh '''
-                docker logs urbantracker-frontend-admin-develop --tail 20 2>/dev/null || echo "No se pueden obtener logs del admin"
-                docker logs urbantracker-frontend-client-develop --tail 20 2>/dev/null || echo "No se pueden obtener logs del client"
+                sudo docker logs urbantracker-frontend-admin-develop --tail 20 2>/dev/null || echo "No se pueden obtener logs del admin"
+                sudo docker logs urbantracker-frontend-client-develop --tail 20 2>/dev/null || echo "No se pueden obtener logs del client"
             '''
         }
         always {
@@ -242,11 +242,11 @@ pipeline {
                 if (env.ENVIRONMENT == 'develop') {
                     echo "🧹 Limpiando contenedores..."
                     sh '''
-                        docker stop urbantracker-frontend-admin-${ENVIRONMENT} 2>/dev/null || true
-                        docker rm urbantracker-frontend-admin-${ENVIRONMENT} 2>/dev/null || true
-                        docker stop urbantracker-frontend-client-${ENVIRONMENT} 2>/dev/null || true
-                        docker rm urbantracker-frontend-client-${ENVIRONMENT} 2>/dev/null || true
-                        docker network rm ${NETWORK_PREFIX}-${ENVIRONMENT} 2>/dev/null || true
+                        sudo docker stop urbantracker-frontend-admin-${ENVIRONMENT} 2>/dev/null || true
+                        sudo docker rm urbantracker-frontend-admin-${ENVIRONMENT} 2>/dev/null || true
+                        sudo docker stop urbantracker-frontend-client-${ENVIRONMENT} 2>/dev/null || true
+                        sudo docker rm urbantracker-frontend-client-${ENVIRONMENT} 2>/dev/null || true
+                        sudo docker network rm ${NETWORK_PREFIX}-${ENVIRONMENT} 2>/dev/null || true
                     '''
                 }
             }
