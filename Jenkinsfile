@@ -49,7 +49,7 @@ pipeline {
                 sh '''
                     echo "🔍 Verificando herramientas..."
                     docker --version || echo "Docker no disponible en este entorno"
-                    echo "✅ Node.js y npm se verificarán dentro de contenedores Docker"
+                    echo "✅ Node.js se usará dentro de contenedores Docker"
                 '''
             }
         }
@@ -58,11 +58,13 @@ pipeline {
             steps {
                 dir('Frontend/Web-Admin') {
                     script {
-                        echo "📦 Compilando Web-Admin con Node.js..."
+                        echo "📦 Compilando Web-Admin con Node.js en contenedor Docker..."
                         sh '''
-                            npm install || npm ci
-                            npm run lint || echo "Linting falló pero continuando..."
-                            npm run build
+                            docker run --rm -v "$WORKSPACE/Frontend/Web-Admin":/app -w /app node:18-alpine sh -c "
+                                npm install || npm ci
+                                npm run lint || echo 'Linting falló pero continuando...'
+                                npm run build
+                            "
                         '''
                     }
                 }
@@ -73,11 +75,13 @@ pipeline {
             steps {
                 dir('Frontend/Web-Client') {
                     script {
-                        echo "📦 Compilando Web-Client con Node.js..."
+                        echo "📦 Compilando Web-Client con Node.js en contenedor Docker..."
                         sh '''
-                            npm install || npm ci
-                            npm run lint || echo "Linting falló pero continuando..."
-                            npm run build
+                            docker run --rm -v "$WORKSPACE/Frontend/Web-Client":/app -w /app node:18-alpine sh -c "
+                                npm install || npm ci
+                                npm run lint || echo 'Linting falló pero continuando...'
+                                npm run build
+                            "
                         '''
                     }
                 }
