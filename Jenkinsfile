@@ -147,7 +147,9 @@ pipeline {
   post {
     success {
       echo "🎉 Deploy completado para ${env.ENVIRONMENT}"
-      echo "Tags:"; if (env.IMAGE_TAG_WEB_ADMIN) echo " - Admin: ${env.IMAGE_TAG_WEB_ADMIN}"; if (env.IMAGE_TAG_WEB_CLIENT) echo " - Client: ${env.IMAGE_TAG_WEB_CLIENT}";
+      echo "Tags:"
+      if (env.IMAGE_TAG_WEB_ADMIN) echo " - Admin: ${env.IMAGE_TAG_WEB_ADMIN}"
+      if (env.IMAGE_TAG_WEB_CLIENT) echo " - Client: ${env.IMAGE_TAG_WEB_CLIENT}"
       echo "📊 Servicios disponibles:"
       echo " - Web-Admin: http://localhost:3001"
       echo " - Web-Client: http://localhost:3002"
