@@ -1,0 +1,42 @@
+version: "3.9"
+
+name: urbantracker-portal-develop
+
+services:
+  web-admin:
+    build:
+      context: ../../Web-Admin
+      dockerfile: Dockerfile
+    container_name: urbantracker-web-admin-develop
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
+      - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL}
+      - NEXT_TELEMETRY_DISABLED=${NEXT_TELEMETRY_DISABLED}
+    ports:
+      - "${PORT_WEB_ADMIN:-3001}:3000"
+    networks:
+      - portal_net
+
+  web-client:
+    build:
+      context: ../../Web-Client
+      dockerfile: Dockerfile
+    container_name: urbantracker-web-client-develop
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
+      - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL}
+      - NEXT_TELEMETRY_DISABLED=${NEXT_TELEMETRY_DISABLED}
+    ports:
+      - "${PORT_WEB_CLIENT:-3002}:3000"
+    networks:
+      - portal_net
+
+networks:
+  portal_net:
+    driver: bridge
