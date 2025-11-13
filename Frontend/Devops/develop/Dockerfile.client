@@ -1,16 +1,16 @@
-# Dockerfile para Web-Admin
+# Dockerfile para Web-Client
 FROM node:18-alpine AS builder
 
 WORKDIR /app
 
 # Copiar archivos de dependencias
-COPY Frontend/Web-Admin/package*.json ./
+COPY Frontend/Web-Client/package*.json ./
 
 # Instalar dependencias
 RUN npm ci
 
 # Copiar código fuente
-COPY Frontend/Web-Admin/ ./
+COPY Frontend/Web-Client/ ./
 
 # Build de la aplicación
 RUN npm run build
@@ -26,7 +26,7 @@ COPY --from=builder /app/package*.json ./
 # Copiar build
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/next.config.ts ./
+COPY --from=builder /app/next.config.mjs ./
 
 # Instalar solo dependencias de producción
 RUN npm ci --only=production
