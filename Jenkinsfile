@@ -2,48 +2,68 @@ pipeline {
     agent any
 
     environment {
+        DOCKER_CLI_HINTS = "off"
         IMAGE_BASE_ADMIN = 'frontend-admin'
         IMAGE_BASE_CLIENT = 'frontend-client'
         NETWORK_PREFIX = 'urbantracker-net'
     }
 
     stages {
-        stage('Permisos workspace') {
+
+        // =====================================================
+        // 1️⃣ Leer entorno desde .env raíz
+        // =====================================================
+        stage('Leer entorno desde .env raíz') {
             steps {
                 sh '''
-                    chmod -R 777 $WORKSPACE || true
-                '''
-            }
-        }
+                    echo "📂 Leyendo entorno desde .env raíz..."
 
-        stage('Leer entorno desde .env') {
-            steps {
+                    ENVIRONMENT=$(grep '^ENVIRONMENT=' .env | cut -d '=' -f2 | tr -d '\\r\\n')
+
+                    if [ -z "$ENVIRONMENT" ]; then
+                        echo "❌ No se encontró ENVIRONMENT en .env"
+                        exit 1
+                    fi
+
+                    echo "✅ Entorno detectado: $ENVIRONMENT"
+                    echo "ENVIRONMENT=$ENVIRONMENT" > env.properties
+                    echo "ENV_DIR=Frontend/Devops/$ENVIRONMENT" >> env.properties
+                    echo "COMPOSE_FILE=Frontend/Devops/$ENVIRONMENT/docker-compose.yml" >> env.properties
+                '''
+
                 script {
-                    if (!fileExists('.env')) {
-                        error ".env no encontrado en la raíz. Debe contener: ENVIRONMENT=<develop|qa|staging|main>"
-                    }
-                    sh '''
-                        ENVIRONMENT=$(grep -E '^ENVIRONMENT=' .env | cut -d'=' -f2 | tr -d '\\r\\n')
-                        echo "ENVIRONMENT=$ENVIRONMENT" > env.properties
-                        echo "ENV_DIR=Frontend/Devops/$ENVIRONMENT" >> env.properties
-                        echo "COMPOSE_FILE=Frontend/Devops/$ENVIRONMENT/docker-compose.yml" >> env.properties
-                    '''
-                    def props = [:]
-                    def lines = readFile(file: 'env.properties').split('\n')
-                    for (line in lines) {
-                        if (line.contains('=')) {
-                            def parts = line.split('=', 2)
-                            props[parts[0]] = parts[1]
-                        }
-                    }
+                    def props = readProperties file: 'env.properties'
                     env.ENVIRONMENT = props['ENVIRONMENT']
                     env.ENV_DIR = props['ENV_DIR']
                     env.COMPOSE_FILE = props['COMPOSE_FILE']
-                    echo "✅ Entorno detectado: ${env.ENVIRONMENT}"
+
+                    echo """
+                    ✅ Entorno detectado: ${env.ENVIRONMENT}
+                    📄 Compose: ${env.COMPOSE_FILE}
+                    📁 Env dir: ${env.ENV_DIR}
+                    """
                 }
             }
         }
 
+        // =====================================================
+        // 2️⃣ Limpiar imágenes y preparar entorno
+        // =====================================================
+        stage('Preparar entorno Docker') {
+            steps {
+                sh '''
+                    echo "🧹 Limpiando imágenes no utilizadas..."
+                    sudo docker image prune -f || true
+
+                    echo "🌐 Verificando red ${NETWORK_PREFIX}-${ENVIRONMENT} ..."
+                    sudo docker network create ${NETWORK_PREFIX}-${ENVIRONMENT} || echo "✅ Red ya existente"
+                '''
+            }
+        }
+
+        // =====================================================
+        // 3️⃣ Verificar herramientas
+        // =====================================================
         stage('Verificar herramientas') {
             steps {
                 sh '''
@@ -54,13 +74,16 @@ pipeline {
             }
         }
 
+        // =====================================================
+        // 4️⃣ Compilar Frontend Admin
+        // =====================================================
         stage('Compilar Frontend Admin') {
             steps {
                 dir('Frontend/Web-Admin') {
                     script {
                         echo "📦 Compilando Web-Admin con Node.js en contenedor Docker..."
                         sh '''
-                            sudo docker run --rm -v "$WORKSPACE/Frontend/Web-Admin":/app -w /app node:18-alpine sh -c "
+                            sudo docker run --rm -v .:/app -w /app node:18-alpine sh -c "
                                 npm install || npm ci
                                 npm run lint || echo 'Linting falló pero continuando...'
                                 npm run build
@@ -71,13 +94,16 @@ pipeline {
             }
         }
 
+        // =====================================================
+        // 5️⃣ Compilar Frontend Client
+        // =====================================================
         stage('Compilar Frontend Client') {
             steps {
                 dir('Frontend/Web-Client') {
                     script {
                         echo "📦 Compilando Web-Client con Node.js en contenedor Docker..."
                         sh '''
-                            sudo docker run --rm -v "$WORKSPACE/Frontend/Web-Client":/app -w /app node:18-alpine sh -c "
+                            sudo docker run --rm -v .:/app -w /app node:18-alpine sh -c "
                                 npm install || npm ci
                                 npm run lint || echo 'Linting falló pero continuando...'
                                 npm run build
@@ -88,6 +114,9 @@ pipeline {
             }
         }
 
+        // =====================================================
+        // 6️⃣ Construir imagen Docker Admin
+        // =====================================================
         stage('Construir imagen Docker Admin') {
             steps {
                 script {
@@ -109,6 +138,9 @@ pipeline {
             }
         }
 
+        // =====================================================
+        // 7️⃣ Construir imagen Docker Client
+        // =====================================================
         stage('Construir imagen Docker Client') {
             steps {
                 script {
@@ -130,16 +162,9 @@ pipeline {
             }
         }
 
-        stage('Preparar servicios') {
-            steps {
-                script {
-                    def netName = "${NETWORK_PREFIX}-${env.ENVIRONMENT}"
-                    echo "🌐 Creando red ${netName} ..."
-                    sh "sudo docker network create ${netName} || echo '✅ Red ya existe'"
-                }
-            }
-        }
-
+        // =====================================================
+        // 8️⃣ Desplegar Frontend Admin
+        // =====================================================
         stage('Desplegar Frontend Admin') {
             steps {
                 script {
@@ -166,6 +191,9 @@ pipeline {
             }
         }
 
+        // =====================================================
+        // 9️⃣ Desplegar Frontend Client
+        // =====================================================
         stage('Desplegar Frontend Client') {
             steps {
                 script {
@@ -192,6 +220,9 @@ pipeline {
             }
         }
 
+        // =====================================================
+        // 🔟 Verificar Estado
+        // =====================================================
         stage('Verificar Estado') {
             steps {
                 script {
@@ -223,6 +254,9 @@ pipeline {
         }
     }
 
+    // =========================================================
+    // Post actions
+    // =========================================================
     post {
         success {
             echo "🎉 Deploy completado para ${env.ENVIRONMENT}"
