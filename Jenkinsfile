@@ -28,8 +28,17 @@ pipeline {
                         echo "ENV_DIR=Frontend/Devops/$ENVIRONMENT" >> env.properties
                         echo "COMPOSE_FILE=Frontend/Devops/$ENVIRONMENT/docker-compose.yml" >> env.properties
                     '''
-                    def props = readProperties file: 'env.properties'
+                    def props = [:]
+                    def lines = readFile(file: 'env.properties').split('\n')
+                    for (line in lines) {
+                        if (line.contains('=')) {
+                            def parts = line.split('=', 2)
+                            props[parts[0]] = parts[1]
+                        }
+                    }
                     env.ENVIRONMENT = props['ENVIRONMENT']
+                    env.ENV_DIR = props['ENV_DIR']
+                    env.COMPOSE_FILE = props['COMPOSE_FILE']
                     echo "✅ Entorno detectado: ${env.ENVIRONMENT}"
                 }
             }
