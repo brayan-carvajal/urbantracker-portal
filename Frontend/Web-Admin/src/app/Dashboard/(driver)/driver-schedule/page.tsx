@@ -110,15 +110,16 @@ export default function DriverSchedulePage() {
       await fetchDriverSchedules();
       console.log('Data refreshed successfully');
       handleCloseFormModal();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Error desconocido';
       console.error('Error saving schedules:', {
         error,
-        message: error.message,
-        stack: error.stack,
+        message,
+        stack: error instanceof Error ? error.stack : undefined,
         data: JSON.stringify(data, null, 2)
       });
       // Mostrar el error al usuario en lugar de lanzarlo
-      alert(`Error al guardar los horarios: ${error.message || 'Error desconocido'}`);
+      alert(`Error al guardar los horarios: ${message}`);
     } finally {
       setIsFormLoading(false);
     }

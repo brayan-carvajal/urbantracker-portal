@@ -54,6 +54,7 @@ pipeline {
                         docker.image('node:18-alpine').inside {
                             sh '''
                                 npm ci
+                                npm run lint
                                 npm run build
                             '''
                         }
@@ -70,6 +71,7 @@ pipeline {
                         docker.image('node:18-alpine').inside {
                             sh '''
                                 npm ci
+                                npm run lint
                                 npm run build
                             '''
                         }
@@ -85,7 +87,7 @@ pipeline {
                     def commit = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
                     env.IMAGE_TAG_ADMIN = "${IMAGE_BASE_ADMIN}:${env.ENVIRONMENT}-${commit}"
                     sh """
-                        docker build -t ${env.IMAGE_TAG_ADMIN} -f Frontend/Devops/develop/Dockerfile.app Frontend/Web-Admin
+                        docker build -t ${env.IMAGE_TAG_ADMIN} -f ${env.ENV_DIR}/Dockerfile.app .
                     """
                     echo "✅ Imagen creada: ${env.IMAGE_TAG_ADMIN}"
                 }
@@ -99,7 +101,7 @@ pipeline {
                     def commit = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
                     env.IMAGE_TAG_CLIENT = "${IMAGE_BASE_CLIENT}:${env.ENVIRONMENT}-${commit}"
                     sh """
-                        docker build -t ${env.IMAGE_TAG_CLIENT} -f Frontend/Devops/develop/Dockerfile.client Frontend/Web-Client
+                        docker build -t ${env.IMAGE_TAG_CLIENT} -f ${env.ENV_DIR}/Dockerfile.client .
                     """
                     echo "✅ Imagen creada: ${env.IMAGE_TAG_CLIENT}"
                 }

@@ -34,7 +34,7 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
   const handleConfirm = async () => {
     try {
       await onConfirm();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error deleting driver:', error);
       throw error; // Re-lanzamos el error para que pueda ser manejado por el componente padre
     }

@@ -71,8 +71,8 @@ const DriverScheduleFormManager: React.FC<DriverScheduleFormManagerProps> = ({
           active: apiDriver.active
         }));
         setDrivers(formattedDrivers);
-      } catch (error: any) {
-        const errorMessage = error.message || 'Error al cargar los conductores';
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Error al cargar los conductores';
         console.error('Error loading drivers:', errorMessage);
         setErrors(prev => [...prev, errorMessage]);
       } finally {
