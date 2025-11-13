@@ -49,8 +49,7 @@ pipeline {
                 sh '''
                     echo "🔍 Verificando herramientas..."
                     docker --version
-                    node --version
-                    npm --version
+                    echo "✅ Node.js y npm se verificarán dentro de contenedores Docker"
                 '''
             }
         }
