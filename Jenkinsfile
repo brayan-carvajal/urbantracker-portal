@@ -146,34 +146,110 @@ pipeline {
 
   post {
     success {
-      echo "🎉 Deploy completado para ${env.ENVIRONMENT}"
-      echo "Tags:"
-      if (env.IMAGE_TAG_WEB_ADMIN) echo " - Admin: ${env.IMAGE_TAG_WEB_ADMIN}"
-      if (env.IMAGE_TAG_WEB_CLIENT) echo " - Client: ${env.IMAGE_TAG_WEB_CLIENT}"
+      echo "🎉 Deploy completado exitosamente para ${env.ENVIRONMENT}"
+      script {
+        echo "Tags:"
+        if (env.IMAGE_TAG_WEB_ADMIN) echo " - Admin: ${env.IMAGE_TAG_WEB_ADMIN}"
+        if (env.IMAGE_TAG_WEB_CLIENT) echo " - Client: ${env.IMAGE_TAG_WEB_CLIENT}"
+      }
       echo "📊 Servicios disponibles:"
       echo " - Web-Admin: http://localhost:3001"
       echo " - Web-Client: http://localhost:3002"
+      echo "✅ Todas las etapas completadas correctamente"
     }
     failure {
-      echo "💥 Error durante deploy"
       script {
+        // Obtener información detallada del error
+        def errorMessage = "Pipeline falló en etapa: ${env.STAGE_NAME ?: 'Desconocida'}"
+        def buildNumber = env.BUILD_NUMBER ?: 'N/A'
+        def gitCommit = sh(script: 'git rev-parse --short HEAD 2>/dev/null || echo "N/A"', returnStdout: true).trim()
+        
+        echo "❌ === ERROR DETALLADO ==="
+        echo "Número de build: ${buildNumber}"
+        echo "Git commit: ${gitCommit}"
+        echo "Ambiente: ${env.ENVIRONMENT ?: 'N/A'}"
+        echo "Etapa fallida: ${env.STAGE_NAME ?: 'N/A'}"
+        echo "Timestamp: ${new Date()}"
+        echo "============================"
+        
+        // Recopilar logs de contenedores antes de la limpieza
+        echo "🔍 Recopilando logs de debugging..."
+        
+        // Verificar estado de contenedores
         sh '''
-          docker logs urbantracker-web-admin-${ENVIRONMENT} --tail 50 2>/dev/null || true
-          docker logs urbantracker-web-client-${ENVIRONMENT} --tail 50 2>/dev/null || true
+          echo "📊 Estado actual de contenedores:"
+          docker ps -a --filter "name=urbantracker-web" --format "table {{.Names}}\\t{{.Status}}\\t{{.Ports}}"
         '''
+        
+        // Logs del contenedor Web-Admin
+        echo "📋 Logs Web-Admin (últimas 100 líneas):"
+        sh '''
+          if docker ps -a --filter "name=urbantracker-web-admin-${ENVIRONMENT}" --format "{{.Names}}" | grep -q .; then
+            echo "=== CONTENEDOR WEB-ADMIN ==="
+            docker logs urbantracker-web-admin-${ENVIRONMENT} --tail 100 2>/dev/null || echo "⚠️ No se pudieron obtener logs de Web-Admin"
+            echo "=== FIN WEB-ADMIN ==="
+          else
+            echo "⚠️ Contenedor Web-Admin no encontrado o ya eliminado"
+          fi
+        '''
+        
+        // Logs del contenedor Web-Client
+        echo "📋 Logs Web-Client (últimas 100 líneas):"
+        sh '''
+          if docker ps -a --filter "name=urbantracker-web-client-${ENVIRONMENT}" --format "{{.Names}}" | grep -q .; then
+            echo "=== CONTENEDOR WEB-CLIENT ==="
+            docker logs urbantracker-web-client-${ENVIRONMENT} --tail 100 2>/dev/null || echo "⚠️ No se pudieron obtener logs de Web-Client"
+            echo "=== FIN WEB-CLIENT ==="
+          else
+            echo "⚠️ Contenedor Web-Client no encontrado o ya eliminado"
+          fi
+        '''
+        
+        // Información de recursos del sistema
+        echo "💾 Uso de recursos del sistema:"
+        sh '''
+          echo "=== IMÁGENES DOCKER ==="
+          docker images | grep -E "(urbantracker|web-admin|web-client)" || echo "No hay imágenes relacionadas"
+          echo "=== REDES DOCKER ==="
+          docker network ls | grep "${NETWORK_PREFIX}" || echo "No hay redes relacionadas"
+          echo "=== ESPACIO EN DISCO ==="
+          df -h / 2>/dev/null || echo "No se pudo obtener info de disco"
+        '''
+        
+        echo "💡 Recomendaciones de troubleshooting:"
+        echo "1. Verificar que los Dockerfiles estén correctos"
+        echo "2. Revisar dependencias en package.json"
+        echo "3. Comprobar conectividad de red"
+        echo "4. Validar variables de entorno"
+        echo "5. Revisar logs detallados arriba para errores específicos"
       }
     }
     always {
       script {
+        echo "🧹 Ejecutando limpieza final..."
+        
+        // Limpieza específica para ambiente develop
         if (env.ENVIRONMENT == 'develop') {
+          echo "🧽 Limpiando recursos de desarrollo..."
           sh '''
-            docker stop urbantracker-web-admin-develop 2>/dev/null || true
-            docker rm urbantracker-web-admin-develop 2>/dev/null || true
-            docker stop urbantracker-web-client-develop 2>/dev/null || true
-            docker rm urbantracker-web-client-develop 2>/dev/null || true
-            docker network rm ${NETWORK_PREFIX}-develop 2>/dev/null || true
+            echo "Deteniendo contenedores de desarrollo..."
+            docker stop urbantracker-web-admin-develop 2>/dev/null || echo "✅ Web-Admin develop ya detenido"
+            docker rm urbantracker-web-admin-develop 2>/dev/null || echo "✅ Web-Admin develop ya eliminado"
+            docker stop urbantracker-web-client-develop 2>/dev/null || echo "✅ Web-Client develop ya detenido"
+            docker rm urbantracker-web-client-develop 2>/dev/null || echo "✅ Web-Client develop ya eliminado"
+            
+            echo "Eliminando red de desarrollo..."
+            docker network rm ${NETWORK_PREFIX}-develop 2>/dev/null || echo "✅ Red de desarrollo ya eliminada"
           '''
         }
+        
+        // Limpieza general de recursos no utilizados
+        sh '''
+          echo "🏃 Removiendo imágenes sin usar..."
+          docker system prune -f 2>/dev/null || echo "⚠️ Error en limpieza general"
+          
+          echo "✅ Proceso de limpieza completado"
+        '''
       }
     }
   }
