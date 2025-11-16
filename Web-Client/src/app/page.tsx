@@ -1,15 +1,23 @@
+"use client"
+
+import Header from "landing/header"
+import Hero from "landing/hero"
+import Features from "landing/features"
+import HowItWorks from "landing/how-it-works"
+import PrivacyInfo from "landing/privacy-info"
+import Team from "landing/team"
+import Footer from "landing/footer"
+
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      {/* Página completamente vacía - solo para mostrar la barra lateral */}
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">
-          Dashboard
-        </h1>
-        <p className="text-gray-600">
-          Contenido de la página principal...
-        </p>
-      </div>
-    </div>
+    <main className="min-h-screen">
+      <Header />
+      <Hero />
+      <Features />
+  <HowItWorks />
+  <Team />
+  <PrivacyInfo />
+      <Footer />
+    </main>
   )
 }

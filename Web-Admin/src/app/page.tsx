@@ -1,32 +1,52 @@
-import Link from "next/link"
+"use client"
+
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 import Image from "next/image"
+import { getToken, validateToken } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
-import { ArrowRight } from "lucide-react"
 
 export default function HomePage() {
-  return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="text-center space-y-6 max-w-md">
-        <Image
-          src="/white-logo.png"
-          alt="Logo UrbanTracker"
-          width={256}
-          height={256}
-          className="mx-auto h-25 w-auto"
-        />
-        <h1 className="text-4xl font-bold text-foreground">
-          Bienvenido a UrbanTracker
-        </h1>
-        <p className="text-muted-foreground">
-          Accede a tu dashboard para gestionar toda la información
-        </p>
-        <Link href="/Dashboard">
-          <Button size="lg" className="gap-2 bg-purple-50 hover:bg-purple-200">
-            Ir al Dashboard
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-        </Link>
-      </div>
-    </div>
-  );
+    const router = useRouter()
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            const token = getToken()
+
+            if (!token) {
+                router.push("/auth/login")
+                return
+            }
+
+            const isValid = await validateToken(token)
+
+            if (isValid) {
+                router.push("/Dashboard")
+            } else {
+                // Token inválido, limpiar y redirigir a login
+                localStorage.removeItem("token")
+                router.push("/auth/login")
+            }
+        }
+
+        checkAuth()
+    }, [router])
+
+    // Mostrar loading mientras verifica
+    return (
+        <div className="min-h-screen bg-background flex items-center justify-center">
+            <div className="text-center">
+                <div className="animate-pulse">
+                    <Image
+                        src="/white-logo.svg"
+                        alt="UrbanTracker Logo"
+                        width={300}
+                        height={75}
+                        className="mx-auto mb-6 opacity-80"
+                    />
+                </div>
+                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+            </div>
+        </div>
+    )
 }
