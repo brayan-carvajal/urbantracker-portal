@@ -1,136 +1,261 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Users, Search, Plus, Phone, Mail, MapPin } from "lucide-react"
+"use client";
 
-export default function ConductoresPage() {
-  const conductores = [
-    {
-      id: 1,
-      nombre: "Carlos Mendoza",
-      licencia: "A2",
-      telefono: "+1 234-567-8901",
-      email: "carlos@transport.com",
-      estado: "Activo",
-      vehiculo: "Camión ABC-123",
-      experiencia: "5 años",
-    },
-    {
-      id: 2,
-      nombre: "María García",
-      licencia: "B1",
-      telefono: "+1 234-567-8902",
-      email: "maria@transport.com",
-      estado: "En Ruta",
-      vehiculo: "Van DEF-456",
-      experiencia: "3 años",
-    },
-    {
-      id: 3,
-      nombre: "José Rodríguez",
-      licencia: "A1",
-      telefono: "+1 234-567-8903",
-      email: "jose@transport.com",
-      estado: "Descanso",
-      vehiculo: "Camión GHI-789",
-      experiencia: "8 años",
-    },
-  ]
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Plus, Loader2, AlertTriangle, RefreshCw } from "lucide-react";
+import { useDrivers } from "./hooks/useDrivers";
+import { DriverCard } from "./components/DriverCard";
+import { StatisticsCards } from "./components/StatisticsCards";
+import { DriverFilters } from "./components/DriverFilters";
+import { DriverModal } from "./components/DriverModal";
+import { Pagination } from "./components/Pagination";
+import { DeleteConfirmationModal } from "./components/DeleteConfirmationModal";
+import { Driver } from "./types/driverTypes";
+import type { ApiError } from "./services/api/types";
+
+
+export default function DriversPage() {
+  const {
+    paginatedDrivers,
+    filteredDrivers,
+    searchTerm,
+    statistics,
+    pagination,
+    isDialogOpen,
+    isDeleteModalOpen,
+    editingDriver,
+    driverToDelete,
+    formData,
+    isLoading,
+    isDeleting,
+    isSaving,
+    setSearchTerm,
+    setPage,
+    setItemsPerPage,
+    openCreateModal,
+    openEditModal,
+    openDeleteModal,
+    closeModal,
+    closeDeleteModal,
+    updateFormData,
+    saveDriver,
+    confirmDeleteDriver,
+    apiError,
+    clearApiError,
+    refetchDrivers,
+  } = useDrivers();
+
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleSaveDriver = async () => {
+    setFormErrors({});
+    try {
+      await saveDriver();
+    } catch (error) {
+      if (error instanceof Error) {
+        setFormErrors({ general: error.message });
+      }
+    }
+  };
+
+  const handleDeleteClick = (id: number) => {
+    const driver = filteredDrivers.find((driver) => driver.id === id);
+    if (driver) {
+      openDeleteModal(driver);
+    }
+  };
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await refetchDrivers();
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  const isEditing = !!editingDriver;
+  const hasError = !!apiError;
+  const hasData = filteredDrivers.length > 0;
+  const isEmpty = !isLoading && !hasError && !hasData && !searchTerm;
+  const noResults = !isLoading && !hasError && !hasData && !!searchTerm;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black p-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="flex items-center gap-3 text-zinc-300">
+            <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+            <span className="text-lg">Cargando Conductores...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
+    <div className="space-y-8 bg-black min-h-screen p-6">
+      {/* Header */}
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Administrar Conductores</h1>
-          <p className="text-muted-foreground mt-2">Gestiona la información de todos los conductores</p>
+          <h1 className="text-3xl font-bold text-white">
+            Gestión de conductores
+          </h1>
+          <p className="text-zinc-400 mt-2">
+            Controle y gestione su flota de conductores
+          </p>
         </div>
-        <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
-          <Plus className="h-4 w-4 mr-2" />
-          Nuevo Conductor
-        </Button>
-      </div>
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            variant="outline"
+            className="border-zinc-600 text-zinc-300 hover:bg-zinc-800"
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+            Actualizar
+          </Button>
+          <Button
+            onClick={openCreateModal}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white transition-all duration-300 hover:scale-105"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Nuevo conductor
+          </Button>
+        </div>
+      </header>
 
-      {/* Filtros */}
-      <Card className="border-0 shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Search className="h-5 w-5" />
-            Filtros de Búsqueda
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
-            <Input placeholder="Buscar por nombre..." className="max-w-sm" />
-            <Button variant="outline">Filtrar por Estado</Button>
-            <Button variant="outline">Filtrar por Licencia</Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Lista de Conductores */}
-      <div className="grid gap-6">
-        {conductores.map((conductor) => (
-          <Card key={conductor.id} className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-6">
-                  <div className="p-4 bg-accent/10 rounded-full">
-                    <Users className="h-8 w-8 text-accent" />
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3">
-                      <h3 className="text-xl font-bold text-foreground">{conductor.nombre}</h3>
-                      <Badge
-                        variant={
-                          conductor.estado === "Activo"
-                            ? "default"
-                            : conductor.estado === "En Ruta"
-                              ? "secondary"
-                              : "outline"
-                        }
-                        className={conductor.estado === "Activo" ? "bg-accent text-accent-foreground" : ""}
-                      >
-                        {conductor.estado}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-2">
-                        <Phone className="h-4 w-4" />
-                        {conductor.telefono}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Mail className="h-4 w-4" />
-                        {conductor.email}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4" />
-                        {conductor.vehiculo}
-                      </div>
-                    </div>
-                    <div className="flex gap-4 text-sm">
-                      <span className="font-medium">
-                        Licencia: <span className="text-accent">{conductor.licencia}</span>
-                      </span>
-                      <span className="font-medium">
-                        Experiencia: <span className="text-accent">{conductor.experiencia}</span>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    Editar
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    Ver Historial
-                  </Button>
-                </div>
+      {/* Error Alert - Simple y directo */}
+      {hasError && (
+        <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
+          <div className="flex items-start justify-between">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-red-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <h4 className="text-red-300 font-medium mb-1">
+                  {apiError.status === 0 ? "Error de Conexión" : "Error"}
+                </h4>
+                <p className="text-red-200/80 text-sm">
+                  {apiError.message}
+                </p>
               </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {(apiError.status === 0 || (apiError.status && apiError.status >= 500)) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleRefresh}
+                  className="text-red-300 hover:text-red-200 hover:bg-red-900/30"
+                >
+                  <RefreshCw className="h-3 w-3 mr-1" />
+                  Reintentar
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearApiError}
+                className="text-red-300 hover:text-red-200 hover:bg-red-900/30"
+              >
+                ✕
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Statistics - Solo mostrar si no hay errores críticos */}
+      {!hasError && <StatisticsCards statistics={statistics} />}
+
+      {/* Filters - Solo mostrar si no hay errores críticos */}
+      {!hasError && (
+        <DriverFilters 
+          searchTerm={searchTerm} 
+          onSearchChange={setSearchTerm} 
+        />
+      )}
+
+      {/* Content Section */}
+      <section className="space-y-6">
+        {isEmpty && (
+          <div className="text-center py-12">
+            <div className="text-zinc-400 text-lg mb-4">
+              No hay conductores disponibles. ¡Agregue su primer conductor!
+            </div>
+            <Button
+              onClick={openCreateModal}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Agregar conductor
+            </Button>
+          </div>
+        )}
+
+        {noResults && (
+          <div className="text-center py-12">
+            <div className="text-zinc-400 text-lg mb-4">
+              No se encontraron conductores que coincidan con su búsqueda.
+            </div>
+            <Button
+              onClick={() => setSearchTerm('')}
+              variant="outline"
+              className="border-zinc-600 text-zinc-300 hover:bg-zinc-800"
+            >
+              Limpiar búsqueda
+            </Button>
+          </div>
+        )}
+
+        {hasData && (
+          <>
+            {/* Drivers grid */}
+            <div className="grid gap-6">
+              {paginatedDrivers.map((driver) => (
+                <DriverCard
+                  key={driver.id}
+                  driver={driver}
+                  onEdit={openEditModal}
+                  onDelete={() => handleDeleteClick(driver.id)}
+                />
+              ))}
+            </div>
+
+            {/* Pagination component */}
+            <Pagination
+              pagination={pagination}
+              onPageChange={setPage}
+              onItemsPerPageChange={setItemsPerPage}
+              isLoading={isRefreshing}
+            />
+          </>
+        )}
+      </section>
+
+      {/* Driver Form Modal */}
+      <DriverModal
+        isOpen={isDialogOpen}
+        isEditing={isEditing}
+        formData={formData}
+        onClose={closeModal}
+        onSave={handleSaveDriver}
+        onFormChange={updateFormData}
+        isSaving={isSaving}
+        errors={formErrors}
+        apiError={apiError} // Pasamos el error de API al modal
+      />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={confirmDeleteDriver}
+        driver={driverToDelete}
+        isDeleting={isDeleting}
+        apiError={apiError} // Pasamos el error de API al modal
+      />
     </div>
-  )
+  );
 }
