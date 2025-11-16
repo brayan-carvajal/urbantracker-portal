@@ -10,7 +10,7 @@ services:
     env_file:
       - .env.qa
     ports:
-      - "3012:3000"
+      - "3004:3000"
     networks:
       - network_frontend_client_qa
     environment:

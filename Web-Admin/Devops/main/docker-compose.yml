@@ -10,7 +10,7 @@ services:
     env_file:
       - .env.main
     ports:
-      - "3001:3000"
+      - "3007:3000"  
     networks:
       - network_frontend_admin_main
     environment:

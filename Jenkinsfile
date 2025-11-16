@@ -38,30 +38,30 @@ pipeline {
           env.ENVIRONMENT = props['ENVIRONMENT']
           
           switch(env.ENVIRONMENT) {
-            case 'main':
+            case 'develop':
               env.ADMIN_PORT = '3001'
               env.CLIENT_PORT = '3002'
-              env.ENABLE_SERVICES = 'false'  // Frontend no necesita servicios locales
-              env.CLEANUP_ENABLED = 'false'
-              env.BACKEND_URL = 'http://localhost:8080'  // Asume backend en puerto estándar
-              break
-            case 'qa':
-              env.ADMIN_PORT = '3011'
-              env.CLIENT_PORT = '3012'
-              env.ENABLE_SERVICES = 'false'
-              env.CLEANUP_ENABLED = 'false'
-              env.BACKEND_URL = 'http://localhost:8080'
-              break
-            case 'develop':
-              env.ADMIN_PORT = '3021'
-              env.CLIENT_PORT = '3022'
               env.ENABLE_SERVICES = 'false'
               env.CLEANUP_ENABLED = 'true'
               env.BACKEND_URL = 'http://localhost:8080'
               break
+            case 'qa':
+              env.ADMIN_PORT = '3003'
+              env.CLIENT_PORT = '3004'
+              env.ENABLE_SERVICES = 'false'
+              env.CLEANUP_ENABLED = 'false'
+              env.BACKEND_URL = 'http://localhost:8080'
+              break
             case 'staging':
-              env.ADMIN_PORT = '3031'
-              env.CLIENT_PORT = '3032'
+              env.ADMIN_PORT = '3005'
+              env.CLIENT_PORT = '3006'
+              env.ENABLE_SERVICES = 'false'
+              env.CLEANUP_ENABLED = 'false'
+              env.BACKEND_URL = 'http://localhost:8080'
+              break
+            case 'main':
+              env.ADMIN_PORT = '3007'
+              env.CLIENT_PORT = '3008'
               env.ENABLE_SERVICES = 'false'
               env.CLEANUP_ENABLED = 'false'
               env.BACKEND_URL = 'http://localhost:8080'

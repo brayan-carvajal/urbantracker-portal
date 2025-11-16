@@ -10,7 +10,7 @@ services:
     env_file:
       - .env.staging
     ports:
-      - "3031:3000"
+      - "3005:3000"
     networks:
       - network_frontend_admin_staging
     environment:
