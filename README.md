@@ -9,6 +9,80 @@
 
 ---
 
+## 🌍 Gestión de Ambientes
+
+UrbanTracker-portal maneja **4 ambientes** diferentes para garantizar un ciclo de desarrollo robusto:
+
+### 🏗️ Estructura de Ambientes
+
+| Ambiente | Propósito | Puerto Web-Admin | Puerto Web-Client | URL Backend |
+|----------|-----------|------------------|-------------------|-------------|
+| **develop** | Desarrollo diario | 3001 | 3002 | localhost:8080 |
+| **qa** | Pruebas de calidad | 3011 | 3012 | api-qa.urbantracker.com |
+| **staging** | Pre-producción | 3031 | 3032 | api-staging.urbantracker.com |
+| **main** | Producción | 3001 | 3002 | api-main.urbantracker.com |
+
+### 📁 Configuración de Ambientes
+
+Cada ambiente tiene su propia configuración en:
+```
+Web-Admin/Devops/{ambiente}/
+Web-Client/Devops/{ambiente}/
+```
+
+#### Archivos de Configuración por Ambiente:
+- `.env.{ambiente}` - Variables de entorno específicas
+- `docker-compose.yml` - Configuración de contenedores
+- `Dockerfile.app` - Imagen Docker para el ambiente
+
+### 🚀 Comandos por Ambiente
+
+#### Desarrollar (develop)
+```bash
+# Web-Admin
+cd Web-Admin/Devops/develop
+docker-compose up -d
+
+# Web-Client
+cd Web-Client/Devops/develop
+docker-compose up -d
+```
+
+#### QA Testing (qa)
+```bash
+# Web-Admin
+cd Web-Admin/Devops/qa
+docker-compose up -d
+
+# Web-Client
+cd Web-Client/Devops/qa
+docker-compose up -d
+```
+
+#### Staging
+```bash
+# Web-Admin
+cd Web-Admin/Devops/staging
+docker-compose up -d
+
+# Web-Client
+cd Web-Client/Devops/staging
+docker-compose up -d
+```
+
+#### Producción (main)
+```bash
+# Web-Admin
+cd Web-Admin/Devops/main
+docker-compose up -d
+
+# Web-Client
+cd Web-Client/Devops/main
+docker-compose up -d
+```
+
+---
+
 ## 🌐 Web-Client
 
 ### 📋 Propósito
@@ -68,6 +142,29 @@ npm install
 npm run dev
 ```
 
+---
+
+## 🔧 Configuración CI/CD
+
+El repositorio incluye un **Jenkinsfile** que maneja automáticamente:
+- Compilación para cada ambiente
+- Construcción de imágenes Docker
+- Despliegue automatizado
+- Health checks por ambiente
+
+### Variables de Entorno Globales
+
+El archivo `.env` principal controla el ambiente activo:
+```bash
+ENVIRONMENT=develop  # main, qa, develop, staging
+```
+
+### Flujo de Desarrollo
+
+1. **Desarrollo** → Rama `develop` → Ambiente `develop`
+2. **Testing** → Rama `qa` → Ambiente `qa`
+3. **Staging** → Rama `staging` → Ambiente `staging`
+4. **Producción** → Rama `main` → Ambiente `main`
 
 ---
 
