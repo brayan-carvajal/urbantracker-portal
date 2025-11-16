@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  web-client-develop:
+    build:
+      context: ../..
+      dockerfile: Devops/develop/Dockerfile.app
+    container_name: urbantracker-web-client-develop
+    restart: unless-stopped
+    env_file:
+      - .env.develop
+    ports:
+      - "3002:3000"
+    networks:
+      - network_frontend_client
+    volumes:
+      # Montar el código fuente para desarrollo en vivo
+      - ../../src:/app/src:ro
+      # Cache de Node modules para mejor rendimiento
+      - node_modules_client:/app/node_modules
+      # Cache de Next.js
+      - next_cache_client:/app/.next
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+
+volumes:
+  node_modules_client:
+    driver: local
+  next_cache_client:
+    driver: local
+
+networks:
+  network_frontend_client:
+    driver: bridge
