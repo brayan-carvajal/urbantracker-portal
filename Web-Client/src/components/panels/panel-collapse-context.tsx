@@ -16,7 +16,7 @@ export function usePanelCollapse() {
 }
 
 export function PanelCollapseProvider({ children }: { children: ReactNode }) {
-  const [isPanelCollapsed, setIsPanelCollapsed] = useState(false);
+  const [isPanelCollapsed, setIsPanelCollapsed] = useState(false); // Cambiar a true para probar si está colapsado
   const togglePanelCollapse = () => setIsPanelCollapsed((prev) => !prev);
   return (
     <PanelCollapseContext.Provider value={{ isPanelCollapsed, togglePanelCollapse }}>

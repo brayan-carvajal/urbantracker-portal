@@ -11,7 +11,7 @@ export default function DemoPage() {
   return (
     <VehicleProvider>
       <RouteProvider>
-        <main className="relative h-screen bg-[#18181b] flex">
+        <main className="relative h-screen bg-background flex">
           <Sidebar />
           <div className="flex-1 relative h-screen">
             <MapView>
