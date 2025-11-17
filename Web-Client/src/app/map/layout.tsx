@@ -9,6 +9,7 @@ import MapView from "components/map/map-view";
 import { MapControls } from "components/map/map-controls";
 import { usePanelCollapse } from "components/panels/panel-collapse-context";
 import { ThemeWrapper } from "components/theme-wrapper";
+import { ThemeToggle } from "components/ThemeToggle";
 
 function MapLayoutContent({
   children,
@@ -50,6 +51,7 @@ export default function MapLayout({
           <PanelCollapseProvider>
             <ThemeWrapper>
               <MapLayoutContent>{children}</MapLayoutContent>
+              <ThemeToggle />
             </ThemeWrapper>
           </PanelCollapseProvider>
         </PanelActiveProvider>

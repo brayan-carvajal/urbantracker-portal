@@ -36,7 +36,7 @@ export function Sidebar() {
   }
 
   return (
-    <div className="w-20 bg-neutral-800 dark:bg-neutral-950 flex flex-col items-center py-4 space-y-4">
+    <div className="w-20 bg-gray-100 dark:bg-neutral-900 flex flex-col items-center py-4 space-y-4">
       <div className="flex flex-col items-center space-y-1 mb-8">
         <a href="/" className="w-15 h-15 flex items-center justify-center" title="Ir a la página principal">
           <img src={theme === "dark" ? "/logo-icon-white.svg" : "/logo-icon-black.svg"} alt="UrbanTracker Logo" className="w-13 h-13 object-contain" />
@@ -52,8 +52,8 @@ export function Sidebar() {
           onClick={() => handleNavigation(item)}
           title={item.label}
           className={`w-12 h-12 rounded-xl transition-colors ${activePanel === item.id
-            ? "bg-neutral-700/50 dark:bg-neutral-600/50 text-foreground hover:bg-neutral-700/60 dark:hover:bg-neutral-600/60"
-            : "text-muted-foreground hover:text-foreground hover:bg-neutral-700/50 dark:hover:bg-neutral-600/50"
+            ? "bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800"
+            : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
             }`}
         >
           <item.icon className="h-10 w-10" />

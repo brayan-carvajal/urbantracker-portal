@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState } from 'react';
+"use client";
+import React from 'react';
+import { createContext, useContext, useState } from 'react';
 
 interface RouteData {
   id: number;
