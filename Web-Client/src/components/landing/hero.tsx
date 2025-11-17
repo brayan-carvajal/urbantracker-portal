@@ -1,18 +1,26 @@
+"use client"
+
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { MapPin, Smartphone } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useTheme } from "@/hooks/useTheme"
+import { useEffect, useState } from "react"
 
 export default function Hero() {
   const router = useRouter();
   const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-  // Selección directa sin useState
-  const imageSrc = theme === "dark" ? "/mapa-dark.png" : "/mapa-light.png";
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Evitar hidratación incorrecta usando un placeholder hasta que el cliente esté montado
+  const imageSrc = mounted ? (theme === "dark" ? "/mapa-dark.png" : "/mapa-light.png") : "/mapa-light.png";
 
   return (
-  <section id="inicio" className="pt-32 pb-16 bg-background">
+    <section id="inicio" className="pt-32 pb-16 bg-background">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto text-center">
           <div className="mb-8">
@@ -45,18 +53,22 @@ export default function Hero() {
 
           <div className="relative">
             <div className="bg-card rounded-lg shadow-xl p-8">
-              <Image
-                src={imageSrc}
-                alt="Vista previa del mapa interactivo de UrbanTracker"
-                width={1400}
-                height={900}
-                className="w-full h-auto rounded-lg"
-                priority
-              />
+              {mounted ? (
+                <Image
+                  src={imageSrc}
+                  alt="Vista previa del mapa interactivo de UrbanTracker"
+                  width={1400}
+                  height={900}
+                  className="w-full h-auto rounded-lg"
+                  priority
+                />
+              ) : (
+                <div className="w-full h-[400px] bg-muted animate-pulse rounded-lg" />
+              )}
             </div>
           </div>
         </div>
       </div>
     </section>
-  )
+  );
 }

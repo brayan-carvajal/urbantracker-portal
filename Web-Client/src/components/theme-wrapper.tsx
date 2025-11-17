@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useTheme } from "@/hooks/useTheme"
+import { useTheme } from "next-themes"
 
 interface ThemeWrapperProps {
   children: React.ReactNode
@@ -15,11 +15,11 @@ export function ThemeWrapper({ children }: ThemeWrapperProps) {
     setMounted(true)
   }, [])
 
-  // Durante la hidratación inicial, renderizar con tema oscuro por defecto
-  // para evitar FOUC cuando el usuario esté en modo oscuro
+  // Durante la hidratación inicial, renderizar sin clase de tema hasta que se determine el tema real
+  // para evitar FOUC y problemas de hidratación
   if (!mounted) {
     return (
-      <div className="dark">
+      <div>
         {children}
       </div>
     )

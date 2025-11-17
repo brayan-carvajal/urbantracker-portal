@@ -1,13 +1,18 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "ui/button"
 import { Menu, X } from "lucide-react"
 import { useTheme } from "@/hooks/useTheme"
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { theme } = useTheme();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Lista de secciones para navegación
   const sections = [
@@ -52,6 +57,9 @@ export default function Header() {
     setIsMenuOpen(false);
   };
 
+  // Determinar logo según tema - con placeholder durante hidratación
+  const logoSrc = mounted ? (theme === "dark" ? "/logo-full-white.svg" : "/logo-full-black.svg") : "/logo-full-white.svg";
+
   return (
     <header className="fixed top-0 w-full bg-background/90 dark:bg-background/95 backdrop-blur-sm border-b border-border text-foreground z-50">
       <div className="container mx-auto px-4 py-4 ">
@@ -63,7 +71,11 @@ export default function Header() {
               onClick={() => handleNavClick("inicio")}
               className="focus:outline-none cursor-pointer"
             >
-              <img src={theme === "dark" ? "/logo-full-white.svg" : "/logo-full-black.svg"} alt="UrbanTracker Logo" className="w-auto h-12" />
+              <img
+                src={logoSrc}
+                alt="UrbanTracker Logo"
+                className="w-auto h-12"
+              />
             </button>
           </div>
 

@@ -1,6 +1,9 @@
 
+"use client"
+
 import { Github, Linkedin, Mail, MapPin } from "lucide-react"
 import { useTheme } from "@/hooks/useTheme"
+import { useEffect, useState } from "react"
 
 // Animación suave personalizada para el scroll
 const smoothScrollTo = (targetY: number, duration = 600) => {
@@ -34,7 +37,15 @@ const scrollToSection = (id: string) => {
 };
 
 export default function Footer() {
-  const { theme } = useTheme()
+  const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Determinar logo según tema - con placeholder durante hidratación
+  const logoSrc = mounted ? (theme === "dark" ? "/logo-full-white.svg" : "/logo-full-black.svg") : "/logo-full-white.svg";
 
   return (
     <footer className="bg-background text-foreground border-t border-border">
@@ -43,7 +54,7 @@ export default function Footer() {
           {/* Logo y descripción */}
           <div className="md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
-              <img src={theme === "dark" ? "/logo-full-white.svg" : "/logo-full-black.svg"} alt="Logo UrbanTracker" className="h-10" />
+              <img src={logoSrc} alt="Logo UrbanTracker" className="h-10" />
             </div>
             <p className="text-muted-foreground mb-4 max-w-md">
               Sistema de gestión y visualización de rutas de transporte público en tiempo real. Desarrollado por
