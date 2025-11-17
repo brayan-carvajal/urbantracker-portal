@@ -29,14 +29,14 @@ export function Sidebar() {
 
   const activePanel = getActivePanel()
 
-  const handleNavigation = (item) => {
+  const handleNavigation = (item: { id: string; path: string }) => {
     setActivePanel(item.id)
     router.push(item.path)
     if (isPanelCollapsed) togglePanelCollapse()
   }
 
   return (
-    <div className="w-20 bg-background flex flex-col items-center py-4 space-y-4">
+    <div className="w-20 bg-background border-r border-border flex flex-col items-center py-4 space-y-4">
       
       {/* Logo */}
       <div className="flex flex-col items-center space-y-1 mb-8">
