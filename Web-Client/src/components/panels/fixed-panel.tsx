@@ -48,11 +48,11 @@ export function FixedPanel() {
       <div
         className={`fixed-panel-anim-panel ${
           isPanelCollapsed ? "collapsed" : "expanded"
-        } w-96 bg-white dark:bg-neutral-800 shadow-xl flex flex-col h-full relative`}
+        } w-96 bg-background/95 border-r border-border shadow-xl flex flex-col h-full relative`}
       >
         {/* Botón para colapsar */}
         <div
-          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full bg-white dark:bg-neutral-800 rounded-r-md shadow-md cursor-pointer hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors z-10"
+          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full bg-muted/95 border-t border-b border-r border-border rounded-r-md shadow-lg cursor-pointer hover:bg-accent transition-colors z-10"
           onClick={togglePanelCollapse}
         >
           <div className="flex items-center justify-center w-6 h-12">
@@ -61,12 +61,12 @@ export function FixedPanel() {
         </div>
 
         {/* Search Bar Section */}
-        <div className="p-4 bg-white dark:bg-neutral-800">
+        <div className="p-4 bg-muted/95">
           <SearchBar />
         </div>
 
         {/* Contenido del panel */}
-        <div className="flex-1 overflow-y-auto hide-scrollbar p-4 bg-white dark:bg-neutral-800">
+        <div className="flex-1 overflow-y-auto hide-scrollbar p-4 bg-background">
           {renderPanel()}
         </div>
       </div>
@@ -74,7 +74,7 @@ export function FixedPanel() {
       {/* Botón para expandir */}
       {isPanelCollapsed && (
         <div
-          className="absolute left-0 top-1/2 -translate-y-1/2 bg-white dark:bg-neutral-800 rounded-r-md shadow-md cursor-pointer hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors z-10"
+          className="absolute left-0 top-1/2 -translate-y-1/2 bg-background/95 border border-border rounded-r-md shadow-lg cursor-pointer hover:bg-accent transition-colors z-10"
           onClick={togglePanelCollapse}
         >
           <div className="flex items-center justify-center w-6 h-12">

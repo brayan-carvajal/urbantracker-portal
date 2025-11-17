@@ -23,8 +23,15 @@ function MapLayoutContent({
       <Sidebar />
       <div className="flex-1 relative h-screen">
         <MapView>
-          <MapControls />
+          {/* Controles de zoom posicionados cerca del botón de tema con espacio */}
+          <div className="absolute bottom-16 right-6 z-40">
+            <MapControls />
+          </div>
         </MapView>
+        
+        {/* Botón de cambio de tema */}
+        <ThemeToggle />
+        
         <div
           className={`fixed top-0 z-40 h-screen transition-all duration-700 ease-in-out ${
             isPanelCollapsed
@@ -51,7 +58,6 @@ export default function MapLayout({
           <PanelCollapseProvider>
             <ThemeWrapper>
               <MapLayoutContent>{children}</MapLayoutContent>
-              <ThemeToggle />
             </ThemeWrapper>
           </PanelCollapseProvider>
         </PanelActiveProvider>

@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { MapPin, Smartphone } from "lucide-react"
+import { MapPin } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useTheme } from "@/hooks/useTheme"
 import { useEffect, useState } from "react"
@@ -32,22 +32,14 @@ export default function Hero() {
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          <div className="flex justify-center mb-12">
             <Button
               size="lg"
               className="bg-card text-card-foreground font-semibold rounded-xl border border-border shadow-md hover:bg-primary hover:text-primary-foreground transition-all duration-200 cursor-pointer hover:scale-[1.05] focus:outline-none focus:ring-2 focus:ring-primary/60"
               onClick={() => router.push("demo")}
             >
               <MapPin className="mr-2 h-5 w-5" />
-              Ver Demo
-            </Button>
-            <Button
-              size="lg"
-              className="bg-card text-card-foreground font-semibold rounded-xl border border-border shadow-md hover:bg-primary hover:text-primary-foreground transition-all duration-200 cursor-pointer hover:scale-[1.05] focus:outline-none focus:ring-2 focus:ring-primary/60"
-              onClick={() => window.open('movil/user', '_blank')}
-            >
-              <Smartphone className="mr-2 h-5 w-5" />
-              Descargar App Conductor
+              Comenzar
             </Button>
           </div>
 

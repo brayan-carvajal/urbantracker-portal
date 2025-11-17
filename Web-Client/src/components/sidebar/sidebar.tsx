@@ -24,42 +24,63 @@ export function Sidebar() {
     if (pathname.startsWith("/map/routes")) return "routes"
     if (pathname.startsWith("/map/stops")) return "stop-info"
     if (pathname.startsWith("/map/info")) return "general-info"
-    return "routes" // default
+    return "routes"
   }
 
   const activePanel = getActivePanel()
 
-  const handleNavigation = (item: typeof navigationItems[0]) => {
+  const handleNavigation = (item) => {
     setActivePanel(item.id)
     router.push(item.path)
     if (isPanelCollapsed) togglePanelCollapse()
   }
 
   return (
-    <div className="w-20 bg-gray-100 dark:bg-neutral-900 flex flex-col items-center py-4 space-y-4">
+    <div className="w-20 bg-background flex flex-col items-center py-4 space-y-4">
+      
+      {/* Logo */}
       <div className="flex flex-col items-center space-y-1 mb-8">
         <a href="/" className="w-15 h-15 flex items-center justify-center" title="Ir a la página principal">
-          <img src={theme === "dark" ? "/logo-icon-white.svg" : "/logo-icon-black.svg"} alt="UrbanTracker Logo" className="w-13 h-13 object-contain" />
+          <img
+            src={theme === "dark" ? "/logo-icon-white.svg" : "/logo-icon-black.svg"}
+            alt="UrbanTracker Logo"
+            className="w-13 h-13 object-contain"
+          />
         </a>
-  <span className="text-[10px] font-medium text-foreground text-center leading-tight px-0">UrbanTracker</span>
+        <span className="text-[10px] font-medium text-foreground text-center leading-tight px-0">
+          UrbanTracker
+        </span>
       </div>
 
-      {navigationItems.map((item) => (
-        <Button
-          key={item.id}
-          variant={activePanel === item.id ? "default" : "ghost"}
-          size="icon"
-          onClick={() => handleNavigation(item)}
-          title={item.label}
-          className={`w-12 h-12 rounded-xl transition-colors ${activePanel === item.id
-            ? "bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800"
-            : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
-            }`}
-        >
-          <item.icon className="h-10 w-10" />
-          <span className="sr-only">{item.label}</span>
-        </Button>
-      ))}
+      {/* Navigation */}
+      {navigationItems.map((item) => {
+        const isActive = activePanel === item.id
+
+        return (
+          <Button
+            key={item.id}
+            variant="ghost"
+            size="icon"
+            onClick={() => handleNavigation(item)}
+            title={item.label}
+            className={`
+              w-12 h-12 rounded-xl transition-colors
+
+              /* Color de fondo activo (gris pastel) */
+              ${isActive ? "bg-gray-200 dark:bg-gray-600" : ""}
+
+              /* Color de hover (gris pastel en ambos temas) */
+              hover:bg-gray-200 dark:hover:bg-gray-600
+
+              /* Icono según tema */
+              ${theme === "dark" ? "text-white" : "text-black"}
+            `}
+          >
+            <item.icon className="h-10 w-10" />
+            <span className="sr-only">{item.label}</span>
+          </Button>
+        )
+      })}
     </div>
   )
 }

@@ -40,7 +40,7 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
         }));
         setRoutes(mappedRoutes);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error desconocido');
+        setError('No se encontraron rutas');
       } finally {
         setLoading(false);
       }

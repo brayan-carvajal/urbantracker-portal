@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useEffect, useRef, useMemo } from "react";
 import { usePanelCollapse } from "components/panels/panel-collapse-context";
+import { useTheme } from "@/hooks/useTheme";
 import Map, { Layer, MapRef, Source } from "react-map-gl/mapbox";
 import { useRoutePoints, useRoute } from "./route-context";
 import { useVehiclePositions } from "./vehicle-context";
@@ -22,12 +23,21 @@ export function useMapboxRef() {
 
 const MapViewComponent = ({ children }: { children?: React.ReactNode }) => {
   const { isPanelCollapsed } = usePanelCollapse();
+  const { theme } = useTheme();
   const { vehiclePositions } = useVehiclePositions();
   const { routes, selectedRoutes } = useRoutePoints();
   const { focusedRoute } = useRoute();
   const mapRef = useRef<MapRef | null>(null);
   const accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
   const [mapLoaded, setMapLoaded] = React.useState(false);
+
+  // Define map styles based on theme
+  const mapStyles = {
+    dark: "mapbox://styles/mapbox/dark-v11",
+    light: "mapbox://styles/mapbox/light-v11"
+  };
+
+  const currentMapStyle = theme ? mapStyles[theme as keyof typeof mapStyles] : mapStyles.dark;
 
   // Add arrow icon to map when it loads
   useEffect(() => {
@@ -49,6 +59,14 @@ const MapViewComponent = ({ children }: { children?: React.ReactNode }) => {
       }
     }
   }, [mapLoaded]);
+
+  // Update map style when theme changes
+  useEffect(() => {
+    if (mapRef.current && mapLoaded && theme) {
+      const map = mapRef.current.getMap();
+      map.setStyle(currentMapStyle);
+    }
+  }, [theme, currentMapStyle, mapLoaded]);
 
   useEffect(() => {
     if (mapRef.current) {
@@ -181,7 +199,7 @@ const MapViewComponent = ({ children }: { children?: React.ReactNode }) => {
             latitude: 2.9342900126616227,
             zoom: 15,
           }}
-          mapStyle="mapbox://styles/afsb114/cmf7eaden003301s563d81iss"
+          mapStyle={currentMapStyle}
           attributionControl={false}
           onLoad={() => setMapLoaded(true)}
         >

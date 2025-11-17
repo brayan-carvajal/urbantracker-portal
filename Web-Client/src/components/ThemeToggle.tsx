@@ -18,29 +18,21 @@ export function ThemeToggle() {
     setTheme(theme === "dark" ? "light" : "dark")
   }
 
-  // Durante la hidratación y antes del mount, mostrar un loader neutral
+  // Durante la hidratación, no mostrar nada para evitar FOUC
   if (!mounted) {
-    return (
-      <button
-        className="fixed bottom-4 right-4 z-50 p-3 bg-background border border-border rounded-full shadow-lg"
-        aria-label="Loading theme toggle"
-        disabled
-      >
-        <div className="h-5 w-5 bg-muted-foreground/20 rounded" />
-      </button>
-    )
+    return null
   }
 
   return (
     <button
       onClick={toggleTheme}
-      className="fixed bottom-6 right-6 z-[100] p-3 bg-background/90 dark:bg-background/80 backdrop-blur-sm border border-border rounded-full shadow-lg hover:bg-accent transition-all duration-200 hover:scale-105"
+      className="fixed bottom-6 right-6 z-50 w-8 h-8 bg-background text-foreground hover:bg-accent hover:shadow-lg hover:scale-105 border border-border rounded-lg shadow-md flex items-center justify-center transition-all duration-200"
       aria-label={`Cambiar a modo ${theme === "dark" ? "claro" : "oscuro"}`}
     >
       {theme === "dark" ? (
-        <Moon className="h-5 w-5 text-blue-400 dark:text-blue-300" />
+        <Moon className="h-4 w-4 text-blue-400 dark:text-blue-300" />
       ) : (
-        <Sun className="h-5 w-5 text-yellow-500 dark:text-yellow-400" />
+        <Sun className="h-4 w-4 text-yellow-500 dark:text-yellow-400" />
       )}
     </button>
   )
