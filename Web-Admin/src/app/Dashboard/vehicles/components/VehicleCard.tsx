@@ -24,41 +24,41 @@ export function VehicleCard({ vehicle, onEdit, onDelete }: VehicleCardProps) {
 
   const getStatusStyles = (status: Vehicle['status']) => {
     const styles: Record<string, string> = {
-      "ACTIVE": "bg-green-600 text-white hover:bg-green-700",
-      "INACTIVE": "bg-red-600 text-white hover:bg-red-700"
+      "ACTIVE": "bg-success text-success-foreground hover:bg-success/90",
+      "INACTIVE": "bg-destructive text-destructive-foreground hover:bg-destructive/90"
     }
-    return styles[status] || "bg-gray-600 text-white hover:bg-gray-700"
+    return styles[status] || "bg-muted text-muted-foreground hover:bg-muted/80"
   }
 
   return (
-    <Card className="bg-zinc-900 border-zinc-800 hover:bg-zinc-800 transition-all duration-300 hover:scale-[1.02]">
+    <Card className="bg-card border-border hover:bg-accent transition-all duration-300 hover:scale-[1.02]">
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <div className="p-4 bg-emerald-600/20 rounded-full">
-              <Car className="h-8 w-8 text-emerald-500" />
+            <div className="p-4 bg-primary/20 rounded-full">
+              <Car className="h-8 w-8 text-primary" />
             </div>
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <h3 className="text-xl font-bold text-white">
+                <h3 className="text-xl font-bold text-foreground">
                   {vehicle.licencePlate}
                 </h3>
                 <Badge className={getStatusStyles(vehicle.status)}>
                   {getStatusInSpanish(vehicle.status)}
                 </Badge>
               </div>
-              <div className="text-zinc-400">
-                <span className="font-medium text-white flex items-center gap-2">
-                  <Car className="h-4 w-4 text-white" /> Marca/Modelo: {vehicle.brand} {vehicle.model}
+              <div className="text-muted-foreground">
+                <span className="font-medium text-foreground flex items-center gap-2">
+                  <Car className="h-4 w-4 text-muted-foreground" /> Marca/Modelo: {vehicle.brand} {vehicle.model}
                 </span>
 
-                <span className="font-medium text-white flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-white" /> Año: {vehicle.year}
+                <span className="font-medium text-foreground flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" /> Año: {vehicle.year}
                 </span>
               </div>
               <div className="text-sm">
-                <span className="font-medium text-white flex items-center gap-2">
-                  <Users className="h-4 w-4 text-white" /> <span className="text-emerald-500">Capacidad: {vehicle.passengerCapacity} pasajeros</span>
+                <span className="font-medium text-foreground flex items-center gap-2">
+                  <Users className="h-4 w-4 text-muted-foreground" /> <span className="text-primary">Capacidad: {vehicle.passengerCapacity} pasajeros</span>
                 </span>
               </div>
             </div>
@@ -77,7 +77,7 @@ export function VehicleCard({ vehicle, onEdit, onDelete }: VehicleCardProps) {
               variant="outline"
               size="sm"
               onClick={() => onDelete(vehicle.id)}
-              className="border-red-700 text-red-500 hover:bg-red-900/20"
+              className="border-destructive/50 text-destructive hover:bg-destructive/10"
             >
               <Trash2 className="h-4 w-4 mr-2" />
               Eliminar

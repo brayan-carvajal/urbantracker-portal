@@ -191,7 +191,7 @@ const MapEditor: React.FC<MapEditorProps> = ({
                       className="flex items-center justify-between bg-zinc-800 p-2 rounded text-sm"
                     >
                       <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-success"></div>
                         <span className="text-zinc-300">
                           Punto {wp.sequence}: {wp.latitude.toFixed(4)}, {wp.longitude.toFixed(4)}
                         </span>
@@ -223,7 +223,7 @@ const MapEditor: React.FC<MapEditorProps> = ({
                       className="flex items-center justify-between bg-zinc-800 p-2 rounded text-sm"
                     >
                       <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-destructive"></div>
                         <span className="text-zinc-300">
                           Punto {wp.sequence}: {wp.latitude.toFixed(4)}, {wp.longitude.toFixed(4)}
                         </span>

@@ -13,21 +13,21 @@ interface RouteCardProps {
 export function RouteCard({ route, onEdit, onDelete }: RouteCardProps) {
   const getStatusStyles = (active: boolean) => {
     return active
-      ? "bg-green-600 text-white hover:bg-green-700"
-      : "bg-red-600 text-white hover:bg-red-700"
+      ? "bg-success text-success-foreground hover:bg-success/90"
+      : "bg-destructive text-destructive-foreground hover:bg-destructive/90"
   }
 
   return (
-    <Card className="bg-zinc-900 border-zinc-800 hover:bg-zinc-800 transition-all duration-300 hover:scale-[1.02]">
+    <Card className="bg-card border-border hover:bg-accent transition-all duration-300 hover:scale-[1.02]">
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <div className="p-4 bg-emerald-600/20 rounded-full">
-              <Route className="h-8 w-8 text-emerald-500" />
+            <div className="p-4 bg-primary/20 rounded-full">
+              <Route className="h-8 w-8 text-primary" />
             </div>
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <h3 className="text-xl font-bold text-white">
+                <h3 className="text-xl font-bold text-foreground">
                   {route.numberRoute}
                 </h3>
                 <Badge className={getStatusStyles(route.active)}>
@@ -35,22 +35,22 @@ export function RouteCard({ route, onEdit, onDelete }: RouteCardProps) {
                 </Badge>
               </div>
               {route.description && (
-                <div className="text-zinc-400">
-                  <span className="font-medium text-white">
+                <div className="text-muted-foreground">
+                  <span className="font-medium text-foreground">
                     {route.description}
                   </span>
                 </div>
               )}
               <div className="text-sm">
-                <span className="font-medium text-zinc-400">
+                <span className="font-medium text-muted-foreground">
                   Distancia:{" "}
                 </span>
-                <span className="text-emerald-500">{route.totalDistance || 0} km</span>
+                <span className="text-primary">{route.totalDistance || 0} km</span>
                 <span className="mx-2">•</span>
-                <span className="font-medium text-zinc-400">
+                <span className="font-medium text-muted-foreground">
                   Puntos:{" "}
                 </span>
-                <span className="text-emerald-500">{route.waypoints}</span>
+                <span className="text-primary">{route.waypoints}</span>
               </div>
             </div>
           </div>
@@ -68,7 +68,7 @@ export function RouteCard({ route, onEdit, onDelete }: RouteCardProps) {
               variant="outline"
               size="sm"
               onClick={() => onDelete(route.id!)}
-              className="border-red-700 text-red-500 hover:bg-red-900/20"
+              className="border-destructive/50 text-destructive hover:bg-destructive/10"
             >
               <Trash2 className="h-4 w-4 mr-2" />
               Eliminar
