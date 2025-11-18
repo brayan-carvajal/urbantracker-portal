@@ -34,7 +34,7 @@ export default function LoginPage() {
                     <CardContent className="space-y-6">
                         <form onSubmit={handleLogin} className="space-y-4">
                             {error && (
-                                <div className="p-3 text-sm text-red-500 bg-red-50 border border-red-200 rounded-md">{error}</div>
+                                <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">{error}</div>
                             )}
                             <div className="space-y-2">
                                 <Label htmlFor="userName" className="text-card-foreground">

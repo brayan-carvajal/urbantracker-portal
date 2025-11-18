@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { getToken, validateToken } from "@/lib/auth"
 import Image from "next/image"
 import whiteLogo from "@Public/white-logo.svg"
+import { ThemeToggle } from "./theme-toggle"
 
 interface AuthGuardProps {
   children: React.ReactNode
@@ -75,5 +76,10 @@ export function AuthGuard({ children }: AuthGuardProps) {
     return null // No renderizar nada mientras redirige
   }
 
-  return <>{children}</>
+  return (
+    <>
+      {children}
+      <ThemeToggle />
+    </>
+  )
 }

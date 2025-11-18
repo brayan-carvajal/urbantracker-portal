@@ -1,79 +1,74 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import 'mapbox-gl/dist/mapbox-gl.css';
-
-@custom-variant dark (&:is(.dark *));
-
 :root {
-  /* Tema negro dominante con acentos verdes */
-  --background: #000000;
-  --foreground: #ffffff;
-  --card: #0a0a0a;
-  --card-foreground: #ffffff;
-  --popover: #0a0a0a;
-  --popover-foreground: #ffffff;
-  --primary: #10b981;
-  --primary-foreground: #000000;
-  --secondary: #111111;
-  --secondary-foreground: #ffffff;
-  --muted: #1a1a1a;
-  --muted-foreground: #a3a3a3;
-  --accent: #10b981;
-  --accent-foreground: #000000;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --border: #262626;
-  --input: #111111;
-  --ring: rgba(16, 185, 129, 0.6);
-  --chart-1: #10b981;
-  --chart-2: #06b6d4;
-  --chart-3: #f59e0b;
-  --chart-4: #ef4444;
-  --chart-5: #8b5cf6;
+  /* Modo claro - colores RGB sólidos */
+  --background: 248 250 252;
+  --foreground: 15 23 42;
+  --card: 255 255 255;
+  --card-foreground: 15 23 42;
+  --popover: 255 255 255;
+  --popover-foreground: 15 23 42;
+  --primary: 16 185 129;
+  --primary-foreground: 255 255 255;
+  --secondary: 241 245 249;
+  --secondary-foreground: 15 23 42;
+  --muted: 241 245 249;
+  --muted-foreground: 100 116 139;
+  --accent: 241 245 249;
+  --accent-foreground: 15 23 42;
+  --destructive: 239 68 68;
+  --destructive-foreground: 255 255 255;
+  --border: 226 232 240;
+  --input: 226 232 240;
+  --ring: 16 185 129;
+  --chart-1: 16 185 129;
+  --chart-2: 6 182 212;
+  --chart-3: 245 158 11;
+  --chart-4: 239 68 68;
+  --chart-5: 139 92 246;
   --radius: 0.75rem;
-  --sidebar: #000000;
-  --sidebar-foreground: #ffffff;
-  --sidebar-primary: #111111;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #10b981;
-  --sidebar-accent-foreground: #000000;
-  --sidebar-border: #262626;
-  --sidebar-ring: rgba(16, 185, 129, 0.6);
+  --sidebar: 248 250 252;
+  --sidebar-foreground: 15 23 42;
+  --sidebar-primary: 241 245 249;
+  --sidebar-primary-foreground: 15 23 42;
+  --sidebar-accent: 16 185 129;
+  --sidebar-accent-foreground: 255 255 255;
+  --sidebar-border: 226 232 240;
+  --sidebar-ring: 16 185 129;
 }
 
 .dark {
-  --background: #000000;
-  --foreground: #ffffff;
-  --card: #0a0a0a;
-  --card-foreground: #ffffff;
-  --popover: #0a0a0a;
-  --popover-foreground: #ffffff;
-  --primary: #10b981;
-  --primary-foreground: #000000;
-  --secondary: #111111;
-  --secondary-foreground: #ffffff;
-  --muted: #1a1a1a;
-  --muted-foreground: #a3a3a3;
-  --accent: #10b981;
-  --accent-foreground: #000000;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --border: #262626;
-  --input: #111111;
-  --ring: rgba(16, 185, 129, 0.6);
-  --chart-1: #10b981;
-  --chart-2: #06b6d4;
-  --chart-3: #f59e0b;
-  --chart-4: #ef4444;
-  --chart-5: #8b5cf6;
-  --sidebar: #000000;
-  --sidebar-foreground: #ffffff;
-  --sidebar-primary: #111111;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #10b981;
-  --sidebar-accent-foreground: #000000;
-  --sidebar-border: #262626;
-  --sidebar-ring: rgba(16, 185, 129, 0.6);
+  /* Modo oscuro */
+  --background: 2 6 23;
+  --foreground: 248 250 252;
+  --card: 15 23 42;
+  --card-foreground: 248 250 252;
+  --popover: 15 23 42;
+  --popover-foreground: 248 250 252;
+  --primary: 16 185 129;
+  --primary-foreground: 2 6 23;
+  --secondary: 30 41 59;
+  --secondary-foreground: 226 232 240;
+  --muted: 30 41 59;
+  --muted-foreground: 148 163 184;
+  --accent: 30 41 59;
+  --accent-foreground: 248 250 252;
+  --destructive: 239 68 68;
+  --destructive-foreground: 248 250 252;
+  --border: 30 41 59;
+  --input: 30 41 59;
+  --ring: 16 185 129;
+  --chart-1: 16 185 129;
+  --chart-2: 6 182 212;
+  --chart-3: 245 158 11;
+  --chart-4: 239 68 68;
+  --chart-5: 139 92 246;
+  --sidebar: 15 23 42;
+  --sidebar-foreground: 248 250 252;
+  --sidebar-primary: 30 41 59;
+  --sidebar-primary-foreground: 248 250 252;
+  --sidebar-accent: 16 185 129;
+  --sidebar-accent-foreground: 2 6 23;
+  --sidebar-border: 30 41 59;
+  --sidebar-ring: 16 185 129;
 }
 
 @theme inline {
@@ -115,12 +110,24 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* Librerías externas */
+@import 'mapbox-gl/dist/mapbox-gl.css';
+
+/* Tailwind */
+@import 'tailwindcss';
+
+/* Animaciones */
+@import 'tw-animate-css';
+
+/* Variante oscura para Tailwind */
+@custom-variant dark (&:is(.dark *));
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-black text-white font-sans;
+    @apply bg-background text-foreground font-sans;
   }
   html {
     @apply scroll-smooth;

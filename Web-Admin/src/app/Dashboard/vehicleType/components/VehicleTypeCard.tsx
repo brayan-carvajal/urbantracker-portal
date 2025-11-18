@@ -12,24 +12,24 @@ interface VehicleTypeCardProps {
 
 const VehicleTypeCard: React.FC<VehicleTypeCardProps> = ({ vehicleType, onEdit, onDelete }) => {
   return (
-    <Card className="bg-zinc-900 border-zinc-800 hover:bg-zinc-800 transition-all duration-300 hover:scale-[1.02]">
+    <Card className="bg-card border-border hover:bg-card/80 transition-all duration-300 hover:scale-[1.02]">
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <div className="p-4 bg-emerald-600/20 rounded-full">
-              <Car className="h-8 w-8 text-emerald-500" />
+            <div className="p-4 bg-primary/20 rounded-full">
+              <Car className="h-8 w-8 text-primary" />
             </div>
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <h3 className="text-xl font-bold text-white">
+                <h3 className="text-xl font-bold text-foreground">
                   {vehicleType.name}
                 </h3>
-                <Badge className={vehicleType.active ? "bg-emerald-600" : "bg-zinc-600"}>
+                <Badge className={vehicleType.active ? "bg-primary text-primary-foreground" : "bg-muted"}>
                   {vehicleType.active ? "Activo" : "Inactivo"}
                 </Badge>
               </div>
-              <div className="text-zinc-400">
-                <span className="font-medium text-white">
+              <div className="text-muted-foreground">
+                <span className="font-medium text-foreground">
                   {vehicleType.description}
                 </span>
               </div>
