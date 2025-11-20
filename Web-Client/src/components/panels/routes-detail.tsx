@@ -32,6 +32,7 @@ export interface VehicleTelemetryMessage {
 
 // Componente que muestra el detalle de una ruta seleccionada
 export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => void }) {
+  console.log('Route id:', route.id);
   const [fullRoute, setFullRoute] = useState<Route | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +68,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
     const fetchDetail = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`http://10.3.235.231:8080/api/v1/public/route/${route.id}/GEOMETRY`);
+        const response = await fetch(`http://localhost:8080/api/v1/public/route/${route.id}/GEOMETRY`);
         if (!response.ok) throw new Error('Error al cargar detalle de ruta');
         let data: any;
         try {
@@ -132,19 +133,42 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
     setVehiclePositions(new Map());
 
     const client = new Client({
-      webSocketFactory: () => new SockJS('http://10.3.235.231:8080/ws/connect'),
+      webSocketFactory: () => new SockJS('http://localhost:8080/ws/connect'),
       onConnect: () => {
         console.log('Connected to WebSocket');
+        console.log('Subscribing to /topic/route/' + route.id + '/telemetry');
         client.subscribe(`/topic/route/${route.id}/telemetry`, (message) => {
-          console.log('Received telemetry:', message.body);
+          console.log('Received telemetry for route:', message.body);
           setTelemetry(message.body);
           try {
             const telemetryData: VehicleTelemetryMessage = JSON.parse(message.body);
-            setVehiclePositions(prev => new Map(prev.set(telemetryData.vehicleId, telemetryData)));
+            console.log('Parsed telemetry data:', telemetryData);
+            console.log('Setting vehicle positions for', telemetryData.vehicleId);
+            setVehiclePositions(prev => {
+              const newMap = new Map(prev.set(telemetryData.vehicleId, telemetryData));
+              console.log('New vehicle positions:', newMap);
+              return newMap;
+            });
             setParseError(null); // Limpiar error si se parsea correctamente
           } catch (err) {
             console.error('Error parsing telemetry JSON:', err);
             setParseError('Error al parsear mensaje de telemetría: formato JSON inválido');
+          }
+        });
+
+        // También suscribirse a telemetría de vehículos sin ruta asignada
+        console.log('Subscribing to /topic/vehicles/+/telemetry');
+        client.subscribe('/topic/vehicles/+/telemetry', (message) => {
+          console.log('Received vehicle telemetry:', message.body);
+          setTelemetry(message.body);
+          try {
+            const telemetryData: VehicleTelemetryMessage = JSON.parse(message.body);
+            console.log('Parsed vehicle telemetry data:', telemetryData);
+            setVehiclePositions(prev => new Map(prev.set(telemetryData.vehicleId, telemetryData)));
+            setParseError(null); // Limpiar error si se parsea correctamente
+          } catch (err) {
+            console.error('Error parsing vehicle telemetry JSON:', err);
+            setParseError('Error al parsear mensaje de telemetría de vehículo: formato JSON inválido');
           }
         });
       },

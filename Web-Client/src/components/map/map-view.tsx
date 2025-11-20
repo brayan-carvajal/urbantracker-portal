@@ -164,10 +164,13 @@ const MapViewComponent = ({ children }: { children?: React.ReactNode }) => {
   }, [routes, selectedRoutes, focusedRoute]);
 
   const vehicleMarkers = useMemo(() => {
+    console.log('Vehicle positions in map-view:', vehiclePositions);
     if (!vehiclePositions) return [];
-    return Array.from(vehiclePositions.values()).map((vehicle) => (
+    const markers = Array.from(vehiclePositions.values()).map((vehicle) => (
       <VehicleMarker key={vehicle.vehicleId} vehicle={vehicle} />
     ));
+    console.log('Created markers:', markers.length);
+    return markers;
   }, [vehiclePositions]);
 
   return (
@@ -177,8 +180,8 @@ const MapViewComponent = ({ children }: { children?: React.ReactNode }) => {
           ref={mapRef}
           mapboxAccessToken={accessToken}
           initialViewState={{
-            longitude: -75.2810060736973,
-            latitude: 2.9342900126616227,
+            longitude: -74.08175,
+            latitude: 4.60971,
             zoom: 15,
           }}
           mapStyle="mapbox://styles/afsb114/cmf7eaden003301s563d81iss"
