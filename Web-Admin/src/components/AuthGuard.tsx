@@ -4,8 +4,8 @@ import { useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { getToken, validateToken } from "@/lib/auth"
 import Image from "next/image"
-import whiteLogo from "@Public/white-logo.svg"
 import { ThemeToggle } from "./theme-toggle"
+import { useTheme } from "@/hooks/useTheme"
 
 interface AuthGuardProps {
   children: React.ReactNode
@@ -14,8 +14,14 @@ interface AuthGuardProps {
 export function AuthGuard({ children }: AuthGuardProps) {
   const [isValidating, setIsValidating] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
+  const { theme } = useTheme()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Rutas públicas que no requieren autenticación
   const publicRoutes = ["/auth/login", "/forgot-password", "/reset-password", "/verify-otp"]
@@ -53,13 +59,16 @@ export function AuthGuard({ children }: AuthGuardProps) {
     checkAuth()
   }, [pathname, router, isPublicRoute])
 
+  // Determinar logo según tema - con placeholder durante hidratación
+  const logoSrc = mounted ? (theme === "dark" ? "/logo-icon-white.svg" : "/logo-icon-black.svg") : "/logo-icon-white.svg";
+
   if (isValidating) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-pulse">
             <Image
-              src="/white-logo.svg"
+              src={logoSrc}
               alt="UrbanTracker Logo"
               className="mx-auto mb-6 opacity-80 w-72 h-auto"
               width={72}

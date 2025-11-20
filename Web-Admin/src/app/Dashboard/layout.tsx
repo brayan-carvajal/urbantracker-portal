@@ -15,10 +15,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { DashboardHeader } from "./components/DashboardHeader";
 import { DriverProvider } from "./drivers/context/DriverContext";
+import { useTheme } from "@/hooks/useTheme";
 import "../globals.css";
 
 // Create a client
@@ -119,7 +120,13 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [expandedItems, setExpandedItems] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
+  const { theme } = useTheme();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const toggleExpanded = (title: string) => {
     setExpandedItems((prev) => prev === title ? null : title);
@@ -134,6 +141,9 @@ export default function DashboardLayout({
     return subItems.some((item) => pathname === item.href);
   };
 
+  // Determinar logo según tema - con placeholder durante hidratación
+  const logoSrc = mounted ? (theme === "dark" ? "/logo-icon-white.svg" : "/logo-icon-black.svg") : "/logo-icon-white.svg";
+
   return (
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-background">
@@ -142,7 +152,7 @@ export default function DashboardLayout({
           <div className="flex h-20 items-center px-8 border-b border-sidebar-border">
             <div className="flex items-center gap-3">
               <Image
-                src="/white-logo.svg"
+                src={logoSrc}
                 alt="Logo UrbanTracker"
                 width={280}
                 height={280}

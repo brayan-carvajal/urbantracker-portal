@@ -12,7 +12,7 @@ export function Sidebar() {
   const { isPanelCollapsed, togglePanelCollapse } = usePanelCollapse()
   const router = useRouter()
   const pathname = usePathname()
-  const { theme } = useTheme()
+  const { theme, mounted, safeTheme } = useTheme()
 
   const navigationItems = [
     { id: "routes", icon: Bus, label: "Rutas", path: "/map/routes" },
@@ -42,7 +42,7 @@ export function Sidebar() {
       <div className="flex flex-col items-center space-y-1 mb-8">
         <a href="/" className="w-15 h-15 flex items-center justify-center" title="Ir a la página principal">
           <img
-            src={theme === "dark" ? "/logo-icon-white.svg" : "/logo-icon-black.svg"}
+            src={mounted && safeTheme === "dark" ? "/logo-icon-white.svg" : "/logo-icon-black.svg"}
             alt="UrbanTracker Logo"
             className="w-13 h-13 object-contain"
           />

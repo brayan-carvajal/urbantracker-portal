@@ -292,7 +292,7 @@ const DriverScheduleFormManager: React.FC<DriverScheduleFormManagerProps> = ({
               >
                 <input
                   type="checkbox"
-                  checked={daySchedule.selected}
+                  checked={daySchedule.selected ?? false}
                   onChange={() => handleDayToggle(index)}
                   className="sr-only"
                 />

@@ -5,6 +5,7 @@ import SockJS from 'sockjs-client';
 import { useVehiclePositions } from '../map/vehicle-context';
 import { useRoutePoints, useRoute } from '../map/route-context';
 
+
 // Interface que define la estructura de una ruta de transporte público
 export interface Route {
   id: number;
@@ -109,8 +110,8 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
             end: `${last.latitude}, ${last.longitude}`,
             startDetail: `Inicio: ${first.latitude}, ${first.longitude}`,
             endDetail: `Fin: ${last.latitude}, ${last.longitude}`,
-            imageStart: route.imageStart ? `/${route.imageStart}` : '/ruta1.png', // Default fallback
-            imageEnd: route.imageEnd ? `/${route.imageEnd}` : '/ruta2.png', // Default fallback
+            imageStart: route.imageStart || '',
+            imageEnd: route.imageEnd || '',
           });
         }
       } catch (err) {
@@ -198,7 +199,9 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
           {/* Imagen y datos de inicio */}
           <div className="flex flex-col items-center">
-            <img src={fullRoute.imageStart} alt="Ruta inicio" className="w-24 h-24 object-contain mb-1 rounded" />
+            <div className="w-24 h-24 flex items-center justify-center bg-muted rounded-lg">
+              <Bus className="h-8 w-8 text-muted-foreground" />
+            </div>
             <div className="flex items-center gap-1 mt-2">
               <span className="bg-primary w-3 h-3 rounded-full" />
               <span className="text-xs text-muted-foreground font-semibold">Ida</span>
@@ -207,7 +210,9 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
           </div>
           {/* Imagen y datos de fin */}
           <div className="flex flex-col items-center">
-            <img src={fullRoute.imageEnd} alt="Ruta termina" className="w-24 h-24 object-contain mb-1 rounded" />
+            <div className="w-24 h-24 flex items-center justify-center bg-muted rounded-lg">
+              <Bus className="h-8 w-8 text-muted-foreground" />
+            </div>
             <div className="flex items-center gap-1 mt-2">
               <span className="bg-secondary w-3 h-3 rounded-full" />
               <span className="text-xs text-muted-foreground font-semibold">Vuelta</span>

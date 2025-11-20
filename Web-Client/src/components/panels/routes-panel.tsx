@@ -27,18 +27,57 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
         if (!response.ok) throw new Error('Error al cargar rutas');
         const data = await response.json();
         
-        const mappedRoutes: Route[] = data.data.map((r: RouteResDto) => ({
-          id: r.id,
-          name: r.numberRoute,
-          description: r.description,
-          start: '', 
-          end: '',
-          imageStart: r.outboundImageUrl,
-          imageEnd: r.returnImageUrl,
-          startDetail: '',
-          endDetail: '',
+        const routesWithDetails = await Promise.all(data.data.map(async (r: RouteResDto) => {
+          try {
+            // Obtener geometría para cada ruta
+            const geometryResponse = await fetch(`http://localhost:8080/api/v1/public/route/${r.id}/GEOMETRY`);
+            let startPoint = 'Cargando...';
+            let endPoint = 'Cargando...';
+            
+            if (geometryResponse.ok) {
+              const geometryData = await geometryResponse.json();
+              const waypoints = geometryData.data?.waypoints || [];
+              
+              if (waypoints.length > 0) {
+                const first = waypoints.find((w: any) => w.sequence === 1) || waypoints[0];
+                const last = waypoints.reduce((prev: any, curr: any) => 
+                  (prev && curr && curr.sequence > prev.sequence) ? curr : prev, waypoints[0] || first);
+                
+                if (first && last) {
+                  startPoint = `${first.latitude.toFixed(6)}, ${first.longitude.toFixed(6)}`;
+                  endPoint = `${last.latitude.toFixed(6)}, ${last.longitude.toFixed(6)}`;
+                }
+              }
+            }
+            
+            return {
+              id: r.id,
+              name: r.numberRoute,
+              description: r.description,
+              start: startPoint, 
+              end: endPoint,
+              imageStart: r.outboundImageUrl || '',
+              imageEnd: r.returnImageUrl || '',
+              startDetail: startPoint !== 'Cargando...' ? `Inicio: ${startPoint}` : '',
+              endDetail: endPoint !== 'Cargando...' ? `Fin: ${endPoint}` : '',
+            };
+          } catch (detailErr) {
+            console.warn(`Error cargando detalles de ruta ${r.id}:`, detailErr);
+            return {
+              id: r.id,
+              name: r.numberRoute,
+              description: r.description,
+              start: 'No disponible',
+              end: 'No disponible',
+              imageStart: r.outboundImageUrl || '',
+              imageEnd: r.returnImageUrl || '',
+              startDetail: '',
+              endDetail: '',
+            };
+          }
         }));
-        setRoutes(mappedRoutes);
+        
+        setRoutes(routesWithDetails);
       } catch (err) {
         setError('No se encontraron rutas');
       } finally {

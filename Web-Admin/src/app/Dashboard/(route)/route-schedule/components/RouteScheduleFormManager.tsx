@@ -264,7 +264,7 @@ const RouteScheduleFormManager: React.FC<RouteScheduleFormManagerProps> = ({
               >
                 <input
                   type="checkbox"
-                  checked={daySchedule.selected}
+                  checked={daySchedule.selected ?? false}
                   onChange={() => handleDayToggle(index)}
                   className="sr-only"
                 />

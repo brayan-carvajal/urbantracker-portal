@@ -12,7 +12,8 @@ export const metadata: Metadata = {
   generator: "v0.app",
   icons: {
   icon: [
-    { url: "/white-logo.svg", sizes: "any", type: "image/svg+xml" },
+    { url: "/logo-icon-black.svg", sizes: "any", type: "image/svg+xml" },
+    { url: "/logo-icon-white.svg", sizes: "any", type: "image/svg+xml" },
     { url: "/favicon.ico", sizes: "any", type: "image/x-icon" },
   ],
 }
