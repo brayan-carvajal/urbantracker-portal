@@ -67,7 +67,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
     const fetchDetail = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:8080/api/v1/public/route/${route.id}/GEOMETRY`);
+        const response = await fetch(`http://10.3.235.231:8080/api/v1/public/route/${route.id}/GEOMETRY`);
         if (!response.ok) throw new Error('Error al cargar detalle de ruta');
         let data: any;
         try {
@@ -132,7 +132,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
     setVehiclePositions(new Map());
 
     const client = new Client({
-      webSocketFactory: () => new SockJS('http://localhost:8080/ws/connect'),
+      webSocketFactory: () => new SockJS('http://10.3.235.231:8080/ws/connect'),
       onConnect: () => {
         console.log('Connected to WebSocket');
         client.subscribe(`/topic/route/${route.id}/telemetry`, (message) => {
