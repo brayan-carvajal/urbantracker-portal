@@ -50,10 +50,10 @@ export default function RouteDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black p-6">
+      <div className="min-h-screen bg-background p-6">
         <div className="flex items-center justify-center h-64">
-          <div className="flex items-center gap-3 text-zinc-300">
-            <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+          <div className="flex items-center gap-3 text-muted-foreground">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
             <span className="text-lg">Cargando Rutas...</span>
           </div>
         </div>
@@ -64,7 +64,7 @@ export default function RouteDashboard() {
   if (error) return <RouteErrorState error={error} />;
 
   return (
-    <div className="space-y-8 bg-black min-h-screen p-6">
+    <div className="space-y-8 bg-background min-h-screen p-6">
       {/* Header */}
       <RouteHeader onCreateRoute={handleCreateRoute} />
 
@@ -83,7 +83,7 @@ export default function RouteDashboard() {
       <section className="space-y-6">
         {filteredRoutes.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-zinc-400 text-lg">
+            <div className="text-muted-foreground text-lg">
               {searchTerm || statusFilter !== "all"
                 ? "No routes found with the applied filters"
                 : "No routes registered"}
@@ -91,7 +91,7 @@ export default function RouteDashboard() {
             {!searchTerm && statusFilter === "all" && (
               <button
                 onClick={handleCreateRoute}
-                className="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg transition-colors"
+                className="mt-4 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-lg transition-colors"
               >
                 Agregar primera ruta
               </button>

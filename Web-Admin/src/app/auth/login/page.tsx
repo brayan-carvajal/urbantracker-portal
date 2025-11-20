@@ -1,17 +1,27 @@
 "use client"
 
 import type React from "react"
+import { useState, useEffect } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Image from "next/image"
+import { useTheme } from "@/hooks/useTheme"
 import { useLogin } from "./hooks/useLogin"
-import { newMethodo } from "./services/api/loginApi"
 
 export default function LoginPage() {
     const { userName, setUserName, password, setPassword, isLoading, error, handleLogin, router } = useLogin()
+    const { theme } = useTheme()
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
+
+    // Determinar logo según tema - con placeholder durante hidratación
+    const logoSrc = mounted ? (theme === "dark" ? "/logo-full-white.svg" : "/logo-full-black.svg") : "/logo-full-white.svg"
 
     return (
         <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -19,7 +29,7 @@ export default function LoginPage() {
                 {/* Logo/Brand */}
                 <div className="text-center">
                     <div className="flex items-center justify-center mb-6">
-                        <Image src="/white-complete-logo.svg" alt="Logo" width={200} height={50} />
+                        <Image src={logoSrc} alt="Logo" width={200} height={50} />
                     </div>
                     <h1 className="text-2xl font-bold text-foreground">Bienvenido</h1>
                     <p className="text-muted-foreground mt-2">Inicia sesión en tu cuenta</p>
@@ -35,7 +45,7 @@ export default function LoginPage() {
                     <CardContent className="space-y-6">
                         <form onSubmit={handleLogin} className="space-y-4">
                             {error && (
-                                <div className="p-3 text-sm text-red-500 bg-red-50 border border-red-200 rounded-md">{error}</div>
+                                <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">{error}</div>
                             )}
                             <div className="space-y-2">
                                 <Label htmlFor="userName" className="text-card-foreground">
@@ -90,12 +100,6 @@ export default function LoginPage() {
                             </div>
                         </form>
                     </CardContent>
-                    {/* //nuevo metodo */}
-                    <div>
-                        <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={newMethodo}>
-                            nuevo metodo
-                        </Button>
-                    </div>
                 </Card>
             </div>
         </div>
