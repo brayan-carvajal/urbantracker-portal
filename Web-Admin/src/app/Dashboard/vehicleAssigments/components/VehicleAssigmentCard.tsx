@@ -23,39 +23,39 @@ const getStatusLabel = (status: string): string => {
 
 const getStatusStyles = (status: string) => {
     const styles: Record<string, string> = {
-      "ACTIVE": "bg-green-600 text-white hover:bg-green-700",
-      "INACTIVE": "bg-red-600 text-white hover:bg-red-700"
+      "ACTIVE": "bg-success text-success-foreground hover:bg-success/90",
+      "INACTIVE": "bg-destructive text-destructive-foreground hover:bg-destructive/90"
     }
-    return styles[status] || "bg-gray-600 text-white hover:bg-gray-700"
+    return styles[status] || "bg-muted text-muted-foreground hover:bg-muted/80"
 }
 
 export function VehicleAssigmentCard({ vehicleAssigment, onEdit, onDelete }: VehicleAssigmentCardProps) {
 
     return (
-        <Card className="bg-zinc-900 border-zinc-800 hover:bg-zinc-800 transition-all duration-300 hover:scale-[1.02]">
+        <Card className="bg-card border-border hover:bg-accent transition-all duration-300 hover:scale-[1.02]">
             <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-6">
-                        <div className="p-4 bg-emerald-600/20 rounded-full">
-                            <Car className="h-8 w-8 text-emerald-500" />
+                        <div className="p-4 bg-primary/20 rounded-full">
+                            <Car className="h-8 w-8 text-primary" />
                         </div>
                         <div className="space-y-3">
                             <div className="flex items-center gap-3">
-                                <h3 className="text-xl font-bold text-white">
+                                <h3 className="text-xl font-bold text-foreground">
                                     {vehicleAssigment.vehiclePlate}
                                 </h3>
                                 <Badge className={getStatusStyles(vehicleAssigment.assignmentStatus)}>
                                     {getStatusLabel(vehicleAssigment.assignmentStatus)}
                                 </Badge>
                             </div>
-                            <div className="text-zinc-400 space-y-1">
+                            <div className="text-muted-foreground space-y-1">
                                 <div>
-                                    <span className="font-medium text-white">Conductor: </span>
-                                    <span className="text-emerald-500">{vehicleAssigment.driverName}</span>
+                                    <span className="font-medium text-foreground">Conductor: </span>
+                                    <span className="text-primary">{vehicleAssigment.driverName}</span>
                                 </div>
                                 <div>
-                                    <span className="font-medium text-white">Nota: </span>
-                                    <span className="text-zinc-300">{vehicleAssigment.note}</span>
+                                    <span className="font-medium text-foreground">Nota: </span>
+                                    <span className="text-muted-foreground">{vehicleAssigment.note}</span>
                                 </div>
                             </div>
                         </div>
@@ -74,7 +74,7 @@ export function VehicleAssigmentCard({ vehicleAssigment, onEdit, onDelete }: Veh
                             variant="outline"
                             size="sm"
                             onClick={() => onDelete(vehicleAssigment.id)}
-                            className="border-red-700 text-red-500 hover:bg-red-900/20"
+                            className="border-destructive/50 text-destructive hover:bg-destructive/10"
                         >
                             <Trash2 className="h-4 w-4 mr-2" />
                             Eliminar
@@ -85,4 +85,3 @@ export function VehicleAssigmentCard({ vehicleAssigment, onEdit, onDelete }: Veh
         </Card>
     );
 }
-

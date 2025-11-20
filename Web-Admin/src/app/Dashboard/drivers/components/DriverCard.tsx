@@ -25,17 +25,21 @@ export function DriverCard({ driver, onEdit, onDelete }: DriverCardProps) {
                                     {driver.firstName} {driver.lastName}
                                 </h3>
                             </div>
-                            <div className="text-muted-foreground">
+                            <div className="space-y-2">
                                 <span className="font-medium text-foreground flex items-center gap-2">
-                                    <CreditCard className="h-4 w-4 text-muted-foreground" /> N° Identificación: {driver.idNumber}
+                                    <CreditCard className="h-4 w-4 text-muted-foreground" /> 
+                                    <span className="text-muted-foreground">N° Identificación:</span> {driver.idNumber}
                                 </span>
 
                                 <span className="font-medium text-foreground flex items-center gap-2">
-                                    <Smartphone className="h-4 w-4 text-muted-foreground" /> Teléfono: {driver.phone}
+                                    <Smartphone className="h-4 w-4 text-muted-foreground" /> 
+                                    <span className="text-muted-foreground">Teléfono:</span> {driver.phone}
                                 </span>
 
                                 <span className="font-medium text-foreground flex items-center gap-2">
-                                    <Mail className="h-4 w-4 text-muted-foreground" /> Correo: <span className="text-primary"> {driver.email}</span>
+                                    <Mail className="h-4 w-4 text-muted-foreground" /> 
+                                    <span className="text-muted-foreground">Correo:</span> 
+                                    <span className="text-primary"> {driver.email}</span>
                                 </span>
                             </div>
                         </div>

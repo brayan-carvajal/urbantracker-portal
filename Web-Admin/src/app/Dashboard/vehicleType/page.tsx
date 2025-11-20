@@ -64,7 +64,7 @@ export default function VehicleTypesPage() {
             <div className="min-h-screen bg-background p-6">
                 <div className="flex items-center justify-center h-64">
                     <div className="flex items-center gap-3 text-muted-foreground">
-                        <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
                         <span className="text-lg">Cargando Tipos de Vehículo...</span>
                     </div>
                 </div>

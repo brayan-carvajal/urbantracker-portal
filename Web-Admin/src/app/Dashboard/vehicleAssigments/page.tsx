@@ -111,7 +111,7 @@ export default function VehicleAssigmentsPage() {
       <section className="space-y-6">
         {filteredVehicles.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-zinc-400 text-lg">
+            <div className="text-muted-foreground text-lg">
               {searchTerm
                 ? "No se encontraron vehículos con los filtros aplicados"
                 : "No hay vehiculos asignados aún"}
@@ -119,7 +119,7 @@ export default function VehicleAssigmentsPage() {
             {!searchTerm && (
               <Button
                 onClick={openCreateModal}
-                className="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="mt-4 bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Agregar primer asignación

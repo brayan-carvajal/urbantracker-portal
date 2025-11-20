@@ -85,7 +85,7 @@ export const CompanyModal: React.FC<CompanyModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-zinc-900  text-white max-w-2xl">
+      <DialogContent className="bg-card text-foreground max-w-2xl">
         <DialogHeader>
           <DialogTitle>
             {isEditing ? "Editar Empresa" : "Nueva Empresa"}
@@ -94,87 +94,87 @@ export const CompanyModal: React.FC<CompanyModalProps> = ({
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-zinc-400">
+              <Label htmlFor="name" className="text-foreground">
                 Nombre *
               </Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={handleInputChange("name")}
-                className="bg-zinc-800 border-zinc-700 text-white"
+                className="bg-input border-border text-foreground"
                 placeholder="Nombre de la empresa"
                 disabled={isLoading}
               />
               {errors.name && (
-                <p className="text-sm text-red-500">{errors.name}</p>
+                <p className="text-sm text-destructive">{errors.name}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="nit" className="text-zinc-400">
+              <Label htmlFor="nit" className="text-foreground">
                 NIT *
               </Label>
               <Input
                 id="nit"
                 value={formData.nit}
                 onChange={handleInputChange("nit")}
-                className="bg-zinc-800 border-zinc-700 text-white"
+                className="bg-input border-border text-foreground"
                 placeholder="NIT de la empresa"
                 disabled={isLoading}
               />
               {errors.nit && (
-                <p className="text-sm text-red-500">{errors.nit}</p>
+                <p className="text-sm text-destructive">{errors.nit}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone" className="text-zinc-400">
+              <Label htmlFor="phone" className="text-foreground">
                 Teléfono
               </Label>
               <Input
                 id="phone"
                 value={formData.phone}
                 onChange={handleInputChange("phone")}
-                className="bg-zinc-800 border-zinc-700 text-white"
+                className="bg-input border-border text-foreground"
                 placeholder="Teléfono de la empresa"
                 disabled={isLoading}
               />
               {errors.phone && (
-                <p className="text-sm text-red-500">{errors.phone}</p>
+                <p className="text-sm text-destructive">{errors.phone}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-zinc-400">
+              <Label htmlFor="email" className="text-foreground">
                 Email *
               </Label>
               <Input
                 id="email"
                 value={formData.email}
                 onChange={handleInputChange("email")}
-                className="bg-zinc-800 border-zinc-700 text-white"
+                className="bg-input border-border text-foreground"
                 placeholder="Email de la empresa"
                 disabled={isLoading}
               />
               {errors.email && (
-                <p className="text-sm text-red-500">{errors.email}</p>
+                <p className="text-sm text-destructive">{errors.email}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="country" className="text-zinc-400">
+              <Label htmlFor="country" className="text-foreground">
                 País
               </Label>
               <Input
                 id="country"
                 value={formData.country}
                 onChange={handleInputChange("country")}
-                className="bg-zinc-800 border-zinc-700 text-white"
+                className="bg-input border-border text-foreground"
                 placeholder="País de la empresa"
                 disabled={isLoading}
               />
               {errors.country && (
-                <p className="text-sm text-red-500">{errors.country}</p>
+                <p className="text-sm text-destructive">{errors.country}</p>
               )}
             </div>
           </div>
@@ -183,7 +183,7 @@ export const CompanyModal: React.FC<CompanyModalProps> = ({
               type="button"
               variant="outline"
               onClick={onClose}
-              className="border-zinc-700 text-white hover:bg-zinc-800"
+              className="border-border text-foreground hover:bg-accent"
               disabled={isLoading}
             >
               Cancelar
@@ -191,7 +191,7 @@ export const CompanyModal: React.FC<CompanyModalProps> = ({
             <Button
               type="submit"
               disabled={isLoading}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {isEditing ? "Editar" : "Crear"} Empresa

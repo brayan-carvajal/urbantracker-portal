@@ -66,7 +66,7 @@ const VehicleTypeModal: React.FC<VehicleTypeModalProps> = ({
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-muted-foreground">
+              <Label htmlFor="name" className="text-foreground">
                 Nombre *
               </Label>
               <Input
@@ -78,11 +78,11 @@ const VehicleTypeModal: React.FC<VehicleTypeModalProps> = ({
                 disabled={isSaving}
               />
               {localErrors.name && (
-                <p className="text-sm text-red-500">{localErrors.name}</p>
+                <p className="text-sm text-destructive">{localErrors.name}</p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description" className="text-muted-foreground">
+              <Label htmlFor="description" className="text-foreground">
                 Descripción
               </Label>
               <Input
@@ -94,7 +94,7 @@ const VehicleTypeModal: React.FC<VehicleTypeModalProps> = ({
                 disabled={isSaving}
               />
               {localErrors.description && (
-                <p className="text-sm text-red-500">{localErrors.description}</p>
+                <p className="text-sm text-destructive">{localErrors.description}</p>
               )}
             </div>
           </div>
@@ -103,7 +103,7 @@ const VehicleTypeModal: React.FC<VehicleTypeModalProps> = ({
               type="button"
               variant="outline"
               onClick={onClose}
-              className="border-border text-foreground hover:bg-secondary"
+              className="border-border text-foreground hover:bg-accent"
               disabled={isSaving}
             >
               Cancelar

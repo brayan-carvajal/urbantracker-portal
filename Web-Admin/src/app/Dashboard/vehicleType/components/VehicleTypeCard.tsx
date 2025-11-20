@@ -49,7 +49,7 @@ const VehicleTypeCard: React.FC<VehicleTypeCardProps> = ({ vehicleType, onEdit, 
               variant="outline"
               size="sm"
               onClick={() => onDelete(vehicleType.id)}
-              className="border-red-700 text-red-500 hover:bg-red-900/20"
+              className="border-destructive/50 text-destructive hover:bg-destructive/10"
             >
               <Trash2 className="h-4 w-4 mr-2" />
               Eliminar

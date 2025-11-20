@@ -7,8 +7,8 @@ import { ThemeWrapper } from "@/components/theme-wrapper"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "Dashboard UrbanTracker",
-  description: "Sistema de gestión de transporte y logística",
+  title: "UrbanTracker",
+  description: "Sistema de gestión de transporte",
   generator: "v0.app",
   icons: {
   icon: [

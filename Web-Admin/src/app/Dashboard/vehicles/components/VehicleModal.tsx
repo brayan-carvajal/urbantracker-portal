@@ -147,7 +147,7 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-zinc-900  text-white max-w-2xl">
+      <DialogContent className="bg-card text-foreground max-w-2xl">
         <DialogHeader>
           <DialogTitle>
             {isEditing ? "Editar Vehiculo" : "Nuevo Vehiculo"}
@@ -156,24 +156,24 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="licencePlate" className="text-zinc-400">
+              <Label htmlFor="licencePlate" className="text-foreground">
                 Matrícula *
               </Label>
               <Input
                 id="licencePlate"
                 value={formData.licencePlate}
                 onChange={handleInputChange("licencePlate")}
-                className="bg-zinc-800 border-zinc-700 text-white"
+                className="bg-input border-border text-foreground"
                 placeholder="ABC-123"
                 disabled={isLoading}
               />
               {errors.licencePlate && (
-                <p className="text-sm text-red-500">{errors.licencePlate}</p>
+                <p className="text-sm text-destructive">{errors.licencePlate}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="vehicleTypeId" className="text-zinc-400">
+              <Label htmlFor="vehicleTypeId" className="text-foreground">
                 Tipo de Vehículo *
               </Label>
               <Select
@@ -182,60 +182,60 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                   onFormChange("vehicleTypeId", Number(value))
                 }
               >
-                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                <SelectTrigger className="bg-input border-border text-foreground">
                   <SelectValue placeholder="Seleccione el tipo de vehículo" />
                 </SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-700">
+                <SelectContent className="bg-popover border-border">
                   {vehicleTypes.map((type) => (
-                    <SelectItem key={type.id} value={type.id.toString()}>
+                    <SelectItem key={type.id} value={type.id.toString()} className="text-popover-foreground hover:bg-accent focus:bg-accent">
                       {type.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               {errors.vehicleTypeId && (
-                <p className="text-sm text-red-500">{errors.vehicleTypeId}</p>
+                <p className="text-sm text-destructive">{errors.vehicleTypeId}</p>
               )}
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="brand" className="text-zinc-400">
+              <Label htmlFor="brand" className="text-foreground">
                 Marca *
               </Label>
               <Input
                 id="brand"
                 value={formData.brand}
                 onChange={handleInputChange("brand")}
-                className="bg-zinc-800 border-zinc-700 text-white"
+                className="bg-input border-border text-foreground"
                 placeholder="Volvo"
                 disabled={isLoading}
               />
               {errors.brand && (
-                <p className="text-sm text-red-500">{errors.brand}</p>
+                <p className="text-sm text-destructive">{errors.brand}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="model" className="text-zinc-400">
+              <Label htmlFor="model" className="text-foreground">
                 Modelo *
               </Label>
               <Input
                 id="model"
                 value={formData.model}
                 onChange={handleInputChange("model")}
-                className="bg-zinc-800 border-zinc-700 text-white"
+                className="bg-input border-border text-foreground"
                 placeholder="FH16"
                 disabled={isLoading}
               />
               {errors.model && (
-                <p className="text-sm text-red-500">{errors.model}</p>
+                <p className="text-sm text-destructive">{errors.model}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="companyId" className="text-zinc-400">
+              <Label htmlFor="companyId" className="text-foreground">
                 Compañía *
               </Label>
               <Select
@@ -244,26 +244,26 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                   onFormChange("companyId", Number(value))
                 }
               >
-                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                <SelectTrigger className="bg-input border-border text-foreground">
                   <SelectValue placeholder="Seleccione la compañía" />
                 </SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-700">
+                <SelectContent className="bg-popover border-border">
                   {companies.map((company) => (
-                    <SelectItem key={company.id} value={company.id.toString()}>
+                    <SelectItem key={company.id} value={company.id.toString()} className="text-popover-foreground hover:bg-accent focus:bg-accent">
                       {company.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               {errors.companyId && (
-                <p className="text-sm text-red-500">{errors.companyId}</p>
+                <p className="text-sm text-destructive">{errors.companyId}</p>
               )}
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="year" className="text-zinc-400">
+              <Label htmlFor="year" className="text-foreground">
                 Año *
               </Label>
               <Input
@@ -271,24 +271,24 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                 type="number"
                 value={formData.year}
                 onChange={handleInputChange("year")}
-                className="bg-zinc-800 border-zinc-700 text-white"
+                className="bg-input border-border text-foreground"
                 placeholder="2023"
                 disabled={isLoading}
               />
               {errors.year && (
-                <p className="text-sm text-red-500">{errors.year}</p>
+                <p className="text-sm text-destructive">{errors.year}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="color" className="text-zinc-400">
+              <Label htmlFor="color" className="text-foreground">
                 Color
               </Label>
               <Input
                 id="color"
                 value={formData.color}
                 onChange={handleInputChange("color")}
-                className="bg-zinc-800 border-zinc-700 text-white"
+                className="bg-input border-border text-foreground"
                 placeholder="Rojo"
                 disabled={isLoading}
               />
@@ -297,7 +297,7 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="passengerCapacity" className="text-zinc-400">
+              <Label htmlFor="passengerCapacity" className="text-foreground">
                 Capacidad de Pasajeros *
               </Label>
               <Input
@@ -305,19 +305,19 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                 type="number"
                 value={formData.passengerCapacity}
                 onChange={handleInputChange("passengerCapacity")}
-                className="bg-zinc-800 border-zinc-700 text-white"
+                className="bg-input border-border text-foreground"
                 placeholder="10"
                 disabled={isLoading}
               />
               {errors.passengerCapacity && (
-                <p className="text-sm text-red-500">
+                <p className="text-sm text-destructive">
                   {errors.passengerCapacity}
                 </p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="status" className="text-zinc-400">
+              <Label htmlFor="status" className="text-foreground">
                 Estado *
               </Label>
               <Select
@@ -326,16 +326,16 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                   onFormChange("status", value)
                 }
               >
-                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                <SelectTrigger className="bg-input border-border text-foreground">
                   <SelectValue placeholder="Seleccione el estado">
                     {formData.status
                       ? getStatusLabel(formData.status)
                       : "Seleccione el estado"}
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-700">
+                <SelectContent className="bg-popover border-border">
                   {VEHICLE_STATUSES.map((status) => (
-                    <SelectItem key={status.value} value={status.value}>
+                    <SelectItem key={status.value} value={status.value} className="text-popover-foreground hover:bg-accent focus:bg-accent">
                       {status.label}
                     </SelectItem>
                   ))}
@@ -345,7 +345,7 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="inService" className="text-zinc-400">
+            <Label htmlFor="inService" className="text-foreground">
               En Servicio
             </Label>
             <input
@@ -353,41 +353,41 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
               type="checkbox"
               checked={formData.inService}
               onChange={(e) => onFormChange("inService", e.target.checked)}
-              className="bg-zinc-800 border-zinc-700 text-white"
+              className="bg-input border-border text-foreground"
               disabled={isLoading}
             />
           </div>
 
           {/* Images */}
-          <div className="bg-zinc-800 p-4 rounded-lg">
-            <h2 className="text-xl font-semibold mb-4">
+          <div className="bg-accent/50 p-4 rounded-lg">
+            <h2 className="text-xl font-semibold mb-4 text-foreground">
               Imágenes de Referencia
             </h2>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Imagen
                 </label>
-                <div className="border-2 border-dashed border-zinc-600 rounded-lg p-4 text-center">
+                <div className="border-2 border-dashed border-border rounded-lg p-4 text-center">
                   {formData.outboundImage ? (
                     <div className="space-y-2">
-                      <p className="text-sm text-zinc-400">
+                      <p className="text-sm text-muted-foreground">
                         {formData.outboundImage.name}
                       </p>
                         <button
                           onClick={() =>
                             handleFileChange("outboundImage", null)
                           }
-                          className="text-red-400 hover:text-red-300 text-sm"
+                          className="text-destructive hover:text-destructive/80 text-sm"
                         >
                           Remover
                         </button>
                     </div>
                   ) : (
                     <>
-                      <Upload className="mx-auto h-8 w-8 text-zinc-400 mb-2" />
-                      <p className="text-sm text-zinc-400 mb-2">
+                      <Upload className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+                      <p className="text-sm text-muted-foreground mb-2">
                         Subir imagen 
                       </p>
                         <input
@@ -402,7 +402,7 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                           className="hidden"
                           id="outbound-image"
                         />
-                      <Button>
+                      <Button variant="outline" className="border-border text-foreground hover:bg-accent">
                         <label
                           htmlFor="outbound-image"
                           className="cursor-pointer"
@@ -422,7 +422,7 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
               type="button"
               variant="outline"
               onClick={onClose}
-              className="border-zinc-700 text-white hover:bg-zinc-800"
+              className="border-border text-foreground hover:bg-accent"
               disabled={isLoading}
             >
               Cancelar
@@ -430,7 +430,7 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
             <Button
               type="submit"
               disabled={isLoading}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {isEditing ? "Editar" : "Crear"} Vehiculo

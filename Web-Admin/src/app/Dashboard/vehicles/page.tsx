@@ -70,7 +70,7 @@ export default function VehiclesPage() {
       <div className="min-h-screen bg-background p-6">
         <div className="flex items-center justify-center h-64">
           <div className="flex items-center gap-3 text-muted-foreground">
-            <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
             <span className="text-lg">Cargando Conductores...</span>
           </div>
         </div>
@@ -92,7 +92,7 @@ export default function VehiclesPage() {
         </div>
         <Button
           onClick={openCreateModal}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white transition-all duration-300 hover:scale-105"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105"
         >
           <Plus className="h-4 w-4 mr-2" />
           Nuevo vehículo
@@ -122,7 +122,7 @@ export default function VehiclesPage() {
             {!searchTerm && (
               <Button
                 onClick={openCreateModal}
-                className="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="mt-4 bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Agregar primer vehículo
