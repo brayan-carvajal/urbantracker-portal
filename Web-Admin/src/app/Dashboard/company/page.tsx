@@ -88,9 +88,9 @@ export default function CompaniesPage() {
         </div>
         <Button
           onClick={openCreateModal}
-          className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105"
+          className="group bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 mr-2 text-primary-foreground group-hover:text-primary-foreground transition-colors" />
           Nueva empresa
         </Button>
       </header>
@@ -118,9 +118,9 @@ export default function CompaniesPage() {
             {!searchTerm && (
               <Button
                 onClick={openCreateModal}
-                className="mt-4 bg-primary hover:bg-primary/90 text-primary-foreground"
+                className="group mt-4 bg-primary hover:bg-primary/90 text-primary-foreground"
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4 mr-2 text-primary-foreground group-hover:text-primary-foreground transition-colors" />
                 Agregar primer empresa
               </Button>
             )}

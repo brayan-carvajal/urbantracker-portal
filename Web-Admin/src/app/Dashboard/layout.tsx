@@ -164,7 +164,7 @@ export default function DashboardLayout({
                 href="/Dashboard"
                 className="flex items-center gap-3 rounded-xl px-4 py-3 text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-300 group hover:shadow-lg hover:scale-105 transform"
               >
-                <BarChart3 className="h-5 w-5 group-hover:scale-110 transition-transform group-hover:text-sidebar-accent" />
+                <BarChart3 className="h-5 w-5 group-hover:scale-110 transition-transform group-hover:text-sidebar-accent-foreground" />
                 <span className="font-medium">Dashboard</span>
               </Link>
             </div>
@@ -192,7 +192,7 @@ export default function DashboardLayout({
                           <div className="flex items-center space-x-3">
                             <item.icon
                               className={cn(
-                                "h-5 w-5 transition-colors group-hover:text-sidebar-accent",
+                                "h-5 w-5 transition-colors group-hover:text-sidebar-accent-foreground",
                                 isParentActive(item.subItems)
                                   ? "text-sidebar-accent"
                                   : "text-sidebar-foreground/80"
@@ -228,7 +228,7 @@ export default function DashboardLayout({
                                 <Link
                                   href={subItem.href}
                                   className={cn(
-                                    "flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-sidebar-accent hover:shadow-md scale-95 hover:scale-100 group",
+                                    "flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-md scale-95 hover:scale-100 group",
                                     isActiveRoute(subItem.href)
                                       ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm scale-100"
                                       : "text-sidebar-foreground/80"
@@ -236,7 +236,7 @@ export default function DashboardLayout({
                                 >
                                   <subItem.icon
                                     className={cn(
-                                      "h-5 w-5 transition-colors group-hover:text-sidebar-accent",
+                                      "h-5 w-5 transition-colors group-hover:text-sidebar-accent-foreground",
                                       isActiveRoute(subItem.href)
                                         ? "text-sidebar-accent"
                                         : "text-sidebar-foreground/80"
@@ -256,7 +256,7 @@ export default function DashboardLayout({
                       <Link
                         href={item.href!}
                         className={cn(
-                          "flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-sidebar-accent hover:shadow-md hover:scale-105 group",
+                          "flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-md hover:scale-105 group",
                           isActiveRoute(item.href!)
                             ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm scale-100"
                             : "text-sidebar-foreground/80"
@@ -264,7 +264,7 @@ export default function DashboardLayout({
                       >
                         <item.icon
                           className={cn(
-                            "h-5 w-5 transition-colors group-hover:text-sidebar-accent",
+                            "h-5 w-5 transition-colors group-hover:text-sidebar-accent-foreground",
                             isActiveRoute(item.href!)
                               ? "text-sidebar-accent"
                               : "text-sidebar-foreground/80"

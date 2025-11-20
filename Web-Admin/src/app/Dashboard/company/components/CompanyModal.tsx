@@ -183,7 +183,7 @@ export const CompanyModal: React.FC<CompanyModalProps> = ({
               type="button"
               variant="outline"
               onClick={onClose}
-              className="border-border text-foreground hover:bg-accent"
+              className="group border-border text-foreground hover:bg-accent hover:text-accent-foreground"
               disabled={isLoading}
             >
               Cancelar

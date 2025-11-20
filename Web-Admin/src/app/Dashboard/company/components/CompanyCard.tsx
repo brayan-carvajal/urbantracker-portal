@@ -49,18 +49,18 @@ export function CompanyCard({ company, onEdit, onDelete }: CompanyCardProps) {
                             variant="outline"
                             size="sm"
                             onClick={() => onEdit(company)}
-                            className="flex items-center gap-2 hover:bg-accent/10 hover:text-accent transition-all duration-200"
+                            className="group flex items-center gap-2 hover:bg-accent/10 hover:text-accent-foreground transition-all duration-200"
                         >
-                            <Edit className="h-4 w-4 mr-2" />
+                            <Edit className="h-4 w-4 mr-2 text-muted-foreground group-hover:text-accent-foreground transition-colors" />
                             Editar
                         </Button>
                         <Button
                             variant="outline"
                             size="sm"
                             onClick={() => onDelete(company.id)}
-                            className="border-destructive/50 text-destructive hover:bg-destructive/10"
+                            className="group border-destructive/50 text-destructive hover:bg-destructive/10"
                         >
-                            <Trash2 className="h-4 w-4 mr-2" />
+                            <Trash2 className="h-4 w-4 mr-2 text-destructive group-hover:text-destructive transition-colors" />
                             Eliminar
                         </Button>
                     </div>
