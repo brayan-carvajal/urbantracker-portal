@@ -36,7 +36,7 @@ export function Sidebar() {
   }
 
   return (
-    <div className="w-20 bg-background border-r border-border flex flex-col items-center py-4 space-y-4">
+    <div className="w-20 bg-muted/30 border-r border-border flex flex-col items-center py-4 space-y-4">
       
       {/* Logo */}
       <div className="flex flex-col items-center space-y-1 mb-8">
@@ -66,14 +66,14 @@ export function Sidebar() {
             className={`
               w-12 h-12 rounded-xl transition-colors
 
-              /* Color de fondo activo (gris pastel) */
-              ${isActive ? "bg-gray-200 dark:bg-gray-600" : ""}
+              /* Color de fondo activo */
+              ${isActive ? "bg-accent" : ""}
 
-              /* Color de hover (gris pastel en ambos temas) */
-              hover:bg-gray-200 dark:hover:bg-gray-600
+              /* Color de hover */
+              hover:bg-accent
 
-              /* Icono según tema */
-              ${theme === "dark" ? "text-white" : "text-black"}
+              /* Color del icono */
+              text-foreground
             `}
           >
             <item.icon className="h-10 w-10" />
