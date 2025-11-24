@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  web-admin-main:
+    build:
+      context: ../..
+      dockerfile: Devops/main/Dockerfile.app
+    container_name: urbantracker-web-admin-main
+    restart: always
+    env_file:
+      - .env.main
+    ports:
+      - "3007:3000"  
+    networks:
+      - network_frontend_admin_main
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "com.urbantracker.service=web-admin"
+      - "com.urbantracker.environment=main"
+      - "com.urbantracker.version=latest"
+
+networks:
+  network_frontend_admin_main:
+    driver: bridge
+    name: urbantracker-frontend-admin-main

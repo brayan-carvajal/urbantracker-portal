@@ -15,10 +15,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { DashboardHeader } from "./components/DashboardHeader";
 import { DriverProvider } from "./drivers/context/DriverContext";
+import { useTheme } from "@/hooks/useTheme";
 import "../globals.css";
 
 // Create a client
@@ -119,7 +120,13 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [expandedItems, setExpandedItems] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
+  const { theme } = useTheme();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const toggleExpanded = (title: string) => {
     setExpandedItems((prev) => prev === title ? null : title);
@@ -134,43 +141,46 @@ export default function DashboardLayout({
     return subItems.some((item) => pathname === item.href);
   };
 
+  // Determinar logo según tema - con placeholder durante hidratación
+  const logoSrc = mounted ? (theme === "dark" ? "/logo-icon-white.svg" : "/logo-icon-black.svg") : "/logo-icon-white.svg";
+
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen bg-black">
+      <div className="min-h-screen bg-background">
         {/* Sidebar */}
-        <div className="fixed inset-y-0 left-0 z-50 w-72 bg-zinc-950 border-r border-zinc-800 shadow-2xl">
-          <div className="flex h-20 items-center px-8 border-b border-zinc-800">
+        <div className="fixed inset-y-0 left-0 z-50 w-72 bg-sidebar border-r border-sidebar-border shadow-2xl">
+          <div className="flex h-20 items-center px-8 border-b border-sidebar-border">
             <div className="flex items-center gap-3">
               <Image
-                src="/white-logo.svg"
+                src={logoSrc}
                 alt="Logo UrbanTracker"
                 width={280}
                 height={280}
                 className="mx-auto h-11 w-11"
               />
               <div>
-                <h1 className="text-xl font-bold text-white">UrbanTracker</h1>
-                <p className="text-sm text-zinc-400">Sistema de Gestión</p>
+                <h1 className="text-xl font-bold text-sidebar-foreground">UrbanTracker</h1>
+                <p className="text-sm text-sidebar-foreground/70">Sistema de Gestión</p>
               </div>
             </div>
           </div>
 
           <nav className="flex-1 space-y-1 p-6">
             <div className="mb-6">
-              <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3">
+              <h3 className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider mb-3">
                 Principal
               </h3>
               <Link
                 href="/Dashboard"
-                className="flex items-center gap-3 rounded-xl px-4 py-3 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-all duration-300 group hover:shadow-lg hover:scale-105 transform"
+                className="flex items-center gap-3 rounded-xl px-4 py-3 text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-300 group hover:shadow-lg hover:scale-105 transform"
               >
-                <BarChart3 className="h-5 w-5 group-hover:scale-110 transition-transform group-hover:text-emerald-400" />
+                <BarChart3 className="h-5 w-5 group-hover:scale-110 transition-transform group-hover:text-sidebar-accent-foreground" />
                 <span className="font-medium">Dashboard</span>
               </Link>
             </div>
 
             <div className="mb-6">
-              <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3">
+              <h3 className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider mb-3">
                 Gestión
               </h3>
 
@@ -183,19 +193,19 @@ export default function DashboardLayout({
                         <button
                           onClick={() => toggleExpanded(item.title)}
                           className={cn(
-                            "w-full flex items-center justify-between px-3 py-3 text-left rounded-lg transition-all duration-200 hover:bg-zinc-800 hover:text-white hover:shadow-md hover:scale-105 group",
+                            "w-full flex items-center justify-between px-3 py-3 text-left rounded-lg transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-md hover:scale-105 group",
                             isParentActive(item.subItems)
-                              ? "bg-zinc-800 text-white shadow-sm scale-100"
-                              : "text-zinc-400"
+                              ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm scale-100"
+                              : "text-sidebar-foreground/80"
                           )}
                         >
                           <div className="flex items-center space-x-3">
                             <item.icon
                               className={cn(
-                                "h-5 w-5 transition-colors group-hover:text-emerald-400",
+                                "h-5 w-5 transition-colors group-hover:text-sidebar-accent-foreground",
                                 isParentActive(item.subItems)
-                                  ? "text-emerald-400"
-                                  : "text-zinc-400"
+                                  ? "text-sidebar-accent"
+                                  : "text-sidebar-foreground/80"
                               )}
                             />
                             <span className="font-medium">{item.title}</span>
@@ -207,8 +217,8 @@ export default function DashboardLayout({
                                 ? "rotate-180"
                                 : "rotate-0",
                               isParentActive(item.subItems)
-                                ? "text-white"
-                                : "text-zinc-400"
+                                ? "text-sidebar-accent-foreground"
+                                : "text-sidebar-foreground/80"
                             )}
                           />
                         </button>
@@ -228,18 +238,18 @@ export default function DashboardLayout({
                                 <Link
                                   href={subItem.href}
                                   className={cn(
-                                    "flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-zinc-800 hover:shadow-md scale-95 hover:scale-100 group",
+                                    "flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-md scale-95 hover:scale-100 group",
                                     isActiveRoute(subItem.href)
-                                      ? "bg-zinc-800 text-white shadow-sm scale-100"
-                                      : "text-zinc-400"
+                                      ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm scale-100"
+                                      : "text-sidebar-foreground/80"
                                   )}
                                 >
                                   <subItem.icon
                                     className={cn(
-                                      "h-5 w-5 transition-colors group-hover:text-emerald-400",
+                                      "h-5 w-5 transition-colors group-hover:text-sidebar-accent-foreground",
                                       isActiveRoute(subItem.href)
-                                        ? "text-emerald-400"
-                                        : "text-zinc-400"
+                                        ? "text-sidebar-accent"
+                                        : "text-sidebar-foreground/80"
                                     )}
                                   />
                                   <span className="text-sm font-medium">
@@ -256,18 +266,18 @@ export default function DashboardLayout({
                       <Link
                         href={item.href!}
                         className={cn(
-                          "flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-zinc-800 hover:shadow-md hover:scale-105 group",
+                          "flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-md hover:scale-105 group",
                           isActiveRoute(item.href!)
-                            ? "bg-zinc-800 text-white shadow-sm scale-100"
-                            : "text-zinc-400"
+                            ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm scale-100"
+                            : "text-sidebar-foreground/80"
                         )}
                       >
                         <item.icon
                           className={cn(
-                            "h-5 w-5 transition-colors group-hover:text-emerald-400",
+                            "h-5 w-5 transition-colors group-hover:text-sidebar-accent-foreground",
                             isActiveRoute(item.href!)
-                              ? "text-emerald-400"
-                              : "text-zinc-400"
+                              ? "text-sidebar-accent"
+                              : "text-sidebar-foreground/80"
                           )}
                         />
                         <span className="font-medium">{item.title}</span>
@@ -285,7 +295,7 @@ export default function DashboardLayout({
           <DashboardHeader />
 
           {/* Page content */}
-          <main className="p-8 bg-zinc-900">
+          <main className="p-8 bg-background">
             <DriverProvider>
               {children}
             </DriverProvider>

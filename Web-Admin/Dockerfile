@@ -31,8 +31,8 @@ COPY --from=build /app/next.config.* ./
 # Instalar solo dependencias de producción
 RUN npm ci --only=production
 
-# Exponer el puerto 3001
-EXPOSE 3001
+# Exponer el puerto interno de la app (Next por defecto usa 3000)
+EXPOSE 3000
 
 # Comando para ejecutar la aplicación
 CMD ["npm", "start"]
