@@ -51,9 +51,7 @@ class MapboxAPIService {
     this.accessToken = accessToken;
   }
 
-  /**
-   * Verifica y aplica límites de tasa para las llamadas a la API
-   */
+  //Verifica y aplica límites de tasa para las llamadas a la API
   private async checkRateLimit(): Promise<void> {
     const now = Date.now();
 
@@ -72,12 +70,8 @@ class MapboxAPIService {
     this.requestCount++;
   }
 
-  /**
-   * Busca direcciones o lugares usando la Geocoding API
-   * @param query - Término de búsqueda
-   * @param options - Opciones adicionales de búsqueda
-   * @returns Promise con los resultados de geocoding
-   */
+
+  //Busca direcciones o lugares usando la Geocoding API
   async geocode(
     query: string,
     options: {
@@ -137,9 +131,6 @@ class MapboxAPIService {
 // Instancia singleton del servicio
 let mapboxService: MapboxAPIService | null = null;
 
-/**
- * Obtiene la instancia del servicio Mapbox
- */
 export function getMapboxService(): MapboxAPIService {
   if (!mapboxService) {
     const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;

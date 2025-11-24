@@ -3,10 +3,8 @@
 import { useState, useCallback, useRef } from 'react';
 import { getMapboxService, GeocodingFeature } from '@/lib/mapbox-api';
 
-/**
- * Hook personalizado para manejar la búsqueda de direcciones y lugares
- * con autocompletado usando Mapbox Geocoding API
- */
+//Hook para manejar la búsqueda de direcciones y lugares con autocompletado usando Mapbox Geocoding API
+
 export function useSearch() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<GeocodingFeature[]>([]);

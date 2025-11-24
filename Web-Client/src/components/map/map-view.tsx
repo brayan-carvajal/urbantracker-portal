@@ -73,24 +73,27 @@ const MapViewComponent = ({ children }: { children?: React.ReactNode }) => {
     }
   }, [mapLoaded]);
 
-  // Get user location on mount
+  // Obtener la ubicación del usuario
   useEffect(() => {
-    if (typeof window !== 'undefined' && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setUserLocation([longitude, latitude]);
-        },
-        (error) => {
-          console.error('Error obteniendo ubicación:', error);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 300000, // 5 minutes
-        }
-      );
-    }
+    const interval = setInterval(() => {
+      if (typeof window !== 'undefined' && navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            setUserLocation([longitude, latitude]);
+          },
+          (error) => {
+            console.error('Error obteniendo ubicación:', error);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 300000, // 5 minutos
+          }
+        );
+      }
+    },180000); // Cada 3 minutos
+    return () => clearInterval(interval);
   }, []);
 
   // Update map style when theme changes
