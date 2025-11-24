@@ -1,24 +1,36 @@
 "use client"
 
-import React from "react";
+import React, { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { SearchBar } from "components/shared/search-bar"
 import { RoutesPanel } from "./routes-panel"
 import { StopInfoPanel } from "./stop-info-panel"
 import { GeneralInfoPanel } from "./general-info-panel"
+import { SearchResultsPanel } from "components/map/search-results-panel"
+import { useSearchContext } from "components/map/search-context"
 import { usePanelActive } from "components/panels/panel-active-context"
 import { usePanelCollapse } from "components/panels/panel-collapse-context"
 import { useRoute } from "components/map/route-context"
 import { useRouter, useParams } from "next/navigation"
+import { GeocodingFeature } from "@/lib/mapbox-api"
 
 export function FixedPanel() {
   const { activePanel } = usePanelActive();
   const { isPanelCollapsed, togglePanelCollapse } = usePanelCollapse();
   const { selectedRoutes } = useRoute();
+  const { selectedPlace, setSelectedPlace } = useSearchContext();
   const router = useRouter();
   const params = useParams();
 
   const detailSelected = params?.id ? parseInt(params.id as string, 10) : null;
+
+  const handlePlaceSelect = (place: GeocodingFeature) => {
+    setSelectedPlace(place);
+  };
+
+  const handleBackToRoutes = () => {
+    setSelectedPlace(null);
+  };
 
   const handleRouteSelection = (routeId: number | null, userAction = false) => {
     if (userAction) {
@@ -31,6 +43,12 @@ export function FixedPanel() {
   };
 
   const renderPanel = () => {
+    // Si hay un lugar seleccionado, mostrar resultados de búsqueda
+    if (selectedPlace) {
+      return <SearchResultsPanel selectedPlace={selectedPlace} onBack={handleBackToRoutes} />
+    }
+
+    // Panel normal según el activePanel
     switch (activePanel) {
       case "routes":
         return <RoutesPanel showTitle selected={detailSelected} setSelected={(id) => handleRouteSelection(id, true)} />
@@ -62,7 +80,7 @@ export function FixedPanel() {
 
         {/* Search Bar Section */}
         <div className="p-4 bg-muted/95">
-          <SearchBar />
+          <SearchBar onPlaceSelect={handlePlaceSelect} />
         </div>
 
         {/* Contenido del panel */}
