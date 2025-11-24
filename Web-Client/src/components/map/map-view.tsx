@@ -3,9 +3,10 @@
 import React, { createContext, useContext, useEffect, useRef, useMemo, useState } from "react";
 import { usePanelCollapse } from "components/panels/panel-collapse-context";
 import { useTheme } from "@/hooks/useTheme";
-import Map, { Layer, MapRef, Source } from "react-map-gl/mapbox";
+import Map, { Layer, MapRef, Source, Marker } from "react-map-gl/mapbox";
 import { useRoutePoints, useRoute } from "./route-context";
 import { useVehiclePositions } from "./vehicle-context";
+import { useSearchContext } from "./search-context";
 import { VehicleMarker } from "./vehicle-marker";
 
 interface RouteData {
@@ -22,14 +23,22 @@ export function useMapboxRef() {
   return ctx;
 }
 
+// Contexto para exponer la ubicación del usuario
+const UserLocationContext = createContext<[number, number] | null>(null);
+export function useUserLocation() {
+  return useContext(UserLocationContext);
+}
+
 const MapViewComponent = ({ children }: { children?: React.ReactNode }) => {
   const { isPanelCollapsed } = usePanelCollapse();
   const { theme, mounted } = useTheme();
   const { vehiclePositions } = useVehiclePositions();
   const { routes, selectedRoutes } = useRoutePoints();
   const { focusedRoute } = useRoute();
+  const { selectedPlace } = useSearchContext();
   const mapRef = useRef<MapRef | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
 
 
   // Safely access environment variables only on client
@@ -64,6 +73,29 @@ const MapViewComponent = ({ children }: { children?: React.ReactNode }) => {
     }
   }, [mapLoaded]);
 
+  // Obtener la ubicación del usuario
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (typeof window !== 'undefined' && navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            setUserLocation([longitude, latitude]);
+          },
+          (error) => {
+            console.error('Error obteniendo ubicación:', error);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 300000, // 5 minutos
+          }
+        );
+      }
+    },180000); // Cada 3 minutos
+    return () => clearInterval(interval);
+  }, []);
+
   // Update map style when theme changes
   useEffect(() => {
     if (mapRef.current && mapLoaded && theme) {
@@ -77,6 +109,17 @@ const MapViewComponent = ({ children }: { children?: React.ReactNode }) => {
       mapRef.current.resize();
     }
   }, [isPanelCollapsed]);
+
+  // Centrar mapa en el lugar seleccionado
+  useEffect(() => {
+    if (mapRef.current && selectedPlace) {
+      mapRef.current.flyTo({
+        center: [selectedPlace.center[0], selectedPlace.center[1]],
+        zoom: 15,
+        duration: 1000,
+      });
+    }
+  }, [selectedPlace]);
 
   // Center map on selected routes when route points are loaded
   useEffect(() => {
@@ -191,81 +234,128 @@ const MapViewComponent = ({ children }: { children?: React.ReactNode }) => {
     const markers = Array.from(vehiclePositions.values()).map((vehicle) => (
       <VehicleMarker key={vehicle.vehicleId} vehicle={vehicle} />
     ));
-    console.log('Created markers:', markers.length);
     return markers;
   }, [vehiclePositions]);
 
-  // Only render the map when mounted to avoid hydration mismatch
+  const userLocationMarker = useMemo(() => {
+    if (!userLocation) return null;
+    return (
+      <Marker
+        longitude={userLocation[0]}
+        latitude={userLocation[1]}
+        anchor="center"
+        style={{ zIndex: 1000 }}
+      >
+        <div className="relative">
+          {/* Círculo pulsante */}
+          <div className="absolute inset-0 bg-blue-500 rounded-full animate-ping opacity-75 w-6 h-6"></div>
+          {/* Punto central */}
+          <div className="relative bg-blue-600 rounded-full w-5 h-5 border-2 border-white shadow-lg"></div>
+        </div>
+      </Marker>
+    );
+  }, [userLocation]);
+
+  const selectedPlaceMarker = useMemo(() => {
+    if (!selectedPlace) return null;
+    return (
+      <Marker
+        longitude={selectedPlace.center[0]}
+        latitude={selectedPlace.center[1]}
+        anchor="bottom"
+        style={{ zIndex: 1100 }}
+      >
+        <div className="relative">
+          {/* Marcador de ubicación seleccionada */}
+          <div className="bg-red-500 rounded-full w-6 h-6 border-2 border-white shadow-lg flex items-center justify-center">
+            <div className="bg-white rounded-full w-2 h-2"></div>
+          </div>
+          {/* Etiqueta con el nombre del lugar */}
+          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 bg-background border border-border rounded-md px-2 py-1 shadow-lg whitespace-nowrap">
+            <div className="text-xs font-medium text-foreground">{selectedPlace.text}</div>
+          </div>
+        </div>
+      </Marker>
+    );
+  }, [selectedPlace]);
+
+  
   if (!mounted) {
     return (
-      <MapboxRefContext.Provider value={mapRef}>
-        <div className="relative w-full h-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-          <div className="text-gray-500 dark:text-gray-400">Cargando mapa...</div>
-        </div>
-      </MapboxRefContext.Provider>
+      <UserLocationContext.Provider value={userLocation}>
+        <MapboxRefContext.Provider value={mapRef}>
+          <div className="relative w-full h-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+            <div className="text-gray-500 dark:text-gray-400">Cargando mapa...</div>
+          </div>
+        </MapboxRefContext.Provider>
+      </UserLocationContext.Provider>
     );
   }
 
   return (
-    <MapboxRefContext.Provider value={mapRef}>
-      <div className="relative w-full h-full">
-        <Map
-          ref={mapRef}
-          mapboxAccessToken={accessToken}
-          initialViewState={{
-            longitude: -74.08175,
-            latitude: 4.60971,
-            zoom: 15,
-          }}
-          mapStyle={currentMapStyle}
-          attributionControl={false}
-          onLoad={() => setMapLoaded(true)}
-        >
-          {mapLoaded && vehicleMarkers}
-          {mapLoaded && routeSources.map((source) => (
-            <Source key={source.id} {...source}>
-              {/* Main line layer - enhanced visibility */}
-              <Layer
-                id={`${source.id}-layer`}
-                type="line"
-                source={source.id}
-                paint={{
-                  "line-color": source.data.properties.color,
-                  "line-width": source.data.properties.routeIndex === 0 ? 8 : 6, // Thicker for first route
-                  "line-opacity": source.data.properties.routeIndex === 0 ? 1.0 : 0.7,
-                  "line-dasharray": source.data.properties.routeIndex > 0 ? [2, 1] : [1, 0], // Dashed for additional routes
-                  "line-blur": 0,
-                }}
-                layout={{
-                  "line-join": "round",
-                  "line-cap": "round",
-                  "visibility": "visible",
-                }}
-              />
-              
-              {/* Highlight layer for better visibility */}
-              <Layer
-                id={`${source.id}-highlight-layer`}
-                type="line"
-                source={source.id}
-                paint={{
-                  "line-color": source.data.properties.color,
-                  "line-width": source.data.properties.routeIndex === 0 ? 4 : 3,
-                  "line-opacity": source.data.properties.routeIndex === 0 ? 0.6 : 0.4,
-                  "line-dasharray": [1, 0], // Solid line for highlight
-                }}
-                layout={{
-                  "line-join": "round",
-                  "line-cap": "round",
-                  "visibility": "visible",
-                }}
-              />
-            </Source>
-          ))}
-        </Map>
-        {children}
-      </div>
-    </MapboxRefContext.Provider>
+    <UserLocationContext.Provider value={userLocation}>
+      <MapboxRefContext.Provider value={mapRef}>
+        <div className="relative w-full h-full">
+          <Map
+            ref={mapRef}
+            mapboxAccessToken={accessToken}
+            initialViewState={{
+              longitude: -75.28380,
+              latitude: 2.93261,
+              zoom: 12,
+            }}
+            mapStyle={currentMapStyle}
+            attributionControl={false}
+            onLoad={() => setMapLoaded(true)}
+          >
+            {mapLoaded && vehicleMarkers}
+            {mapLoaded && userLocationMarker}
+            {mapLoaded && selectedPlaceMarker}
+            {mapLoaded && routeSources.map((source) => (
+              <Source key={source.id} {...source}>
+                {/* Main line layer - enhanced visibility */}
+                <Layer
+                  id={`${source.id}-layer`}
+                  type="line"
+                  source={source.id}
+                  paint={{
+                    "line-color": source.data.properties.color,
+                    "line-width": source.data.properties.routeIndex === 0 ? 8 : 6, // Thicker for first route
+                    "line-opacity": source.data.properties.routeIndex === 0 ? 1.0 : 0.7,
+                    "line-dasharray": source.data.properties.routeIndex > 0 ? [2, 1] : [1, 0], // Dashed for additional routes
+                    "line-blur": 0,
+                  }}
+                  layout={{
+                    "line-join": "round",
+                    "line-cap": "round",
+                    "visibility": "visible",
+                  }}
+                />
+
+                {/* Highlight layer for better visibility */}
+                <Layer
+                  id={`${source.id}-highlight-layer`}
+                  type="line"
+                  source={source.id}
+                  paint={{
+                    "line-color": source.data.properties.color,
+                    "line-width": source.data.properties.routeIndex === 0 ? 4 : 3,
+                    "line-opacity": source.data.properties.routeIndex === 0 ? 0.6 : 0.4,
+                    "line-dasharray": [1, 0], // Solid line for highlight
+                  }}
+                  layout={{
+                    "line-join": "round",
+                    "line-cap": "round",
+                    "visibility": "visible",
+                  }}
+                />
+              </Source>
+            ))}
+          </Map>
+          {children}
+        </div>
+      </MapboxRefContext.Provider>
+    </UserLocationContext.Provider>
   );
 };
 

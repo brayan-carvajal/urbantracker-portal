@@ -209,7 +209,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
   return (
     <div className="space-y-4 overflow-y-auto hide-scrollbar p-1">
       {/* Tarjeta resumen de la ruta */}
-      <div className="bg-background rounded-xl p-4 flex flex-col gap-2 shadow-sm transition-all duration-200 hover:shadow-xl hover:scale-[1.02]">
+      <div className="bg-background rounded-xl p-4 flex flex-col gap-2 shadow-sm transition-all duration-200 hover:shadow-xl hover:scale-[1.02] border">
         <div className="flex items-center justify-between mb-2">
           <div className="flex flex-col">
             <h4 className="text-base font-semibold leading-tight text-foreground">{fullRoute.name}</h4>
@@ -227,7 +227,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
               <Bus className="h-8 w-8 text-muted-foreground" />
             </div>
             <div className="flex items-center gap-1 mt-2">
-              <span className="bg-primary w-3 h-3 rounded-full" />
+              <span className="bg-red-500 w-3 h-3 rounded-full" />
               <span className="text-xs text-muted-foreground font-semibold">Ida</span>
             </div>
             <span className="text-xs text-foreground text-center">{fullRoute.start}</span>
@@ -238,7 +238,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
               <Bus className="h-8 w-8 text-muted-foreground" />
             </div>
             <div className="flex items-center gap-1 mt-2">
-              <span className="bg-secondary w-3 h-3 rounded-full" />
+              <span className="bg-green-500 w-3 h-3 rounded-full" />
               <span className="text-xs text-muted-foreground font-semibold">Vuelta</span>
             </div>
             <span className="text-xs text-foreground text-center">{fullRoute.end}</span>
@@ -246,13 +246,13 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
         </div>
       </div>
       {/* Tarjeta de detalles del recorrido */}
-      <div className="bg-background rounded-xl p-4 max-w-full overflow-hidden shadow-sm transition-all duration-200 hover:shadow-xl hover:scale-[1.02]">
+      <div className="bg-background rounded-xl p-4 max-w-full overflow-hidden shadow-sm transition-all duration-200 hover:shadow-xl hover:scale-[1.02] border">
         <h4 className="font-semibold text-foreground mb-2">Recorrido</h4>
         <div className="border-t border-border/50 my-2" />
         <div className="flex flex-col gap-2">
           {/* Detalle de inicio */}
           <div className="flex gap-2 mb-1 items-start">
-            <span className="bg-primary w-3 h-3 rounded-full flex-shrink-0 mt-1" />
+            <span className="bg-red-500 w-3 h-3 rounded-full flex-shrink-0 mt-1" />
             <div className="flex flex-col min-w-0 max-w-full">
               <span className="text-xs text-muted-foreground font-medium flex-shrink-0">Ida:</span>
               <span className="text-xs text-card-foreground break-words whitespace-pre-line overflow-hidden max-w-full" style={{ display: 'block', whiteSpace: 'pre-line', wordBreak: 'break-word' }}>{fullRoute.startDetail}</span>
@@ -260,7 +260,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
           </div>
           {/* Detalle de fin */}
           <div className="flex gap-2 items-start">
-            <span className="bg-secondary w-3 h-3 rounded-full flex-shrink-0 mt-1" />
+            <span className="bg-green-500 w-3 h-3 rounded-full flex-shrink-0 mt-1" />
             <div className="flex flex-col min-w-0 max-w-full">
               <span className="text-xs text-muted-foreground font-medium flex-shrink-0">Vuelta:</span>
               <span className="text-xs text-card-foreground break-words whitespace-pre-line overflow-hidden max-w-full" style={{ display: 'block', whiteSpace: 'pre-line', wordBreak: 'break-word' }}>{fullRoute.endDetail}</span>
