@@ -10,6 +10,7 @@ import {
   MapPin,
   Route,
   Users,
+  ParkingCircle,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -17,8 +18,10 @@ import { usePathname } from "next/navigation";
 import type React from "react";
 import { useState, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "react-hot-toast";
 import { DashboardHeader } from "./components/DashboardHeader";
 import { DriverProvider } from "./drivers/context/DriverContext";
+import { ParkingProvider } from "./parking/context/ParkingContext";
 import { useTheme } from "@/hooks/useTheme";
 import "../globals.css";
 
@@ -111,6 +114,11 @@ const menuItems: MenuItem[] = [
         icon: MapPin,
       },
     ],
+  },
+  {
+    title: "Monitoreo de Estacionamiento",
+    href: "/Dashboard/parking",
+    icon: ParkingCircle,
   },
 ];
 
@@ -297,10 +305,34 @@ export default function DashboardLayout({
           {/* Page content */}
           <main className="p-8 bg-background">
             <DriverProvider>
-              {children}
+              <ParkingProvider>
+                {children}
+              </ParkingProvider>
             </DriverProvider>
           </main>
         </div>
+        
+        {/* Toast Notifications */}
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#363636',
+              color: '#fff',
+            },
+            success: {
+              style: {
+                background: '#10B981',
+              },
+            },
+            error: {
+              style: {
+                background: '#EF4444',
+              },
+            },
+          }}
+        />
       </div>
     </QueryClientProvider>
   );
