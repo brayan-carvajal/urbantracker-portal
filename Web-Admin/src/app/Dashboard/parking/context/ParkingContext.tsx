@@ -57,7 +57,15 @@ export function ParkingProvider({ children }: { children: ReactNode }) {
     averageParkingDurationMinutes: 0,
     lastEventTime: null,
   });
-  const [config, setConfig] = useState<ParkingConfig | null>(null);
+  const [config, setConfig] = useState<ParkingConfig | null>({
+    id: 1,
+    companyId: 1,
+    companyName: 'UrbanTracker Corp',
+    minTimeMinutes: 5,
+    maxDistanceMeters: 50,
+    maxSpeedKmh: 5,
+    isActive: true,
+  });
   const [activeEvents, setActiveEvents] = useState<ParkingEvent[]>([]);
   const [loading, setLoading] = useState(false); // Cambiado a false para evitar loading infinito
   const [error, setError] = useState<string | null>(null);
@@ -90,15 +98,6 @@ export function ParkingProvider({ children }: { children: ReactNode }) {
       // Deshabilitado temporalmente
       console.log('⚠️ updateConfig deshabilitado temporalmente');
       
-      // Mostrar notificación de éxito
-      toast.success('🎯 Configuración actualizada localmente', {
-        duration: 3000,
-        style: {
-          background: '#10B981',
-          color: '#fff',
-          fontWeight: '500',
-        },
-      });
       
       setConfig(updatedConfig); // Actualizar localmente
       return Promise.resolve();
