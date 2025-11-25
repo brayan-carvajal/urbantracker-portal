@@ -91,47 +91,47 @@ function DashboardPage() {
 
       {/* Main Stats Cards */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800 shadow-xl hover:shadow-blue-300/50 transition-all duration-500 hover:scale-105 transform group">
+        <Card className="bg-card border-border shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 transform group">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">Total Conductores</CardTitle>
-            <Users className="h-5 w-5 text-blue-600 group-hover:scale-110 transition-transform" />
+            <CardTitle className="text-sm font-medium text-foreground">Total Conductores</CardTitle>
+            <Users className="h-5 w-5 text-muted-foreground group-hover:scale-110 transition-transform" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-blue-900 dark:text-blue-100">{dashboardData?.stats.totalDrivers || 0}</div>
-            <p className="text-xs text-blue-600 dark:text-blue-400">+{Math.floor((dashboardData?.stats.totalDrivers || 0) * 0.1)} nuevos este mes</p>
+            <div className="text-3xl font-bold text-foreground">{dashboardData?.stats.totalDrivers || 0}</div>
+            <p className="text-xs text-muted-foreground">+{Math.floor((dashboardData?.stats.totalDrivers || 0) * 0.1)} nuevos este mes</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800 shadow-xl hover:shadow-green-300/50 transition-all duration-500 hover:scale-105 transform group">
+        <Card className="bg-card border-border shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 transform group">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300">Vehículos Activos</CardTitle>
-            <Car className="h-5 w-5 text-green-600 group-hover:scale-110 transition-transform" />
+            <CardTitle className="text-sm font-medium text-foreground">Vehículos Activos</CardTitle>
+            <Car className="h-5 w-5 text-muted-foreground group-hover:scale-110 transition-transform" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-green-900 dark:text-green-100">{dashboardData?.stats.activeVehicles || 0}</div>
-            <p className="text-xs text-green-600 dark:text-green-400">{dashboardData?.stats.totalVehicles ? Math.round((dashboardData.stats.activeVehicles / dashboardData.stats.totalVehicles) * 100) : 0}% de la flota operativa</p>
+            <div className="text-3xl font-bold text-foreground">{dashboardData?.stats.activeVehicles || 0}</div>
+            <p className="text-xs text-muted-foreground">{dashboardData?.stats.totalVehicles ? Math.round((dashboardData.stats.activeVehicles / dashboardData.stats.totalVehicles) * 100) : 0}% de la flota operativa</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800 shadow-xl hover:shadow-purple-300/50 transition-all duration-500 hover:scale-105 transform group">
+        <Card className="bg-card border-border shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 transform group">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">Vehículos en Ruta</CardTitle>
-            <Truck className="h-5 w-5 text-purple-600 group-hover:scale-110 transition-transform" />
+            <CardTitle className="text-sm font-medium text-foreground">Vehículos en Ruta</CardTitle>
+            <Truck className="h-5 w-5 text-muted-foreground group-hover:scale-110 transition-transform" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-purple-900 dark:text-purple-100">{dashboardData?.stats.vehiclesInRoute || 0}</div>
-            <p className="text-xs text-purple-600 dark:text-purple-400">Rutas activas actualmente</p>
+            <div className="text-3xl font-bold text-foreground">{dashboardData?.stats.vehiclesInRoute || 0}</div>
+            <p className="text-xs text-muted-foreground">Rutas activas actualmente</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 border-orange-200 dark:border-orange-800 shadow-xl hover:shadow-orange-300/50 transition-all duration-500 hover:scale-105 transform group">
+        <Card className="bg-card border-border shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 transform group">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-orange-700 dark:text-orange-300">Total Empresas</CardTitle>
-            <Building2 className="h-5 w-5 text-orange-600 group-hover:scale-110 transition-transform" />
+            <CardTitle className="text-sm font-medium text-foreground">Total Empresas</CardTitle>
+            <Building2 className="h-5 w-5 text-muted-foreground group-hover:scale-110 transition-transform" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-orange-900 dark:text-orange-100">{dashboardData?.stats.totalCompanies || 0}</div>
-            <p className="text-xs text-orange-600 dark:text-orange-400">Empresas registradas</p>
+            <div className="text-3xl font-bold text-foreground">{dashboardData?.stats.totalCompanies || 0}</div>
+            <p className="text-xs text-muted-foreground">Empresas registradas</p>
           </CardContent>
         </Card>
       </div>
@@ -139,57 +139,57 @@ function DashboardPage() {
 
       {/* Key Performance Indicators */}
       <div className="grid gap-6 md:grid-cols-4">
-        <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950 dark:to-emerald-900 border-emerald-200 dark:border-emerald-800">
+        <Card className="bg-card border-border hover:shadow-md transition-all duration-300 hover:scale-105 transform group">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Eficiencia de Flota</CardTitle>
-            <Activity className="h-4 w-4 text-emerald-600" />
+            <CardTitle className="text-sm font-medium text-foreground">Eficiencia de Flota</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground group-hover:scale-110 transition-transform" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-emerald-900 dark:text-emerald-100">
+            <div className="text-2xl font-bold text-foreground">
               {dashboardData?.stats.totalVehicles ? Math.round((dashboardData.stats.vehiclesInRoute / dashboardData.stats.totalVehicles) * 100) : 0}%
             </div>
-            <p className="text-xs text-emerald-600 dark:text-emerald-400">
+            <p className="text-xs text-muted-foreground">
               {dashboardData?.stats.vehiclesInRoute || 0} de {dashboardData?.stats.totalVehicles || 0} vehículos activos
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
+        <Card className="bg-card border-border hover:shadow-md transition-all duration-300 hover:scale-105 transform group">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">Rutas Hoy</CardTitle>
-            <MapPin className="h-4 w-4 text-blue-600" />
+            <CardTitle className="text-sm font-medium text-foreground">Rutas Hoy</CardTitle>
+            <MapPin className="h-4 w-4 text-muted-foreground group-hover:scale-110 transition-transform" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+            <div className="text-2xl font-bold text-foreground">
               {dashboardData?.stats.vehiclesInRoute || 0}
             </div>
-            <p className="text-xs text-blue-600 dark:text-blue-400">Rutas activas actualmente</p>
+            <p className="text-xs text-muted-foreground">Rutas activas actualmente</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950 dark:to-amber-900 border-amber-200 dark:border-amber-800">
+        <Card className="bg-card border-border hover:shadow-md transition-all duration-300 hover:scale-105 transform group">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-amber-700 dark:text-amber-300">Disponibilidad</CardTitle>
-            <CheckCircle className="h-4 w-4 text-amber-600" />
+            <CardTitle className="text-sm font-medium text-foreground">Disponibilidad</CardTitle>
+            <CheckCircle className="h-4 w-4 text-muted-foreground group-hover:scale-110 transition-transform" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-amber-900 dark:text-amber-100">
+            <div className="text-2xl font-bold text-foreground">
               {dashboardData?.stats.availableVehicles || 0}
             </div>
-            <p className="text-xs text-amber-600 dark:text-amber-400">Vehículos listos para asignar</p>
+            <p className="text-xs text-muted-foreground">Vehículos listos para asignar</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
+        <Card className="bg-card border-border hover:shadow-md transition-all duration-300 hover:scale-105 transform group">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">Cobertura</CardTitle>
-            <Building2 className="h-4 w-4 text-purple-600" />
+            <CardTitle className="text-sm font-medium text-foreground">Cobertura</CardTitle>
+            <Building2 className="h-4 w-4 text-muted-foreground group-hover:scale-110 transition-transform" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">
+            <div className="text-2xl font-bold text-foreground">
               {dashboardData?.stats.totalCompanies || 0}
             </div>
-            <p className="text-xs text-purple-600 dark:text-purple-400">Empresas atendidas</p>
+            <p className="text-xs text-muted-foreground">Empresas atendidas</p>
           </CardContent>
         </Card>
       </div>
@@ -197,47 +197,47 @@ function DashboardPage() {
       {/* Key Information Summary */}
       <div className="grid gap-6 md:grid-cols-2">
         {/* Operational Summary */}
-        <Card className="shadow-xl">
+        <Card className="bg-card border-border shadow-sm cursor-default">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5" />
+              <Activity className="h-5 w-5 text-muted-foreground group-hover:scale-110 transition-transform" />
               Resumen Operativo
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4">
-              <div className="flex justify-between items-center p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+              <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors duration-200 cursor-pointer">
                 <div>
-                  <p className="font-medium text-sm">Estado General</p>
+                  <p className="font-medium text-sm text-foreground">Estado General</p>
                   <p className="text-xs text-muted-foreground">
                     {dashboardData?.stats.vehiclesInRoute || 0 > 0 ? 'Operaciones activas' : 'Sin actividad actual'}
                   </p>
                 </div>
-                <Badge className={dashboardData?.stats.vehiclesInRoute || 0 > 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
+                <Badge className={dashboardData?.stats.vehiclesInRoute || 0 > 0 ? 'bg-success text-success-foreground' : 'bg-muted text-muted-foreground'}>
                   {dashboardData?.stats.vehiclesInRoute || 0 > 0 ? 'Activo' : 'Inactivo'}
                 </Badge>
               </div>
 
-              <div className="flex justify-between items-center p-3 bg-green-50 dark:bg-green-950 rounded-lg">
+              <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors duration-200 cursor-pointer">
                 <div>
-                  <p className="font-medium text-sm">Capacidad Disponible</p>
+                  <p className="font-medium text-sm text-foreground">Capacidad Disponible</p>
                   <p className="text-xs text-muted-foreground">
                     {dashboardData?.stats.availableVehicles || 0} vehículos listos
                   </p>
                 </div>
-                <Badge className="bg-green-100 text-green-800">
+                <Badge className="bg-success text-success-foreground">
                   {dashboardData?.stats.availableVehicles || 0}
                 </Badge>
               </div>
 
-              <div className="flex justify-between items-center p-3 bg-purple-50 dark:bg-purple-950 rounded-lg">
+              <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors duration-200 cursor-pointer">
                 <div>
-                  <p className="font-medium text-sm">Cobertura de Mercado</p>
+                  <p className="font-medium text-sm text-foreground">Cobertura de Mercado</p>
                   <p className="text-xs text-muted-foreground">
                     {dashboardData?.stats.totalCompanies || 0} empresas atendidas
                   </p>
                 </div>
-                <Badge className="bg-purple-100 text-purple-800">
+                <Badge className="bg-primary text-primary-foreground">
                   {dashboardData?.stats.totalCompanies || 0}
                 </Badge>
               </div>
@@ -246,10 +246,10 @@ function DashboardPage() {
         </Card>
 
         {/* Fleet Efficiency Chart */}
-        <Card className="shadow-xl">
+        <Card className="bg-card border-border shadow-sm cursor-default">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5" />
+              <Activity className="h-5 w-5 text-muted-foreground group-hover:scale-110 transition-transform" />
               Utilización de Flota
             </CardTitle>
             <p className="text-sm text-muted-foreground">Distribución actual de vehículos</p>
@@ -275,7 +275,7 @@ function DashboardPage() {
             </ResponsiveContainer>
             <div className="flex flex-wrap justify-center gap-3 mt-4">
               {fleetEfficiencyData.map((item, index) => (
-                <div key={index} className="flex items-center gap-2">
+                <div key={index} className="flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 transition-colors duration-200 cursor-pointer">
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
                   <span className="text-sm text-muted-foreground">{item.name}: {item.value}</span>
                 </div>
@@ -289,88 +289,88 @@ function DashboardPage() {
       {/* Critical Information */}
       <div className="grid gap-6 md:grid-cols-2">
         {/* System Health & Critical Information */}
-        <Card className="shadow-xl">
+        <Card className="bg-card border-border shadow-sm cursor-default">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5" />
+              <AlertTriangle className="h-5 w-5 text-muted-foreground group-hover:scale-110 transition-transform" />
               Estado del Sistema
             </CardTitle>
             <p className="text-sm text-muted-foreground">Información crítica para la toma de decisiones operativas</p>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="p-4 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="p-4 bg-muted/30 rounded-lg border border-border hover:bg-muted/50 transition-colors duration-200 cursor-pointer">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-blue-500 rounded-full">
-                      <Truck className="h-5 w-5 text-white" />
+                    <div className="p-2 bg-primary rounded-full">
+                      <Truck className="h-5 w-5 text-primary-foreground" />
                     </div>
                     <div>
-                      <p className="font-semibold text-blue-900 dark:text-blue-100">Operaciones Activas</p>
-                      <p className="text-sm text-blue-700 dark:text-blue-300">
+                      <p className="font-semibold text-foreground">Operaciones Activas</p>
+                      <p className="text-sm text-muted-foreground">
                         {dashboardData?.stats.vehiclesInRoute || 0} rutas en ejecución •
                         Eficiencia: {dashboardData?.stats.totalVehicles ? Math.round((dashboardData.stats.vehiclesInRoute / dashboardData.stats.totalVehicles) * 100) : 0}%
                       </p>
                     </div>
                   </div>
-                  <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 text-lg px-3 py-1">
+                  <Badge className="bg-primary text-primary-foreground text-lg px-3 py-1">
                     {dashboardData?.stats.vehiclesInRoute || 0}
                   </Badge>
                 </div>
               </div>
 
-              <div className="p-4 bg-gradient-to-r from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 rounded-lg border border-green-200 dark:border-green-800">
+              <div className="p-4 bg-muted/30 rounded-lg border border-border hover:bg-muted/50 transition-colors duration-200 cursor-pointer">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-green-500 rounded-full">
-                      <CheckCircle className="h-5 w-5 text-white" />
+                    <div className="p-2 bg-success rounded-full">
+                      <CheckCircle className="h-5 w-5 text-success-foreground" />
                     </div>
                     <div>
-                      <p className="font-semibold text-green-900 dark:text-green-100">Capacidad Disponible</p>
-                      <p className="text-sm text-green-700 dark:text-green-300">
+                      <p className="font-semibold text-foreground">Capacidad Disponible</p>
+                      <p className="text-sm text-muted-foreground">
                         {dashboardData?.stats.availableVehicles || 0} vehículos listos para asignación inmediata
                       </p>
                     </div>
                   </div>
-                  <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-lg px-3 py-1">
+                  <Badge className="bg-success text-success-foreground text-lg px-3 py-1">
                     {dashboardData?.stats.availableVehicles || 0}
                   </Badge>
                 </div>
               </div>
 
-              <div className="p-4 bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-950 dark:to-amber-900 rounded-lg border border-amber-200 dark:border-amber-800">
+              <div className="p-4 bg-muted/30 rounded-lg border border-border hover:bg-muted/50 transition-colors duration-200 cursor-pointer">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-amber-500 rounded-full">
-                      <Users className="h-5 w-5 text-white" />
+                    <div className="p-2 bg-primary rounded-full">
+                      <Users className="h-5 w-5 text-primary-foreground" />
                     </div>
                     <div>
-                      <p className="font-semibold text-amber-900 dark:text-amber-100">Recursos Humanos</p>
-                      <p className="text-sm text-amber-700 dark:text-amber-300">
+                      <p className="font-semibold text-foreground">Recursos Humanos</p>
+                      <p className="text-sm text-muted-foreground">
                         {dashboardData?.stats.activeDrivers || 0} conductores activos de {dashboardData?.stats.totalDrivers || 0} total
                       </p>
                     </div>
                   </div>
-                  <Badge className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 text-lg px-3 py-1">
+                  <Badge className="bg-primary text-primary-foreground text-lg px-3 py-1">
                     {dashboardData?.stats.activeDrivers || 0}/{dashboardData?.stats.totalDrivers || 0}
                   </Badge>
                 </div>
               </div>
 
-              <div className="p-4 bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 rounded-lg border border-purple-200 dark:border-purple-800">
+              <div className="p-4 bg-muted/30 rounded-lg border border-border hover:bg-muted/50 transition-colors duration-200 cursor-pointer">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-purple-500 rounded-full">
-                      <Building2 className="h-5 w-5 text-white" />
+                    <div className="p-2 bg-primary rounded-full">
+                      <Building2 className="h-5 w-5 text-primary-foreground" />
                     </div>
                     <div>
-                      <p className="font-semibold text-purple-900 dark:text-purple-100">Cobertura de Mercado</p>
-                      <p className="text-sm text-purple-700 dark:text-purple-300">
+                      <p className="font-semibold text-foreground">Cobertura de Mercado</p>
+                      <p className="text-sm text-muted-foreground">
                         {dashboardData?.stats.totalCompanies || 0} empresas atendidas actualmente
                       </p>
                     </div>
                   </div>
-                  <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 text-lg px-3 py-1">
+                  <Badge className="bg-primary text-primary-foreground text-lg px-3 py-1">
                     {dashboardData?.stats.totalCompanies || 0}
                   </Badge>
                 </div>
@@ -380,10 +380,10 @@ function DashboardPage() {
         </Card>
 
         {/* Quick Actions */}
-        <Card className="shadow-xl">
+        <Card className="bg-card border-border shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5" />
+              <Activity className="h-5 w-5 text-muted-foreground" />
               Operaciones Rápidas
             </CardTitle>
             <p className="text-sm text-muted-foreground">Acceso directo a las funciones más utilizadas</p>
@@ -395,7 +395,7 @@ function DashboardPage() {
                 <div className="grid gap-2">
                   <Button
                     variant="outline"
-                    className="h-auto p-3 justify-start bg-blue-500 hover:bg-blue-600 text-white border-none hover:scale-105 transition-all duration-300"
+                    className="h-auto p-3 justify-start border-border text-foreground hover:bg-accent/50 hover:text-accent-foreground transition-all duration-300 cursor-pointer"
                     onClick={() => router.push('/Dashboard/vehicleAssigments')}
                   >
                     <MapPin className="h-4 w-4 mr-2" />
@@ -404,7 +404,7 @@ function DashboardPage() {
 
                   <Button
                     variant="outline"
-                    className="h-auto p-3 justify-start bg-indigo-500 hover:bg-indigo-600 text-white border-none hover:scale-105 transition-all duration-300"
+                    className="h-auto p-3 justify-start border-border text-foreground hover:bg-accent/50 hover:text-accent-foreground transition-all duration-300 cursor-pointer"
                     onClick={() => router.push('/Dashboard/(route)/route-schedule')}
                   >
                     <Clock className="h-4 w-4 mr-2" />
@@ -413,7 +413,7 @@ function DashboardPage() {
 
                   <Button
                     variant="outline"
-                    className="h-auto p-3 justify-start bg-cyan-500 hover:bg-cyan-600 text-white border-none hover:scale-105 transition-all duration-300"
+                    className="h-auto p-3 justify-start border-border text-foreground hover:bg-accent/50 hover:text-accent-foreground transition-all duration-300 cursor-pointer"
                     onClick={() => router.push('/Dashboard/(route)/routes')}
                   >
                     <MapPin className="h-4 w-4 mr-2" />
@@ -427,7 +427,7 @@ function DashboardPage() {
                 <div className="grid gap-2">
                   <Button
                     variant="outline"
-                    className="h-auto p-3 justify-start bg-green-500 hover:bg-green-600 text-white border-none hover:scale-105 transition-all duration-300"
+                    className="h-auto p-3 justify-start border-border text-foreground hover:bg-accent/50 hover:text-accent-foreground transition-all duration-300 cursor-pointer"
                     onClick={() => router.push('/Dashboard/drivers')}
                   >
                     <Users className="h-4 w-4 mr-2" />
@@ -436,7 +436,7 @@ function DashboardPage() {
 
                   <Button
                     variant="outline"
-                    className="h-auto p-3 justify-start bg-emerald-500 hover:bg-emerald-600 text-white border-none hover:scale-105 transition-all duration-300"
+                    className="h-auto p-3 justify-start border-border text-foreground hover:bg-accent/50 hover:text-accent-foreground transition-all duration-300 cursor-pointer"
                     onClick={() => router.push('/Dashboard/(driver)/driver-schedule')}
                   >
                     <Clock className="h-4 w-4 mr-2" />
@@ -450,7 +450,7 @@ function DashboardPage() {
                 <div className="grid gap-2">
                   <Button
                     variant="outline"
-                    className="h-auto p-3 justify-start bg-purple-500 hover:bg-purple-600 text-white border-none hover:scale-105 transition-all duration-300"
+                    className="h-auto p-3 justify-start border-border text-foreground hover:bg-accent/50 hover:text-accent-foreground transition-all duration-300 cursor-pointer"
                     onClick={() => router.push('/Dashboard/vehicles')}
                   >
                     <Car className="h-4 w-4 mr-2" />
@@ -459,7 +459,7 @@ function DashboardPage() {
 
                   <Button
                     variant="outline"
-                    className="h-auto p-3 justify-start bg-violet-500 hover:bg-violet-600 text-white border-none hover:scale-105 transition-all duration-300"
+                    className="h-auto p-3 justify-start border-border text-foreground hover:bg-accent/50 hover:text-accent-foreground transition-all duration-300 cursor-pointer"
                     onClick={() => router.push('/Dashboard/vehicleType')}
                   >
                     <Truck className="h-4 w-4 mr-2" />
@@ -473,7 +473,7 @@ function DashboardPage() {
                 <div className="grid gap-2">
                   <Button
                     variant="outline"
-                    className="h-auto p-3 justify-start bg-orange-500 hover:bg-orange-600 text-white border-none hover:scale-105 transition-all duration-300"
+                    className="h-auto p-3 justify-start border-border text-foreground hover:bg-accent/50 hover:text-accent-foreground transition-all duration-300 cursor-pointer"
                     onClick={() => router.push('/Dashboard/company')}
                   >
                     <Building2 className="h-4 w-4 mr-2" />
@@ -482,7 +482,7 @@ function DashboardPage() {
 
                   <Button
                     variant="outline"
-                    className="h-auto p-3 justify-start bg-red-500 hover:bg-red-600 text-white border-none hover:scale-105 transition-all duration-300"
+                    className="h-auto p-3 justify-start border-border text-foreground hover:bg-accent/50 hover:text-accent-foreground transition-all duration-300 cursor-pointer"
                     onClick={() => router.push('/Dashboard/parking')}
                   >
                     <MapPin className="h-4 w-4 mr-2" />
