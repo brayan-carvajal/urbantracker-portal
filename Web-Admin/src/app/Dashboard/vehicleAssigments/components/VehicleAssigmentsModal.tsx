@@ -91,7 +91,15 @@ export const VehicleAssigmentModal: React.FC<VehicleAssigmentModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-card text-foreground max-w-4xl border-border">
+      <DialogContent 
+        className="bg-card text-foreground max-w-4xl border-border"
+        aria-describedby="vehicleassignments-modal-description"
+      >
+        {/* Hidden description for accessibility */}
+        <div id="vehicleassignments-modal-description" className="sr-only">
+          Formulario para crear o editar asignaciones de vehículos
+        </div>
+        
         <DialogHeader>
           <DialogTitle className="text-foreground">
             {isEditing ? "Editar Asignación" : "Nueva Asignación"}

@@ -51,9 +51,21 @@ export default function VehiclesPage() {
     try {
       await saveVehicle()
     } catch (error) {
+      console.error("Error en handleSaveDriver:", error)
+      
+      // Handle different error types
+      let errorMessage = "Error desconocido al guardar vehículo";
+      
       if (error instanceof Error) {
-        setFormErrors({ general: error.message })
+        errorMessage = error.message;
+      } else if (error && typeof error === 'object') {
+        // Handle API errors or other objects
+        errorMessage = (error as any).message || errorMessage;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
       }
+      
+      setFormErrors({ general: errorMessage })
     }
   }
 
