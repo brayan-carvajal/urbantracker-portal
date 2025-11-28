@@ -84,26 +84,26 @@ export const RouteAssignmentModal: React.FC<RouteAssignmentModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-card text-card-foreground max-w-4xl border-border">
+      <DialogContent className="bg-zinc-900 text-white max-w-4xl">
         <DialogHeader>
-          <DialogTitle className="text-foreground">
+          <DialogTitle>
             {isEditing ? "Editar Asignación de Ruta" : "Nueva Asignación de Ruta"}
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="route_id" className="text-muted-foreground">
+              <Label htmlFor="route_id" className="text-zinc-400">
                 Ruta *
               </Label>
               <Select
                 value={formData.routeId ? formData.routeId.toString() : ""}
                 onValueChange={(value: string) => onFormChange("routeId", parseInt(value))}
               >
-                <SelectTrigger className="w-full bg-card border-border text-card-foreground">
+                <SelectTrigger className="w-full bg-zinc-800 border-zinc-700 text-white">
                   <SelectValue placeholder="Seleccione una ruta" />
                 </SelectTrigger>
-                <SelectContent className="bg-popover border-border min-w-[300px]">
+                <SelectContent className="bg-zinc-800 border-zinc-700 min-w-[300px]">
                   {routes.map(route => (
                     <SelectItem key={route.id} value={route.id!.toString()}>
                       Ruta {route.numberRoute} - {route.description || "Sin descripción"}
@@ -112,22 +112,22 @@ export const RouteAssignmentModal: React.FC<RouteAssignmentModalProps> = ({
                 </SelectContent>
               </Select>
               {errors.routeId && (
-                <p className="text-sm text-destructive">{errors.routeId}</p>
+                <p className="text-sm text-red-500">{errors.routeId}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="vehicle_id" className="text-muted-foreground">
+              <Label htmlFor="vehicle_id" className="text-zinc-400">
                 Vehículo *
               </Label>
               <Select
                 value={formData.vehicleId ? formData.vehicleId.toString() : ""}
                 onValueChange={(value: string) => onFormChange("vehicleId", parseInt(value))}
               >
-                <SelectTrigger className="w-full bg-card border-border text-card-foreground">
+                <SelectTrigger className="w-full bg-zinc-800 border-zinc-700 text-white">
                   <SelectValue placeholder="Seleccione un vehículo" />
                 </SelectTrigger>
-                <SelectContent className="bg-popover border-border min-w-[300px]">
+                <SelectContent className="bg-zinc-800 border-zinc-700 min-w-[300px]">
                   {vehicles.map(vehicle => (
                     <SelectItem key={vehicle.id} value={vehicle.id.toString()}>
                       {vehicle.licencePlate} - {vehicle.brand} {vehicle.model}
@@ -136,24 +136,24 @@ export const RouteAssignmentModal: React.FC<RouteAssignmentModalProps> = ({
                 </SelectContent>
               </Select>
               {errors.vehicleId && (
-                <p className="text-sm text-destructive">{errors.vehicleId}</p>
+                <p className="text-sm text-red-500">{errors.vehicleId}</p>
               )}
             </div>
           </div>
 
           <div className="grid grid-cols-1 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="status" className="text-muted-foreground">
+              <Label htmlFor="status" className="text-zinc-400">
                 Estado *
               </Label>
               <Select
                 value={formData.assignmentStatus}
                 onValueChange={(value: string) => onFormChange("assignmentStatus", value as 'ACTIVE' | 'INACTIVE')}
               >
-                <SelectTrigger className="w-full bg-input border-input text-foreground">
+                <SelectTrigger className="w-full bg-zinc-800 border-zinc-700 text-white">
                   <SelectValue placeholder="Seleccione el estado" />
                 </SelectTrigger>
-                <SelectContent className="bg-popover border-border min-w-[200px]">
+                <SelectContent className="bg-zinc-800 border-zinc-700 min-w-[200px]">
                   <SelectItem value="ACTIVE">Activo</SelectItem>
                   <SelectItem value="INACTIVE">Inactivo</SelectItem>
                 </SelectContent>
@@ -163,7 +163,7 @@ export const RouteAssignmentModal: React.FC<RouteAssignmentModalProps> = ({
 
           <div className="grid grid-cols-1 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="note" className="text-muted-foreground">
+              <Label htmlFor="note" className="text-zinc-400">
                 Nota
               </Label>
               <textarea
@@ -173,7 +173,7 @@ export const RouteAssignmentModal: React.FC<RouteAssignmentModalProps> = ({
                   const value = event.target.value;
                   onFormChange("note", value);
                 }}
-                className="w-full bg-input border-input text-foreground rounded px-3 py-2 resize-none"
+                className="w-full bg-zinc-800 border-zinc-700 text-white rounded px-3 py-2 resize-none"
                 placeholder="Nota de asignación (opcional)"
                 disabled={isLoading}
                 rows={3}
@@ -186,7 +186,7 @@ export const RouteAssignmentModal: React.FC<RouteAssignmentModalProps> = ({
               type="button"
               variant="outline"
               onClick={onClose}
-              className="border-border text-foreground hover:bg-accent"
+              className="border-zinc-700 text-white hover:bg-zinc-800"
               disabled={isLoading || isSaving}
             >
               Cancelar
@@ -194,7 +194,7 @@ export const RouteAssignmentModal: React.FC<RouteAssignmentModalProps> = ({
             <Button
               type="submit"
               disabled={isLoading || isSaving}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
             >
               {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {isEditing ? "Editar" : "Crear"} Asignación

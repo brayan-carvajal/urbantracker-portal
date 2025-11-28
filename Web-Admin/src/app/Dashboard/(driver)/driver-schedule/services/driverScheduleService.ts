@@ -73,10 +73,9 @@ export const driverScheduleService = {
       }
       
       return response.data;
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error('Error in updateDriverSchedules:', error);
-      const message = error instanceof Error ? error.message : 'Error updating driver schedules';
-      throw new Error(message);
+      throw new Error(error.message || 'Error updating driver schedules');
     }
   },
 
