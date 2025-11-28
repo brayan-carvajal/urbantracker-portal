@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState } from 'react';
+"use client";
+import React from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 interface RouteData {
   id: number;
@@ -25,6 +27,11 @@ export function RouteProvider({ children }: { children: React.ReactNode }) {
   const [routes, setRoutes] = useState<RouteData[]>([]);
   const [selectedRoutes, setSelectedRoutes] = useState<number[]>([]);
   const [focusedRoute, setFocusedRoute] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const addRoute = (routeId: number, outboundPoints: [number, number][] | null, returnPoints: [number, number][] | null) => {
     setRoutes(prev => {

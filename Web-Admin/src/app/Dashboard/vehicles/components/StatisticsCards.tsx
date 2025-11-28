@@ -14,40 +14,40 @@ export function StatisticsCards({ statistics }: StatisticsCardsProps) {
       value: statistics.totalVehicules,
       description: "En la flota",
       icon: Car,
-      iconColor: "text-emerald-500"
+      iconColor: "text-success"
     },
     {
       title: "Vehículos Activos",
       value: statistics.activeVehicules,
       description: "En operación",
       icon: Car,
-      iconColor: "text-green-500"
+      iconColor: "text-success"
     },
     {
       title: "Vehículos Inactivos",
       value: statistics.inactiveVehicules,
       description: "Fuera de servicio",
       icon: Car,
-      iconColor: "text-red-500"
+      iconColor: "text-destructive"
     }
   ];
 
   return (
-    <div className="grid gap-6 md:grid-cols-4">
+    <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
       {cards.map((card) => (
         <Card
           key={card.title}
-          className="bg-zinc-900 border-zinc-800 hover:bg-zinc-800 transition-all duration-300 hover:scale-105"
+          className="bg-card border-border hover:bg-accent transition-all duration-300 hover:scale-105"
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-400">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
               {card.title}
             </CardTitle>
             <card.icon className={`h-4 w-4 ${card.iconColor}`} />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{card.value}</div>
-            <p className="text-xs text-zinc-400">{card.description}</p>
+            <div className="text-xl sm:text-2xl font-bold text-foreground">{card.value}</div>
+            <p className="text-xs text-muted-foreground">{card.description}</p>
           </CardContent>
         </Card>
       ))}

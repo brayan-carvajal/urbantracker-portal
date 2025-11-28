@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -8,10 +9,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ArrowLeft } from "lucide-react"
 import Image from "next/image"
+import { useTheme } from "@/hooks/useTheme"
 import { useForgotPassword } from "./hooks/useForgotPassword"
 
 export default function ForgotPasswordPage() {
     const { email, setEmail, isLoading, isEmailSent, errorMessage, handleSubmit, handleContinue, handleResend, router } = useForgotPassword()
+    const { theme } = useTheme()
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
+
+    // Determinar logo según tema - con placeholder durante hidratación
+    const logoSrc = mounted ? (theme === "dark" ? "/logo-full-white.svg" : "/logo-full-black.svg") : "/logo-full-white.svg"
 
     return (
         <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -28,7 +39,7 @@ export default function ForgotPasswordPage() {
                 {/* Logo/Brand */}
                 <div className="text-center">
                     <div className="inline-flex items-center justify-center w-12 h-12 bg-primary text-primary-foreground rounded-lg mb-4">
-                        <Image src="/white-logo.svg" alt="Logo" width={50} height={50} />
+                        <Image src={logoSrc} alt="Logo" width={50} height={50} />
                     </div>
                     <h1 className="text-2xl font-bold text-foreground">
                         {isEmailSent ? "Revisa tu email" : "¿Olvidaste tu contraseña?"}
