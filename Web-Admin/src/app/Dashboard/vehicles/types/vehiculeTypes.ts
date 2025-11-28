@@ -11,6 +11,8 @@ export interface Vehicle {
     companyId: number;
     vehicleTypeId: number;
     inService: boolean;
+    outboundImageUrl?: string;
+    returnImageUrl?: string;
 }
 
 export interface VehiculeFormData {
@@ -21,8 +23,8 @@ export interface VehiculeFormData {
     color: string;
     passengerCapacity: number;
     status: string;
-    companyId: number;
-    vehicleTypeId: number;
+    companyId: number | null;
+    vehicleTypeId: number | null;
     inService: boolean;
     outboundImage: File | null;
     returnImage: File | null;
