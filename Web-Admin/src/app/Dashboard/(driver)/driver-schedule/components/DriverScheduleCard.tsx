@@ -37,48 +37,48 @@ export function DriverScheduleCard({ driverWithSchedules, onEdit, onDelete }: Dr
   })
 
   return (
-    <Card className="bg-zinc-900 border-zinc-800 hover:bg-zinc-800 transition-all duration-300 hover:scale-[1.02]">
+    <Card className="bg-card border-border hover:bg-accent transition-all duration-300 hover:scale-[1.02]">
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-6 flex-1">
-            <div className="p-4 bg-blue-600/20 rounded-full">
-              <User className="h-8 w-8 text-blue-500" />
+            <div className="p-4 bg-primary/20 rounded-full">
+              <User className="h-8 w-8 text-primary" />
             </div>
             <div className="space-y-3 flex-1">
               <div className="flex items-center gap-3">
-                <h3 className="text-xl font-bold text-white">
+                <h3 className="text-xl font-bold text-foreground">
                   {`${driver.firstName} ${driver.lastName}`}
                 </h3>
-                <Badge className="bg-blue-600 text-white hover:bg-blue-700">
+                <Badge className="bg-primary text-primary-foreground hover:bg-primary/90">
                   {schedules.length} horario{schedules.length !== 1 ? 's' : ''}
                 </Badge>
               </div>
 
               {/* Schedule Grid */}
               <div className="space-y-2">
-                <div className="text-sm font-medium text-zinc-400">Horarios:</div>
+                <div className="text-sm font-medium text-muted-foreground">Horarios:</div>
                 <div className="grid grid-cols-7 gap-2">
                   {['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'].map(day => {
                     const daySchedules = sortedSchedules.filter(s => s.dayOfWeek.toUpperCase() === day)
                     return (
                       <div key={day} className="text-center">
-                        <div className="text-xs text-zinc-500 mb-1">{getDayName(day)}</div>
+                        <div className="text-xs text-muted-foreground mb-1">{getDayName(day)}</div>
                         {daySchedules.length > 0 ? (
                           <div className="space-y-1">
                             {daySchedules.map(schedule => (
                               <div key={schedule.id} className={`p-2 rounded text-xs ${
                                 schedule.active
-                                  ? 'bg-green-600/20 text-green-400 border border-green-600/30'
-                                  : 'bg-red-600/20 text-red-400 border border-red-600/30'
+                                  ? 'bg-success/20 text-success border border-success/30'
+                                  : 'bg-destructive/20 text-destructive border border-destructive/30'
                               }`}>
                                 <div className="font-medium">{formatTime(schedule.startTime)}</div>
-                                <div className="text-zinc-400">-</div>
+                                <div className="text-muted-foreground">-</div>
                                 <div className="font-medium">{formatTime(schedule.endTime)}</div>
                               </div>
                             ))}
                           </div>
                         ) : (
-                          <div className="p-2 rounded bg-zinc-800/50 border border-zinc-700/50 text-zinc-600 text-xs">
+                          <div className="p-2 rounded bg-muted/50 border border-border text-muted-foreground text-xs">
                             Sin horario
                           </div>
                         )}
@@ -104,7 +104,7 @@ export function DriverScheduleCard({ driverWithSchedules, onEdit, onDelete }: Dr
               variant="outline"
               size="sm"
               onClick={() => onDelete(driverWithSchedules)}
-              className="border-red-700 text-red-500 hover:bg-red-900/20"
+              className="border-destructive/50 text-destructive hover:bg-destructive/10"
             >
               <Trash2 className="h-4 w-4 mr-2" />
               Eliminar

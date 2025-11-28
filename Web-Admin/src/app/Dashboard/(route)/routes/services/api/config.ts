@@ -1,3 +1,3 @@
 export const API_ENDPOINTS = {
-  ROUTES: '/api/v1/route',
+  ROUTES: '/api/v1/routes',
 } as const;

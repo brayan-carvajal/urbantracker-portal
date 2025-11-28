@@ -1,9 +1,10 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import Map, { Source, Layer, Marker } from "react-map-gl/mapbox";
+import Map, { Source, Layer, Marker, MapRef } from "react-map-gl/mapbox";
 import type { RouteWaypointRequest } from "../../types/routeTypes";
 import type { MapMouseEvent } from "mapbox-gl";
 import type { FeatureCollection } from "geojson";
 import { useRouteMapEditor } from "../../context/RouteMapEditorContext";
+import { useTheme } from "@/hooks/useTheme";
 
 export default function MapView() {
   const {
@@ -15,9 +16,18 @@ export default function MapView() {
     setRouteDistanceReturn,
     displayMode,
   } = useRouteMapEditor();
-  const mapRef = useRef(null);
+  const { theme } = useTheme();
+  const mapRef = useRef<MapRef | null>(null);
 
   const accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+
+  // Define map styles based on theme
+  const mapStyles = {
+    dark: "mapbox://styles/mapbox/dark-v11",
+    light: "mapbox://styles/mapbox/light-v11"
+  };
+
+  const currentMapStyle = theme ? mapStyles[theme as keyof typeof mapStyles] : mapStyles.light;
 
   const [route, setRoute] = useState<FeatureCollection>({
     type: "FeatureCollection",
@@ -149,6 +159,14 @@ export default function MapView() {
     getRoute();
   }, [waypointList, getRoute]);
 
+  // Update map style when theme changes
+  useEffect(() => {
+    if (mapRef.current && theme) {
+      const map = mapRef.current.getMap();
+      map.setStyle(currentMapStyle);
+    }
+  }, [theme, currentMapStyle]);
+
   // Comprueba si una geometría GeoJSON tiene un campo 'coordinates' con elementos
   const geometryHasCoordinates = (
     geometry: GeoJSON.Geometry | undefined | null
@@ -200,7 +218,7 @@ export default function MapView() {
           zoom: 12.5,
         }}
         style={{ width: "100%", height: "100%" }}
-        mapStyle="mapbox://styles/afsb114/cmf7eaden003301s563d81iss"
+        mapStyle={currentMapStyle}
         onLoad={getRoute}
         onClick={handleClickMap}
       >
