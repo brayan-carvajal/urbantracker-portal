@@ -164,43 +164,82 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
                 <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Imagen de Ida
                 </label>
-                <div className="border-2 border-dashed border-border rounded-lg p-4 text-center bg-card">
+                <div className="border-2 border-dashed border-border rounded-xl p-6 text-center min-h-[200px] flex flex-col justify-center bg-accent/10 hover:bg-accent/20 transition-colors">
                   {formData.outboundImage ? (
-                    <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground">{formData.outboundImage.name}</p>
+                    <div className="space-y-4">
+                      {/* Vista previa de la imagen */}
+                      <div className="flex justify-center">
+                        <img
+                          src={URL.createObjectURL(formData.outboundImage)}
+                          alt="Vista previa imagen de ida"
+                          className="max-h-40 max-w-full object-contain rounded-lg shadow-sm"
+                          onLoad={(e) => {
+                            // Liberar el objeto URL después de cargar la imagen
+                            URL.revokeObjectURL((e.target as HTMLImageElement).src);
+                          }}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground font-medium break-all">
+                          {formData.outboundImage.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Tamaño: {(formData.outboundImage.size / 1024).toFixed(1)} KB
+                        </p>
+                      </div>
                       {mode !== 'view' && (
-                        <button
+                        <Button
+                          type="button"
+                          variant="outline"
                           onClick={() => handleFileChange('outboundImage', null)}
-                          className="text-destructive hover:text-destructive/80 text-sm"
+                          className="text-destructive border-destructive/50 hover:bg-destructive/10"
+                          size="sm"
                         >
-                          Remover
-                        </button>
+                          Remover imagen
+                        </Button>
                       )}
                     </div>
                   ) : (
-                    <>
-                      <Upload className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
-                      <p className="text-sm text-muted-foreground mb-2">Subir imagen de ida</p>
+                    <div className="space-y-4">
+                      <Upload className="mx-auto h-10 w-10 text-muted-foreground" />
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground font-medium">
+                          Subir imagen de ida
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Formatos soportados: JPG, PNG, WebP
+                        </p>
+                      </div>
                       {mode !== 'view' && (
                         <input
                           type="file"
                           accept="image/*"
-                          onChange={(e) => handleFileChange('outboundImage', e.target.files?.[0] || null)}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            handleFileChange(
+                              'outboundImage',
+                              e.target.files?.[0] || null
+                            );
+                          }}
                           className="hidden"
                           id="outbound-image"
                         />
                       )}
                       <Button
-                        asChild
-                        variant={mode === 'view' ? 'secondary' : 'default'}
-                        disabled={mode === 'view'}
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                        type="button"
+                        variant="outline"
+                        className="border-border text-foreground hover:bg-accent"
+                        size="sm"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          document.getElementById('outbound-image')?.click();
+                        }}
                       >
-                        <label htmlFor="outbound-image" className="cursor-pointer">
-                          Seleccionar Archivo
-                        </label>
+                        <Upload className="h-4 w-4" />
+                        Seleccionar archivo
                       </Button>
-                    </>
+                    </div>
                   )}
                 </div>
               </div>
@@ -209,43 +248,82 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
                 <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Imagen de Vuelta
                 </label>
-                <div className="border-2 border-dashed border-border rounded-lg p-4 text-center bg-card">
+                <div className="border-2 border-dashed border-border rounded-xl p-6 text-center min-h-[200px] flex flex-col justify-center bg-accent/10 hover:bg-accent/20 transition-colors">
                   {formData.returnImage ? (
-                    <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground">{formData.returnImage.name}</p>
+                    <div className="space-y-4">
+                      {/* Vista previa de la imagen */}
+                      <div className="flex justify-center">
+                        <img
+                          src={URL.createObjectURL(formData.returnImage)}
+                          alt="Vista previa imagen de vuelta"
+                          className="max-h-40 max-w-full object-contain rounded-lg shadow-sm"
+                          onLoad={(e) => {
+                            // Liberar el objeto URL después de cargar la imagen
+                            URL.revokeObjectURL((e.target as HTMLImageElement).src);
+                          }}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground font-medium break-all">
+                          {formData.returnImage.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Tamaño: {(formData.returnImage.size / 1024).toFixed(1)} KB
+                        </p>
+                      </div>
                       {mode !== 'view' && (
-                        <button
+                        <Button
+                          type="button"
+                          variant="outline"
                           onClick={() => handleFileChange('returnImage', null)}
-                          className="text-destructive hover:text-destructive/80 text-sm"
+                          className="text-destructive border-destructive/50 hover:bg-destructive/10"
+                          size="sm"
                         >
-                          Remover
-                        </button>
+                          Remover imagen
+                        </Button>
                       )}
                     </div>
                   ) : (
-                    <>
-                      <Upload className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
-                      <p className="text-sm text-muted-foreground mb-2">Subir imagen de vuelta</p>
+                    <div className="space-y-4">
+                      <Upload className="mx-auto h-10 w-10 text-muted-foreground" />
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground font-medium">
+                          Subir imagen de vuelta
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Formatos soportados: JPG, PNG, WebP
+                        </p>
+                      </div>
                       {mode !== 'view' && (
                         <input
                           type="file"
                           accept="image/*"
-                          onChange={(e) => handleFileChange('returnImage', e.target.files?.[0] || null)}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            handleFileChange(
+                              'returnImage',
+                              e.target.files?.[0] || null
+                            );
+                          }}
                           className="hidden"
                           id="return-image"
                         />
                       )}
                       <Button
-                        asChild
-                        variant={mode === 'view' ? 'secondary' : 'default'}
-                        disabled={mode === 'view'}
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                        type="button"
+                        variant="outline"
+                        className="border-border text-foreground hover:bg-accent"
+                        size="sm"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          document.getElementById('return-image')?.click();
+                        }}
                       >
-                        <label htmlFor="return-image" className="cursor-pointer">
-                          Seleccionar Archivo
-                        </label>
+                        <Upload className="h-4 w-4" />
+                        Seleccionar archivo
                       </Button>
-                    </>
+                    </div>
                   )}
                 </div>
               </div>
