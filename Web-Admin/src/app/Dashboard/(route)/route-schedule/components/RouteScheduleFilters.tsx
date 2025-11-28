@@ -26,21 +26,21 @@ export function RouteScheduleFilters({
   return (
     <div className="flex flex-wrap gap-4 items-center">
       <div className="relative flex-1 max-w-md">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 h-4 w-4" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
         <Input
           placeholder="Buscar por día, hora..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-10 bg-zinc-900 border-zinc-700 text-white placeholder-zinc-400"
+          className="pl-10 bg-card border-border text-card-foreground placeholder-muted-foreground"
         />
       </div>
 
       <Select value={dayFilter} onValueChange={onDayFilterChange}>
-        <SelectTrigger className="w-48 bg-zinc-900 border-zinc-700 text-white">
+        <SelectTrigger className="w-48 bg-card border-border text-card-foreground">
           <Filter className="h-4 w-4 mr-2" />
           <SelectValue placeholder="Todos los días" />
         </SelectTrigger>
-        <SelectContent className="bg-zinc-900 border-zinc-700">
+        <SelectContent className="bg-popover border-border">
           <SelectItem value="all">Todos los días</SelectItem>
           <SelectItem value="MONDAY">Lunes</SelectItem>
           <SelectItem value="TUESDAY">Martes</SelectItem>

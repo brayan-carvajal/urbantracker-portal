@@ -29,8 +29,8 @@ const INITIAL_FORM_DATA: VehiculeFormData = {
   color: "",
   passengerCapacity: 10,
   status: "ACTIVE",
-  companyId: 0,
-  vehicleTypeId: 0,
+  companyId: null,
+  vehicleTypeId: null,
   inService: true,
   outboundImage: null,
   returnImage: null,
@@ -176,16 +176,16 @@ export function useVehicles(): UseVehiculesReturn {
   const openEditModal = useCallback((vehicle: Vehicle) => {
     setEditingVehicle(vehicle);
     setFormData({
-      licencePlate: vehicle.licencePlate,
-      brand: vehicle.brand,
-      model: vehicle.model,
-      year: vehicle.year,
-      color: vehicle.color,
-      passengerCapacity: vehicle.passengerCapacity,
-      status: vehicle.status,
-      companyId: vehicle.companyId,
-      vehicleTypeId: vehicle.vehicleTypeId,
-      inService: vehicle.inService,
+      licencePlate: vehicle.licencePlate || '',
+      brand: vehicle.brand || '',
+      model: vehicle.model || '',
+      year: vehicle.year || 0,
+      color: vehicle.color || '',
+      passengerCapacity: vehicle.passengerCapacity || 0,
+      status: vehicle.status || '',
+      companyId: vehicle.companyId || null,
+      vehicleTypeId: vehicle.vehicleTypeId || null,
+      inService: vehicle.inService ?? false,
       outboundImage: null,
       returnImage: null,
     });
@@ -259,16 +259,37 @@ export function useVehicles(): UseVehiculesReturn {
 
       if (!savedVehicle || !savedVehicle.id) {
         console.warn("El backend no devolvió un vehículo válido:", savedVehicle);
+        throw new Error("El servidor no devolvió información válida del vehículo");
       }
 
+      // Añadir el vehículo inmediatamente al estado local
       setVehicles((prev) => [...prev, savedVehicle]);
+      
+      // Recargar la lista desde el servidor para asegurar sincronización
+      // pero solo después de un pequeño delay para permitir que las imágenes se procesen
+      setTimeout(() => {
+        loadVehicles();
+      }, 500);
     }
 
-    await loadVehicles();
+    // Solo cerrar el modal después de que el vehículo se haya guardado correctamente
     closeModal();
   } catch (error) {
     console.error("Error guardando vehículo:", error);
-    throw error;
+    
+    // Better error handling for different error types
+    let errorMessage = "Error desconocido al guardar vehículo";
+    
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    } else if (error && typeof error === 'object') {
+      // Handle API errors that might not be Error instances
+      errorMessage = (error as any).message || errorMessage;
+    } else if (typeof error === 'string') {
+      errorMessage = error;
+    }
+    
+    throw new Error(errorMessage);
   } finally {
     setIsSaving(false);
   }

@@ -13,7 +13,7 @@ import type {
   Company,
   VehicleType,
 } from "../types/vehiculeTypes";
-import { Loader2, Upload } from "lucide-react";
+import { Loader2, Upload, Car } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -90,11 +90,11 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
       newErrors.model = "Modelo debe tener al menos 2 caracteres";
     }
 
-    if (formData.companyId === 0) {
+    if (!formData.companyId || formData.companyId === 0) {
       newErrors.companyId = "Compañía requerida";
     }
 
-    if (formData.vehicleTypeId === 0) {
+    if (!formData.vehicleTypeId || formData.vehicleTypeId === 0) {
       newErrors.vehicleTypeId = "Tipo de vehículo requerido";
     }
 
@@ -147,299 +147,406 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-zinc-900  text-white max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>
-            {isEditing ? "Editar Vehiculo" : "Nuevo Vehiculo"}
+      <DialogContent 
+        className="bg-card text-foreground max-w-6xl w-[96vw] max-h-[95vh] overflow-hidden p-0"
+        aria-describedby="vehicle-modal-description"
+      >
+        <DialogHeader className="sticky top-0 bg-card border-b border-border z-20 px-4 sm:px-6 py-4">
+          <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-3">
+            <Car className="h-6 w-6 text-primary" />
+            {isEditing ? "Editar Vehículo" : "Nuevo Vehículo"}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="licencePlate" className="text-zinc-400">
-                Matrícula *
-              </Label>
-              <Input
-                id="licencePlate"
-                value={formData.licencePlate}
-                onChange={handleInputChange("licencePlate")}
-                className="bg-zinc-800 border-zinc-700 text-white"
-                placeholder="ABC-123"
-                disabled={isLoading}
-              />
-              {errors.licencePlate && (
-                <p className="text-sm text-red-500">{errors.licencePlate}</p>
-              )}
-            </div>
+        
+        {/* Hidden description for accessibility */}
+        <div id="vehicle-modal-description" className="sr-only">
+          Formulario para crear o editar información de vehículos
+        </div>
+        
+        <div className="overflow-y-auto max-h-[calc(95vh-100px)]">
+          <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-8">
+            {/* Sección 1: Información Básica */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-3 border-b border-border pb-3">
+                <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
+                  <span className="text-primary font-bold text-sm">1</span>
+                </div>
+                <h2 className="text-lg font-semibold text-foreground">
+                  Información Básica del Vehículo
+                </h2>
+              </div>
+              
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                {/* Matrícula */}
+                <div className="space-y-3">
+                  <Label htmlFor="licencePlate" className="text-sm font-semibold text-foreground">
+                    Matrícula del vehículo *
+                  </Label>
+                  <Input
+                    id="licencePlate"
+                    value={formData.licencePlate}
+                    onChange={handleInputChange("licencePlate")}
+                    className="bg-input border-border text-foreground h-12 text-base"
+                    placeholder="ABC-123"
+                    disabled={isLoading}
+                  />
+                  {errors.licencePlate && (
+                    <p className="text-sm text-destructive font-medium">{errors.licencePlate}</p>
+                  )}
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="vehicleTypeId" className="text-zinc-400">
-                Tipo de Vehículo *
-              </Label>
-              <Select
-                value={`${formData.vehicleTypeId}`}
-                onValueChange={(value) =>
-                  onFormChange("vehicleTypeId", Number(value))
-                }
-              >
-                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
-                  <SelectValue placeholder="Seleccione el tipo de vehículo" />
-                </SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-700">
-                  {vehicleTypes.map((type) => (
-                    <SelectItem key={type.id} value={type.id.toString()}>
-                      {type.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.vehicleTypeId && (
-                <p className="text-sm text-red-500">{errors.vehicleTypeId}</p>
-              )}
-            </div>
-          </div>
+                {/* Tipo de Vehículo */}
+                <div className="space-y-3">
+                  <Label htmlFor="vehicleTypeId" className="text-sm font-semibold text-foreground">
+                    Tipo de vehículo *
+                  </Label>
+                  <Select
+                    value={formData.vehicleTypeId ? `${formData.vehicleTypeId}` : ""}
+                    onValueChange={(value) =>
+                      onFormChange("vehicleTypeId", value ? Number(value) : null)
+                    }
+                  >
+                    <SelectTrigger className="bg-input border-border text-foreground h-12 text-base">
+                      <SelectValue placeholder="Seleccione el tipo de vehículo" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover border-border">
+                      {vehicleTypes.map((type) => (
+                        <SelectItem key={type.id} value={type.id.toString()} className="text-popover-foreground hover:bg-accent focus:bg-accent">
+                          {type.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.vehicleTypeId && (
+                    <p className="text-sm text-destructive font-medium">{errors.vehicleTypeId}</p>
+                  )}
+                </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="brand" className="text-zinc-400">
-                Marca *
-              </Label>
-              <Input
-                id="brand"
-                value={formData.brand}
-                onChange={handleInputChange("brand")}
-                className="bg-zinc-800 border-zinc-700 text-white"
-                placeholder="Volvo"
-                disabled={isLoading}
-              />
-              {errors.brand && (
-                <p className="text-sm text-red-500">{errors.brand}</p>
-              )}
-            </div>
+                {/* Marca */}
+                <div className="space-y-3">
+                  <Label htmlFor="brand" className="text-sm font-semibold text-foreground">
+                    Marca *
+                  </Label>
+                  <Input
+                    id="brand"
+                    value={formData.brand}
+                    onChange={handleInputChange("brand")}
+                    className="bg-input border-border text-foreground h-12 text-base"
+                    placeholder="Volvo, Mercedes, Scania..."
+                    disabled={isLoading}
+                  />
+                  {errors.brand && (
+                    <p className="text-sm text-destructive font-medium">{errors.brand}</p>
+                  )}
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="model" className="text-zinc-400">
-                Modelo *
-              </Label>
-              <Input
-                id="model"
-                value={formData.model}
-                onChange={handleInputChange("model")}
-                className="bg-zinc-800 border-zinc-700 text-white"
-                placeholder="FH16"
-                disabled={isLoading}
-              />
-              {errors.model && (
-                <p className="text-sm text-red-500">{errors.model}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="companyId" className="text-zinc-400">
-                Compañía *
-              </Label>
-              <Select
-                value={`${formData.companyId}`}
-                onValueChange={(value) =>
-                  onFormChange("companyId", Number(value))
-                }
-              >
-                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
-                  <SelectValue placeholder="Seleccione la compañía" />
-                </SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-700">
-                  {companies.map((company) => (
-                    <SelectItem key={company.id} value={company.id.toString()}>
-                      {company.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.companyId && (
-                <p className="text-sm text-red-500">{errors.companyId}</p>
-              )}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="year" className="text-zinc-400">
-                Año *
-              </Label>
-              <Input
-                id="year"
-                type="number"
-                value={formData.year}
-                onChange={handleInputChange("year")}
-                className="bg-zinc-800 border-zinc-700 text-white"
-                placeholder="2023"
-                disabled={isLoading}
-              />
-              {errors.year && (
-                <p className="text-sm text-red-500">{errors.year}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="color" className="text-zinc-400">
-                Color
-              </Label>
-              <Input
-                id="color"
-                value={formData.color}
-                onChange={handleInputChange("color")}
-                className="bg-zinc-800 border-zinc-700 text-white"
-                placeholder="Rojo"
-                disabled={isLoading}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="passengerCapacity" className="text-zinc-400">
-                Capacidad de Pasajeros *
-              </Label>
-              <Input
-                id="passengerCapacity"
-                type="number"
-                value={formData.passengerCapacity}
-                onChange={handleInputChange("passengerCapacity")}
-                className="bg-zinc-800 border-zinc-700 text-white"
-                placeholder="10"
-                disabled={isLoading}
-              />
-              {errors.passengerCapacity && (
-                <p className="text-sm text-red-500">
-                  {errors.passengerCapacity}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="status" className="text-zinc-400">
-                Estado *
-              </Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value: VehicleStatus) =>
-                  onFormChange("status", value)
-                }
-              >
-                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
-                  <SelectValue placeholder="Seleccione el estado">
-                    {formData.status
-                      ? getStatusLabel(formData.status)
-                      : "Seleccione el estado"}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-700">
-                  {VEHICLE_STATUSES.map((status) => (
-                    <SelectItem key={status.value} value={status.value}>
-                      {status.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="inService" className="text-zinc-400">
-              En Servicio
-            </Label>
-            <input
-              id="inService"
-              type="checkbox"
-              checked={formData.inService}
-              onChange={(e) => onFormChange("inService", e.target.checked)}
-              className="bg-zinc-800 border-zinc-700 text-white"
-              disabled={isLoading}
-            />
-          </div>
-
-          {/* Images */}
-          <div className="bg-zinc-800 p-4 rounded-lg">
-            <h2 className="text-xl font-semibold mb-4">
-              Imágenes de Referencia
-            </h2>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">
-                  Imagen
-                </label>
-                <div className="border-2 border-dashed border-zinc-600 rounded-lg p-4 text-center">
-                  {formData.outboundImage ? (
-                    <div className="space-y-2">
-                      <p className="text-sm text-zinc-400">
-                        {formData.outboundImage.name}
-                      </p>
-                        <button
-                          onClick={() =>
-                            handleFileChange("outboundImage", null)
-                          }
-                          className="text-red-400 hover:text-red-300 text-sm"
-                        >
-                          Remover
-                        </button>
-                    </div>
-                  ) : (
-                    <>
-                      <Upload className="mx-auto h-8 w-8 text-zinc-400 mb-2" />
-                      <p className="text-sm text-zinc-400 mb-2">
-                        Subir imagen 
-                      </p>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) =>
-                            handleFileChange(
-                              "outboundImage",
-                              e.target.files?.[0] || null
-                            )
-                          }
-                          className="hidden"
-                          id="outbound-image"
-                        />
-                      <Button>
-                        <label
-                          htmlFor="outbound-image"
-                          className="cursor-pointer"
-                        >
-                          Seleccionar Archivo
-                        </label>
-                      </Button>
-                    </>
+                {/* Modelo */}
+                <div className="space-y-3">
+                  <Label htmlFor="model" className="text-sm font-semibold text-foreground">
+                    Modelo *
+                  </Label>
+                  <Input
+                    id="model"
+                    value={formData.model}
+                    onChange={handleInputChange("model")}
+                    className="bg-input border-border text-foreground h-12 text-base"
+                    placeholder="FH16, Sprinter, etc."
+                    disabled={isLoading}
+                  />
+                  {errors.model && (
+                    <p className="text-sm text-destructive font-medium">{errors.model}</p>
                   )}
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="flex justify-end gap-3 pt-6">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="border-zinc-700 text-white hover:bg-zinc-800"
-              disabled={isLoading}
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white"
-            >
-              {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {isEditing ? "Editar" : "Crear"} Vehiculo
-            </Button>
-          </div>
-        </form>
+            {/* Sección 2: Detalles del Vehículo */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-3 border-b border-border pb-3">
+                <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
+                  <span className="text-primary font-bold text-sm">2</span>
+                </div>
+                <h2 className="text-lg font-semibold text-foreground">
+                  Detalles y Características
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                {/* Compañía */}
+                <div className="space-y-3 md:col-span-2 xl:col-span-2">
+                  <Label htmlFor="companyId" className="text-sm font-semibold text-foreground">
+                    Compañía *
+                  </Label>
+                  <Select
+                    value={formData.companyId ? `${formData.companyId}` : ""}
+                    onValueChange={(value) =>
+                      onFormChange("companyId", value ? Number(value) : null)
+                    }
+                  >
+                    <SelectTrigger className="bg-input border-border text-foreground h-12 text-base">
+                      <SelectValue placeholder="Seleccione la compañía" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover border-border">
+                      {companies.map((company) => (
+                        <SelectItem key={company.id} value={company.id.toString()} className="text-popover-foreground hover:bg-accent focus:bg-accent">
+                          {company.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.companyId && (
+                    <p className="text-sm text-destructive font-medium">{errors.companyId}</p>
+                  )}
+                </div>
+
+                {/* Año */}
+                <div className="space-y-3">
+                  <Label htmlFor="year" className="text-sm font-semibold text-foreground">
+                    Año *
+                  </Label>
+                  <Input
+                    id="year"
+                    type="number"
+                    value={formData.year}
+                    onChange={handleInputChange("year")}
+                    className="bg-input border-border text-foreground h-12 text-base"
+                    placeholder="2023"
+                    min="1900"
+                    max="2030"
+                    disabled={isLoading}
+                  />
+                  {errors.year && (
+                    <p className="text-sm text-destructive font-medium">{errors.year}</p>
+                  )}
+                </div>
+
+                {/* Color */}
+                <div className="space-y-3">
+                  <Label htmlFor="color" className="text-sm font-semibold text-foreground">
+                    Color
+                  </Label>
+                  <Input
+                    id="color"
+                    value={formData.color}
+                    onChange={handleInputChange("color")}
+                    className="bg-input border-border text-foreground h-12 text-base"
+                    placeholder="Rojo, azul, blanco..."
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Capacidad */}
+                <div className="space-y-3">
+                  <Label htmlFor="passengerCapacity" className="text-sm font-semibold text-foreground">
+                    Capacidad de pasajeros *
+                  </Label>
+                  <Input
+                    id="passengerCapacity"
+                    type="number"
+                    value={formData.passengerCapacity}
+                    onChange={handleInputChange("passengerCapacity")}
+                    className="bg-input border-border text-foreground h-12 text-base"
+                    placeholder="10"
+                    min="1"
+                    max="100"
+                    disabled={isLoading}
+                  />
+                  {errors.passengerCapacity && (
+                    <p className="text-sm text-destructive font-medium">{errors.passengerCapacity}</p>
+                  )}
+                </div>
+
+                {/* Estado */}
+                <div className="space-y-3">
+                  <Label htmlFor="status" className="text-sm font-semibold text-foreground">
+                    Estado del vehículo *
+                  </Label>
+                  <Select
+                    value={formData.status}
+                    onValueChange={(value: VehicleStatus) =>
+                      onFormChange("status", value)
+                    }
+                  >
+                    <SelectTrigger className="bg-input border-border text-foreground h-12 text-base">
+                      <SelectValue placeholder="Seleccione el estado">
+                        {formData.status
+                          ? getStatusLabel(formData.status)
+                          : "Seleccione el estado"}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover border-border">
+                      {VEHICLE_STATUSES.map((status) => (
+                        <SelectItem key={status.value} value={status.value} className="text-popover-foreground hover:bg-accent focus:bg-accent">
+                          {status.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* En Servicio */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-semibold text-foreground">
+                    Configuración de servicio
+                  </Label>
+                  <div className="flex items-center space-x-3 p-4 bg-accent/20 rounded-lg border border-border h-12">
+                    <input
+                      id="inService"
+                      type="checkbox"
+                      checked={formData.inService ?? false}
+                      onChange={(e) => onFormChange("inService", e.target.checked)}
+                      className="h-5 w-5 text-primary border-border rounded focus:ring-primary focus:ring-2"
+                      disabled={isLoading}
+                    />
+                    <Label htmlFor="inService" className="text-foreground font-medium cursor-pointer">
+                      En servicio activo
+                    </Label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Sección 3: Imágenes */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-3 border-b border-border pb-3">
+                <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
+                  <span className="text-primary font-bold text-sm">3</span>
+                </div>
+                <h2 className="text-lg font-semibold text-foreground">
+                  Imágenes del Vehículo
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Imagen Principal */}
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-sm font-semibold text-foreground mb-3 block">
+                      Imagen del vehículo
+                    </Label>
+                    <div className="border-2 border-dashed border-border rounded-xl p-6 text-center min-h-[200px] flex flex-col justify-center bg-accent/10 hover:bg-accent/20 transition-colors">
+                      {formData.outboundImage ? (
+                        <div className="space-y-4">
+                          {/* Vista previa de la imagen */}
+                          <div className="flex justify-center">
+                            <img
+                              src={URL.createObjectURL(formData.outboundImage)}
+                              alt="Vista previa"
+                              className="max-h-40 max-w-full object-contain rounded-lg shadow-sm"
+                              onLoad={(e) => {
+                                // Liberar el objeto URL después de cargar la imagen
+                                URL.revokeObjectURL((e.target as HTMLImageElement).src);
+                              }}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <p className="text-sm text-muted-foreground font-medium break-all">
+                              {formData.outboundImage.name}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Tamaño: {(formData.outboundImage.size / 1024).toFixed(1)} KB
+                            </p>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => handleFileChange("outboundImage", null)}
+                            className="text-destructive border-destructive/50 hover:bg-destructive/10"
+                            size="sm"
+                          >
+                            Remover imagen
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          <Upload className="mx-auto h-10 w-10 text-muted-foreground" />
+                          <div className="space-y-2">
+                            <p className="text-sm text-muted-foreground font-medium">
+                              Subir imagen del vehículo
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Formatos soportados: JPG, PNG, WebP
+                            </p>
+                          </div>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              handleFileChange(
+                                "outboundImage",
+                                e.target.files?.[0] || null
+                              );
+                            }}
+                            className="hidden"
+                            id="outbound-image"
+                          />
+                          <Button 
+                            type="button"
+                            variant="outline" 
+                            className="border-border text-foreground hover:bg-accent" 
+                            size="sm"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              document.getElementById('outbound-image')?.click();
+                            }}
+                          >
+                            <Upload className="h-4 w-4" />
+                            Seleccionar archivo
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Consejos de Imagen */}
+                <div className="space-y-4">
+                  <Label className="text-sm font-semibold text-foreground">
+                    Recomendaciones para la imagen
+                  </Label>
+                  <div className="bg-accent/20 rounded-lg p-4 space-y-3">
+                    <h4 className="font-medium text-foreground text-sm">Para mejores resultados:</h4>
+                    <ul className="text-xs text-muted-foreground space-y-1">
+                      <li>• Imagen en formato cuadrado o rectangular</li>
+                      <li>• Resolución mínima de 800x600 píxeles</li>
+                      <li>• Archivo de tamaño máximo 5MB</li>
+                      <li>• Vehículo completamente visible</li>
+                      <li>• Buena iluminación y calidad</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Botones de Acción */}
+            <div className="sticky bottom-0 bg-card pt-6 border-t border-border -mx-4 sm:-mx-6 px-4 sm:px-6 -mb-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onClose}
+                  className="w-full sm:w-auto border-border text-foreground hover:bg-accent transition-colors h-12 text-base font-medium"
+                  disabled={isLoading}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground transition-colors h-12 text-base font-medium"
+                >
+                  {isLoading && <Loader2 className="h-5 w-5 mr-2 animate-spin" />}
+                  {isEditing ? "Actualizar Vehículo" : "Crear Vehículo"}
+                </Button>
+              </div>
+            </div>
+          </form>
+        </div>
       </DialogContent>
     </Dialog>
   );
 };
-
-

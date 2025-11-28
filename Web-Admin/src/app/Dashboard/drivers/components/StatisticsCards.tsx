@@ -13,13 +13,15 @@ export const StatisticsCards: React.FC<StatisticsCardsProps> = ({ statistics }) 
       title: "Total Conductores",
       value: statistics.totalDrivers,
       icon: Users,
-      color: "text-emerald-600",
+      bgColor: "bg-primary/20",
+      textColor: "text-primary",
     },
     {
       title: "Conductores Activos",
       value: statistics.activeDrivers,
       icon: UserCheck,
-      color: "text-blue-600",
+      bgColor: "bg-secondary/50",
+      textColor: "text-secondary-foreground",
     },
   ];
 
@@ -30,14 +32,14 @@ export const StatisticsCards: React.FC<StatisticsCardsProps> = ({ statistics }) 
         return (
           <Card
             key={card.title}
-            className="border-0 shadow-lg bg-zinc-900 hover:bg-zinc-800 transition-all duration-300 hover:scale-105"
+            className="bg-card border-border hover:bg-accent transition-all duration-300 hover:scale-105"
           >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {card.title}
               </CardTitle>
-              <div className={`p-2 rounded-full`}>
-                <Icon className={`h-4 w-4 ${card.color}`} />
+              <div className={`p-2 rounded-full ${card.bgColor}`}>
+                <Icon className={`h-4 w-4 ${card.textColor}`} />
               </div>
             </CardHeader>
             <CardContent>
