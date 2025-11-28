@@ -90,11 +90,11 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
       newErrors.model = "Modelo debe tener al menos 2 caracteres";
     }
 
-    if (formData.companyId === 0) {
+    if (!formData.companyId || formData.companyId === 0) {
       newErrors.companyId = "Compañía requerida";
     }
 
-    if (formData.vehicleTypeId === 0) {
+    if (!formData.vehicleTypeId || formData.vehicleTypeId === 0) {
       newErrors.vehicleTypeId = "Tipo de vehículo requerido";
     }
 
@@ -201,9 +201,9 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                     Tipo de vehículo *
                   </Label>
                   <Select
-                    value={`${formData.vehicleTypeId}`}
+                    value={formData.vehicleTypeId ? `${formData.vehicleTypeId}` : ""}
                     onValueChange={(value) =>
-                      onFormChange("vehicleTypeId", Number(value))
+                      onFormChange("vehicleTypeId", value ? Number(value) : null)
                     }
                   >
                     <SelectTrigger className="bg-input border-border text-foreground h-12 text-base">
@@ -278,9 +278,9 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                     Compañía *
                   </Label>
                   <Select
-                    value={`${formData.companyId}`}
+                    value={formData.companyId ? `${formData.companyId}` : ""}
                     onValueChange={(value) =>
-                      onFormChange("companyId", Number(value))
+                      onFormChange("companyId", value ? Number(value) : null)
                     }
                   >
                     <SelectTrigger className="bg-input border-border text-foreground h-12 text-base">

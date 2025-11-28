@@ -25,8 +25,12 @@ export class VehiclesApi {
     formData.append('color', vehicleData.color || '');
     formData.append('passengerCapacity', (vehicleData.passengerCapacity ?? 0).toString());
     formData.append('status', vehicleData.status || '');
-    formData.append('companyId', (vehicleData.companyId ?? 0).toString());
-    formData.append('vehicleTypeId', (vehicleData.vehicleTypeId ?? 0).toString());
+    if (vehicleData.companyId !== null && vehicleData.companyId !== undefined) {
+      formData.append('companyId', vehicleData.companyId.toString());
+    }
+    if (vehicleData.vehicleTypeId !== null && vehicleData.vehicleTypeId !== undefined) {
+      formData.append('vehicleTypeId', vehicleData.vehicleTypeId.toString());
+    }
     formData.append('inService', (vehicleData.inService ?? false).toString());
     
     // Add image files if they exist
@@ -51,8 +55,12 @@ export class VehiclesApi {
     formData.append('color', vehicleData.color || '');
     formData.append('passengerCapacity', (vehicleData.passengerCapacity ?? 0).toString());
     formData.append('status', vehicleData.status || '');
-    formData.append('companyId', (vehicleData.companyId ?? 0).toString());
-    formData.append('vehicleTypeId', (vehicleData.vehicleTypeId ?? 0).toString());
+    if (vehicleData.companyId !== null && vehicleData.companyId !== undefined) {
+      formData.append('companyId', vehicleData.companyId.toString());
+    }
+    if (vehicleData.vehicleTypeId !== null && vehicleData.vehicleTypeId !== undefined) {
+      formData.append('vehicleTypeId', vehicleData.vehicleTypeId.toString());
+    }
     formData.append('inService', (vehicleData.inService ?? false).toString());
     
     // Add image files if they exist
