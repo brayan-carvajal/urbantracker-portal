@@ -71,8 +71,8 @@ const DriverScheduleFormManager: React.FC<DriverScheduleFormManagerProps> = ({
           active: apiDriver.active
         }));
         setDrivers(formattedDrivers);
-      } catch (error: any) {
-        const errorMessage = error.message || 'Error al cargar los conductores';
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Error al cargar los conductores';
         console.error('Error loading drivers:', errorMessage);
         setErrors(prev => [...prev, errorMessage]);
       } finally {
@@ -225,20 +225,20 @@ const DriverScheduleFormManager: React.FC<DriverScheduleFormManagerProps> = ({
   };
 
   return (
-    <div className="w-full p-4 bg-zinc-900 text-white rounded-lg overflow-y-auto">
+    <div className="w-full p-4 bg-card text-card-foreground rounded-lg overflow-y-auto">
       <div className="space-y-6">
         {/* Driver Selection */}
         <div className="w-full">
-          <Label className="text-zinc-400">Conductor *</Label>
+          <Label className="text-muted-foreground">Conductor *</Label>
           <Select
             value={selectedDriverId.toString()}
             onValueChange={(value) => setSelectedDriverId(parseInt(value))}
             disabled={isLoadingDrivers}
           >
-            <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+            <SelectTrigger className="bg-input border-input text-foreground">
               <SelectValue placeholder="Selecciona un conductor" />
             </SelectTrigger>
-            <SelectContent className="bg-zinc-900 border-zinc-700">
+            <SelectContent className="bg-popover border-border">
               {drivers.map((driver) => (
                 <SelectItem key={driver.id} value={driver.id!.toString()}>
                   {`${driver.firstName} ${driver.lastName}`} - {driver.idNumber || "Sin identificación"}
@@ -250,7 +250,7 @@ const DriverScheduleFormManager: React.FC<DriverScheduleFormManagerProps> = ({
 
         {/* Schedule Type Selection */}
         <div>
-          <Label className="text-zinc-400">Tipo de Horario</Label>
+          <Label className="text-muted-foreground">Tipo de Horario</Label>
           <div className="flex gap-4 mt-2">
             <label className="flex items-center">
               <input
@@ -260,7 +260,7 @@ const DriverScheduleFormManager: React.FC<DriverScheduleFormManagerProps> = ({
                 onChange={() => setUseGlobalSchedule(true)}
                 className="mr-2"
               />
-              <span className="text-sm text-zinc-300">Horario global para todos los días</span>
+              <span className="text-sm text-foreground">Horario global para todos los días</span>
             </label>
             <label className="flex items-center">
               <input
@@ -270,14 +270,14 @@ const DriverScheduleFormManager: React.FC<DriverScheduleFormManagerProps> = ({
                 onChange={() => setUseGlobalSchedule(false)}
                 className="mr-2"
               />
-              <span className="text-sm text-zinc-300">Horario individual por día</span>
+              <span className="text-sm text-foreground">Horario individual por día</span>
             </label>
           </div>
         </div>
 
         {/* Day Selection */}
         <div>
-          <Label className="text-zinc-400">Días de la Semana *</Label>
+          <Label className="text-muted-foreground">Días de la Semana *</Label>
           <div className="grid grid-cols-2 gap-3 mt-3">
             {daySchedules.map((daySchedule, index) => (
               <label
@@ -285,14 +285,14 @@ const DriverScheduleFormManager: React.FC<DriverScheduleFormManagerProps> = ({
                 className={`
                   flex items-center p-3 rounded-lg border-2 cursor-pointer transition-all duration-200
                   ${daySchedule.selected
-                    ? "bg-emerald-600/20 border-emerald-500 text-emerald-100"
-                    : "bg-zinc-800 border-zinc-600 text-zinc-300 hover:bg-zinc-700 hover:border-zinc-500"
+                    ? "bg-primary/20 border-primary text-primary"
+                    : "bg-muted border-border text-foreground hover:bg-accent hover:border-accent-foreground"
                   }
                 `}
               >
                 <input
                   type="checkbox"
-                  checked={daySchedule.selected}
+                  checked={daySchedule.selected ?? false}
                   onChange={() => handleDayToggle(index)}
                   className="sr-only"
                 />
@@ -300,8 +300,8 @@ const DriverScheduleFormManager: React.FC<DriverScheduleFormManagerProps> = ({
                   className={`
                   w-5 h-5 rounded border-2 mr-3 flex items-center justify-center transition-all duration-200
                   ${daySchedule.selected
-                      ? "bg-emerald-500 border-emerald-500"
-                      : "border-zinc-400"
+                      ? "bg-primary border-primary"
+                      : "border-border"
                     }
                 `}
                 >
@@ -329,30 +329,30 @@ const DriverScheduleFormManager: React.FC<DriverScheduleFormManagerProps> = ({
         {useGlobalSchedule ? (
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-zinc-400">Hora de Inicio Global *</Label>
+              <Label className="text-muted-foreground">Hora de Inicio Global *</Label>
               <Input
                 type="time"
                 value={globalStartTime}
                 onChange={(e) => setGlobalStartTime(e.target.value)}
-                className="bg-zinc-800 border-zinc-700 text-white"
+                className="bg-input border-input text-foreground"
               />
             </div>
             <div>
-              <Label className="text-zinc-400">Hora de Fin Global *</Label>
+              <Label className="text-muted-foreground">Hora de Fin Global *</Label>
               <Input
                 type="time"
                 value={globalEndTime}
                 onChange={(e) => setGlobalEndTime(e.target.value)}
-                className="bg-zinc-800 border-zinc-700 text-white"
+                className="bg-input border-input text-foreground"
               />
             </div>
           </div>
         ) : (
           <div className="space-y-4">
-            <Label className="text-zinc-400">Horarios Individuales *</Label>
+            <Label className="text-muted-foreground">Horarios Individuales *</Label>
             {daySchedules.filter(d => d.selected).map((daySchedule, index) => (
-              <div key={daySchedule.day} className="grid grid-cols-3 gap-4 items-center p-3 bg-zinc-800 rounded-lg">
-                <span className="text-sm font-medium text-zinc-300">{daySchedule.label}</span>
+              <div key={daySchedule.day} className="grid grid-cols-3 gap-4 items-center p-3 bg-muted rounded-lg">
+                <span className="text-sm font-medium text-foreground">{daySchedule.label}</span>
                 <Input
                   type="time"
                   value={daySchedule.startTime}
@@ -361,7 +361,7 @@ const DriverScheduleFormManager: React.FC<DriverScheduleFormManagerProps> = ({
                     'startTime',
                     e.target.value
                   )}
-                  className="bg-zinc-700 border-zinc-600 text-white"
+                  className="bg-input border-input text-foreground"
                   placeholder="Inicio"
                 />
                 <Input
@@ -372,7 +372,7 @@ const DriverScheduleFormManager: React.FC<DriverScheduleFormManagerProps> = ({
                     'endTime',
                     e.target.value
                   )}
-                  className="bg-zinc-700 border-zinc-600 text-white"
+                  className="bg-input border-input text-foreground"
                   placeholder="Fin"
                 />
               </div>
@@ -414,14 +414,14 @@ const DriverScheduleFormManager: React.FC<DriverScheduleFormManagerProps> = ({
         <div className="flex gap-3">
           <Button
             variant="outline"
-            className="flex-1 border-zinc-700 text-white hover:bg-zinc-800 hover:text-gray-100"
+            className="flex-1 border-border text-foreground hover:bg-accent"
           >
             Cancelar
           </Button>
           <Button
             onClick={handleSave}
             disabled={isLoading}
-            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
+            className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
           >
             {isLoading
               ? "Guardando..."

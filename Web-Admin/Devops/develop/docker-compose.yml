@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  web-admin-develop:
+    build:
+      context: ../..
+      dockerfile: Devops/develop/Dockerfile.app
+    container_name: urbantracker-web-admin-develop
+    restart: unless-stopped
+    env_file:
+      - .env.develop
+    ports:
+      - "3001:3000"
+    networks:
+      - network_frontend_admin
+    volumes:
+      # Montar el código fuente para desarrollo en vivo
+      - ../../src:/app/src:ro
+      # Cache de Node modules para mejor rendimiento
+      - node_modules_admin:/app/node_modules
+      # Cache de Next.js
+      - next_cache_admin:/app/.next
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+
+volumes:
+  node_modules_admin:
+    driver: local
+  next_cache_admin:
+    driver: local
+
+networks:
+  network_frontend_admin:
+    driver: bridge
