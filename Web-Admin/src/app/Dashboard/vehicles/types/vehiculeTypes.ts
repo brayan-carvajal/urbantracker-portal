@@ -23,8 +23,8 @@ export interface VehiculeFormData {
     color: string;
     passengerCapacity: number;
     status: string;
-    companyId: number | null;
-    vehicleTypeId: number | null;
+    companyId: number;
+    vehicleTypeId: number;
     inService: boolean;
     outboundImage: File | null;
     returnImage: File | null;

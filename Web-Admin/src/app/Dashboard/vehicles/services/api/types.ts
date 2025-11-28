@@ -4,7 +4,7 @@ export interface CrudResponse<T> {
   data?: T;
   operation?: string;
   entityType?: string;
-  timestamp: string; // El backend devuelve LocalDateTime que se serializa como string
+  timestamp: string;
   validationErrors?: string[];
 }
 
