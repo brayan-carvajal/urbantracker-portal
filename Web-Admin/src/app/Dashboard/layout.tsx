@@ -7,12 +7,9 @@ import {
   Car,
   ChevronDown,
   Clock,
-  Cog,
   MapPin,
   Route,
-  Shuffle,
   Users,
-  ParkingCircle,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -20,10 +17,8 @@ import { usePathname } from "next/navigation";
 import type React from "react";
 import { useState, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "react-hot-toast";
 import { DashboardHeader } from "./components/DashboardHeader";
 import { DriverProvider } from "./drivers/context/DriverContext";
-import { ParkingProvider } from "./parking/context/ParkingContext";
 import { useTheme } from "@/hooks/useTheme";
 import "../globals.css";
 
@@ -82,7 +77,7 @@ const menuItems: MenuItem[] = [
       {
         title: "Tipos de Vehículos",
         href: "/Dashboard/vehicleType",
-        icon: Cog,
+        icon: Car,
       },
       {
         title: "Vehículos",
@@ -92,7 +87,7 @@ const menuItems: MenuItem[] = [
       {
         title: "Asignación de Vehículos",
         href: "/Dashboard/vehicleAssigments",
-        icon: Shuffle,
+        icon: Car,
       },
     ],
   },
@@ -116,11 +111,6 @@ const menuItems: MenuItem[] = [
         icon: MapPin,
       },
     ],
-  },
-  {
-    title: "Monitoreo de Estacionamiento",
-    href: "/Dashboard/parking",
-    icon: ParkingCircle,
   },
 ];
 
@@ -184,7 +174,7 @@ export default function DashboardLayout({
                 href="/Dashboard"
                 className="flex items-center gap-3 rounded-xl px-4 py-3 text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-300 group hover:shadow-lg hover:scale-105 transform"
               >
-                <BarChart3 className="h-5 w-5 group-hover:scale-110 transition-transform text-sidebar-foreground/60 group-hover:text-sidebar-accent-foreground" />
+                <BarChart3 className="h-5 w-5 group-hover:scale-110 transition-transform group-hover:text-sidebar-accent-foreground" />
                 <span className="font-medium">Dashboard</span>
               </Link>
             </div>
@@ -212,10 +202,10 @@ export default function DashboardLayout({
                           <div className="flex items-center space-x-3">
                             <item.icon
                               className={cn(
-                                "h-5 w-5 transition-colors",
+                                "h-5 w-5 transition-colors group-hover:text-sidebar-accent-foreground",
                                 isParentActive(item.subItems)
-                                  ? "text-sidebar-accent-foreground"
-                                  : "text-sidebar-foreground/60 group-hover:text-sidebar-accent-foreground"
+                                  ? "text-sidebar-accent"
+                                  : "text-sidebar-foreground/80"
                               )}
                             />
                             <span className="font-medium">{item.title}</span>
@@ -228,7 +218,7 @@ export default function DashboardLayout({
                                 : "rotate-0",
                               isParentActive(item.subItems)
                                 ? "text-sidebar-accent-foreground"
-                                : "text-sidebar-foreground/60 group-hover:text-sidebar-accent-foreground"
+                                : "text-sidebar-foreground/80"
                             )}
                           />
                         </button>
@@ -256,10 +246,10 @@ export default function DashboardLayout({
                                 >
                                   <subItem.icon
                                     className={cn(
-                                      "h-5 w-5 transition-colors",
+                                      "h-5 w-5 transition-colors group-hover:text-sidebar-accent-foreground",
                                       isActiveRoute(subItem.href)
-                                        ? "text-sidebar-accent-foreground"
-                                        : "text-sidebar-foreground/60 group-hover:text-sidebar-accent-foreground"
+                                        ? "text-sidebar-accent"
+                                        : "text-sidebar-foreground/80"
                                     )}
                                   />
                                   <span className="text-sm font-medium">
@@ -271,28 +261,28 @@ export default function DashboardLayout({
                           </ul>
                         </div>
                       </div>
-                    ) : item.href ? (
+                    ) : (
                       // Simple menu item
                       <Link
-                        href={item.href}
+                        href={item.href!}
                         className={cn(
                           "flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-md hover:scale-105 group",
-                          isActiveRoute(item.href)
+                          isActiveRoute(item.href!)
                             ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm scale-100"
                             : "text-sidebar-foreground/80"
                         )}
                       >
                         <item.icon
                           className={cn(
-                            "h-5 w-5 transition-colors",
-                            isActiveRoute(item.href)
-                              ? "text-sidebar-accent-foreground"
-                              : "text-sidebar-foreground/60 group-hover:text-sidebar-accent-foreground"
+                            "h-5 w-5 transition-colors group-hover:text-sidebar-accent-foreground",
+                            isActiveRoute(item.href!)
+                              ? "text-sidebar-accent"
+                              : "text-sidebar-foreground/80"
                           )}
                         />
                         <span className="font-medium">{item.title}</span>
                       </Link>
-                    ) : null}
+                    )}
                   </li>
                 ))}
               </ul>
@@ -307,34 +297,10 @@ export default function DashboardLayout({
           {/* Page content */}
           <main className="p-8 bg-background">
             <DriverProvider>
-              <ParkingProvider>
-                {children}
-              </ParkingProvider>
+              {children}
             </DriverProvider>
           </main>
         </div>
-        
-        {/* Toast Notifications */}
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#363636',
-              color: '#fff',
-            },
-            success: {
-              style: {
-                background: '#10B981',
-              },
-            },
-            error: {
-              style: {
-                background: '#EF4444',
-              },
-            },
-          }}
-        />
       </div>
     </QueryClientProvider>
   );

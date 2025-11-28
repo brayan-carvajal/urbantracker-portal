@@ -90,11 +90,11 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
       newErrors.model = "Modelo debe tener al menos 2 caracteres";
     }
 
-    if (!formData.companyId || formData.companyId === 0) {
+    if (formData.companyId === 0) {
       newErrors.companyId = "Compañía requerida";
     }
 
-    if (!formData.vehicleTypeId || formData.vehicleTypeId === 0) {
+    if (formData.vehicleTypeId === 0) {
       newErrors.vehicleTypeId = "Tipo de vehículo requerido";
     }
 
@@ -147,21 +147,13 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent 
-        className="bg-card text-foreground max-w-6xl w-[96vw] max-h-[95vh] overflow-hidden p-0"
-        aria-describedby="vehicle-modal-description"
-      >
+      <DialogContent className="bg-card text-foreground max-w-6xl w-[96vw] max-h-[95vh] overflow-hidden p-0">
         <DialogHeader className="sticky top-0 bg-card border-b border-border z-20 px-4 sm:px-6 py-4">
           <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-3">
             <Car className="h-6 w-6 text-primary" />
             {isEditing ? "Editar Vehículo" : "Nuevo Vehículo"}
           </DialogTitle>
         </DialogHeader>
-        
-        {/* Hidden description for accessibility */}
-        <div id="vehicle-modal-description" className="sr-only">
-          Formulario para crear o editar información de vehículos
-        </div>
         
         <div className="overflow-y-auto max-h-[calc(95vh-100px)]">
           <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-8">
@@ -201,9 +193,9 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                     Tipo de vehículo *
                   </Label>
                   <Select
-                    value={formData.vehicleTypeId ? `${formData.vehicleTypeId}` : ""}
+                    value={`${formData.vehicleTypeId}`}
                     onValueChange={(value) =>
-                      onFormChange("vehicleTypeId", value ? Number(value) : null)
+                      onFormChange("vehicleTypeId", Number(value))
                     }
                   >
                     <SelectTrigger className="bg-input border-border text-foreground h-12 text-base">
@@ -278,9 +270,9 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                     Compañía *
                   </Label>
                   <Select
-                    value={formData.companyId ? `${formData.companyId}` : ""}
+                    value={`${formData.companyId}`}
                     onValueChange={(value) =>
-                      onFormChange("companyId", value ? Number(value) : null)
+                      onFormChange("companyId", Number(value))
                     }
                   >
                     <SelectTrigger className="bg-input border-border text-foreground h-12 text-base">
@@ -429,17 +421,8 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                     <div className="border-2 border-dashed border-border rounded-xl p-6 text-center min-h-[200px] flex flex-col justify-center bg-accent/10 hover:bg-accent/20 transition-colors">
                       {formData.outboundImage ? (
                         <div className="space-y-4">
-                          {/* Vista previa de la imagen */}
-                          <div className="flex justify-center">
-                            <img
-                              src={URL.createObjectURL(formData.outboundImage)}
-                              alt="Vista previa"
-                              className="max-h-40 max-w-full object-contain rounded-lg shadow-sm"
-                              onLoad={(e) => {
-                                // Liberar el objeto URL después de cargar la imagen
-                                URL.revokeObjectURL((e.target as HTMLImageElement).src);
-                              }}
-                            />
+                          <div className="flex items-center justify-center">
+                            <Upload className="h-10 w-10 text-muted-foreground" />
                           </div>
                           <div className="space-y-2">
                             <p className="text-sm text-muted-foreground font-medium break-all">
@@ -473,29 +456,23 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                           <input
                             type="file"
                             accept="image/*"
-                            onChange={(e) => {
-                              e.stopPropagation();
+                            onChange={(e) =>
                               handleFileChange(
                                 "outboundImage",
                                 e.target.files?.[0] || null
-                              );
-                            }}
+                              )
+                            }
                             className="hidden"
                             id="outbound-image"
                           />
-                          <Button 
-                            type="button"
-                            variant="outline" 
-                            className="border-border text-foreground hover:bg-accent" 
-                            size="sm"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              document.getElementById('outbound-image')?.click();
-                            }}
-                          >
-                            <Upload className="h-4 w-4" />
-                            Seleccionar archivo
+                          <Button variant="outline" className="border-border text-foreground hover:bg-accent" size="sm">
+                            <label
+                              htmlFor="outbound-image"
+                              className="cursor-pointer flex items-center gap-2"
+                            >
+                              <Upload className="h-4 w-4" />
+                              Seleccionar archivo
+                            </label>
                           </Button>
                         </div>
                       )}
