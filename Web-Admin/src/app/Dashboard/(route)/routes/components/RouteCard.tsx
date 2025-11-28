@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Route, Edit, Trash2, MapPin, Calendar } from "lucide-react"
+import { Route, Edit, Trash2 } from "lucide-react"
 import { RouteResponse } from "../types/routeTypes"
 
 
@@ -18,148 +18,78 @@ export function RouteCard({ route, onEdit, onDelete }: RouteCardProps) {
       : "bg-destructive text-destructive-foreground hover:bg-destructive/90"
   }
 
-  // Función para corregir URLs de imágenes que apuntan al frontend en lugar del backend
-  const getCorrectedImageUrl = (imageUrl: string | undefined): string | undefined => {
-    if (!imageUrl) return undefined;
-
-    // Si la URL contiene localhost:3000 (frontend), convertirla a localhost:8080 (backend)
-    if (imageUrl.includes('localhost:3000')) {
-      return imageUrl.replace('localhost:3000', 'localhost:8080');
-    }
-
-    // Si la URL es relativa (empieza con /), convertirla a URL absoluta del backend
-    if (imageUrl.startsWith('/')) {
-      return `http://localhost:8080${imageUrl}`;
-    }
-
-    return imageUrl;
-  }
-
   return (
     <Card className="bg-card border-border hover:bg-accent transition-all duration-300 hover:scale-[1.02]">
       <CardContent className="p-6">
-        <div className="flex items-start gap-4">
-          {/* Route Images */}
-          <div className="flex-shrink-0 flex gap-2">
-            {/* Outbound Image */}
-            <div className="w-16 h-16">
-              {route.outboundImageUrl ? (
-                <img
-                  src={getCorrectedImageUrl(route.outboundImageUrl)}
-                  alt={`Imagen de ida - Ruta ${route.numberRoute}`}
-                  className="w-full h-full object-cover rounded-lg border border-border"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                    // Show fallback icon when image fails
-                    const parent = target.parentElement;
-                    if (parent && !parent.querySelector('.fallback-icon-outbound')) {
-                      const fallbackDiv = document.createElement('div');
-                      fallbackDiv.className = 'fallback-icon-outbound w-full h-full flex items-center justify-center bg-primary/10 rounded-lg border border-border';
-                      fallbackDiv.innerHTML = '<svg class="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 20 20"><path d="M9 20l-1-3H5l-1 3H1l4-6V9h2v5l4 6H9z"/><path d="M13 2v6h2V4h3V2h-5z"/></svg>';
-                      parent.appendChild(fallbackDiv);
-                    }
-                  }}
-                />
-              ) : (
-                <div className="w-full h-full bg-primary/10 rounded-lg border border-border flex items-center justify-center">
-                  <Route className="h-5 w-5 text-primary" />
-                </div>
-              )}
+        <div className="flex items-start justify-between gap-6">
+          {/* Información de la ruta */}
+          <div className="flex-1 space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-primary/20 rounded-full">
+                <Route className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-foreground">
+                  Ruta {route.numberRoute}
+                </h3>
+                <Badge className={getStatusStyles(route.active)}>
+                  {route.active ? "Activa" : "Inactiva"}
+                </Badge>
+              </div>
             </div>
-
-            {/* Return Image */}
-            <div className="w-16 h-16">
-              {route.returnImageUrl ? (
-                <img
-                  src={getCorrectedImageUrl(route.returnImageUrl)}
-                  alt={`Imagen de vuelta - Ruta ${route.numberRoute}`}
-                  className="w-full h-full object-cover rounded-lg border border-border"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                    // Show fallback icon when image fails
-                    const parent = target.parentElement;
-                    if (parent && !parent.querySelector('.fallback-icon-return')) {
-                      const fallbackDiv = document.createElement('div');
-                      fallbackDiv.className = 'fallback-icon-return w-full h-full flex items-center justify-center bg-primary/10 rounded-lg border border-border';
-                      fallbackDiv.innerHTML = '<svg class="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 20 20"><path d="M9 20l-1-3H5l-1 3H1l4-6V9h2v5l4 6H9z"/><path d="M13 2v6h2V4h3V2h-5z"/></svg>';
-                      parent.appendChild(fallbackDiv);
-                    }
-                  }}
-                />
-              ) : (
-                <div className="w-full h-full bg-primary/10 rounded-lg border border-border flex items-center justify-center">
-                  <Route className="h-5 w-5 text-primary" />
-                </div>
-              )}
+            
+            {route.description && (
+              <div className="text-muted-foreground">
+                <span className="font-medium text-foreground">
+                  {route.description}
+                </span>
+              </div>
+            )}
+            
+            <div className="text-sm space-y-1">
+              <div>
+                <span className="font-medium text-muted-foreground">
+                  Distancia:{" "}
+                </span>
+                <span className="text-primary">{route.totalDistance || 0} km</span>
+              </div>
+              <div>
+                <span className="font-medium text-muted-foreground">
+                  Puntos de ruta:{" "}
+                </span>
+                <span className="text-primary">{route.waypoints}</span>
+              </div>
+              <div>
+                <span className="font-medium text-muted-foreground">
+                  Creado:{" "}
+                </span>
+                <span className="text-muted-foreground">
+                  {new Date(route.createdAt).toLocaleDateString()}
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Route Information */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-3 mb-2">
-                  <h3 className="text-lg font-bold text-foreground truncate">
-                    Ruta {route.numberRoute}
-                  </h3>
-                  <Badge className={`${getStatusStyles(route.active)} text-xs`}>
-                    {route.active ? "Activa" : "Inactiva"}
-                  </Badge>
-                </div>
-
-                {route.description && (
-                  <p className="text-sm text-muted-foreground mb-3">
-                    {route.description}
-                  </p>
-                )}
-
-                <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
-                  <span className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-muted-foreground">Distancia:</span>
-                    <span className="font-medium text-primary">{route.totalDistance || 0} km</span>
-                  </span>
-
-                  <span className="flex items-center gap-2">
-                    <Route className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-muted-foreground">Puntos:</span>
-                    <span className="font-medium text-primary">{route.waypoints}</span>
-                  </span>
-
-                  <span className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-muted-foreground">Creado:</span>
-                    <span className="font-medium text-muted-foreground">
-                      {new Date(route.createdAt).toLocaleDateString()}
-                    </span>
-                  </span>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col gap-2 ml-4">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onEdit(route)}
-                  className="flex items-center gap-2 hover:bg-accent/10 hover:text-accent transition-all duration-200"
-                >
-                  <Edit className="h-4 w-4" />
-                  <span className="hidden sm:inline">Editar</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onDelete(route.id!)}
-                  className="border-destructive/50 text-destructive hover:bg-destructive/10"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  <span className="hidden sm:inline">Eliminar</span>
-                </Button>
-              </div>
-            </div>
+          {/* Botones de acción */}
+          <div className="flex flex-col gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onEdit(route)}
+              className="flex items-center gap-2 hover:bg-accent/10 hover:text-accent transition-all duration-200"
+            >
+              <Edit className="h-4 w-4 mr-2" />
+              Editar
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onDelete(route.id!)}
+              className="border-destructive/50 text-destructive hover:bg-destructive/10"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Eliminar
+            </Button>
           </div>
         </div>
       </CardContent>

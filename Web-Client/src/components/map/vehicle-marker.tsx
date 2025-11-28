@@ -7,13 +7,15 @@ interface VehicleMarkerProps {
 }
 
 export function VehicleMarker({ vehicle }: VehicleMarkerProps) {
+  console.log('Rendering marker for vehicle:', vehicle.vehicleId, 'at', vehicle.latitude, vehicle.longitude);
   return (
     <Marker
       longitude={vehicle.longitude}
       latitude={vehicle.latitude}
-      anchor="bottom"
+      anchor="center"
+      style={{ zIndex: 1000 }}
     >
-      <div className="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-xs font-bold shadow-lg border-2 border-white">
+      <div className="bg-red-500 text-white rounded-full w-10 h-10 flex items-center justify-center text-sm font-bold shadow-xl border-4 border-white animate-pulse">
         🚌
       </div>
     </Marker>
