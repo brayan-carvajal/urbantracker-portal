@@ -148,6 +148,8 @@ export default function VehiclesPage() {
                 <VehicleCard
                   key={vehicle.id}
                   vehicle={vehicle}
+                  companies={companies}
+                  vehicleTypes={vehicleTypes}
                   onEdit={openEditModal}
                   onDelete={() => handleDeleteClick(vehicle.id)}
                 />
