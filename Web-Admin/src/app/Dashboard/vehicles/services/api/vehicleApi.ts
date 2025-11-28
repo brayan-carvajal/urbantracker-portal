@@ -3,7 +3,7 @@ import { ApiClient } from '../../../utils/apiClient';
 import { API_ENDPOINTS } from './config';
 import type { CrudResponse } from './types';
 
-const apiClient = new ApiClient(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080');
+const apiClient = new ApiClient('http://localhost:8080');
 
 export class VehiclesApi {
   static async getAllVehicles(): Promise<CrudResponse<Vehicle[]>> {
@@ -17,23 +17,19 @@ export class VehiclesApi {
   static async createVehicle(vehicleData: VehiculeFormData): Promise<CrudResponse<Vehicle>> {
     const formData = new FormData();
     
-    // Add basic vehicle data
+    // Agregar campos básicos
     formData.append('licencePlate', vehicleData.licencePlate);
     formData.append('brand', vehicleData.brand);
     formData.append('model', vehicleData.model);
-    formData.append('year', (vehicleData.year ?? 0).toString());
-    formData.append('color', vehicleData.color || '');
-    formData.append('passengerCapacity', (vehicleData.passengerCapacity ?? 0).toString());
-    formData.append('status', vehicleData.status || '');
-    if (vehicleData.companyId !== null && vehicleData.companyId !== undefined) {
-      formData.append('companyId', vehicleData.companyId.toString());
-    }
-    if (vehicleData.vehicleTypeId !== null && vehicleData.vehicleTypeId !== undefined) {
-      formData.append('vehicleTypeId', vehicleData.vehicleTypeId.toString());
-    }
-    formData.append('inService', (vehicleData.inService ?? false).toString());
+    formData.append('year', vehicleData.year.toString());
+    formData.append('color', vehicleData.color);
+    formData.append('passengerCapacity', vehicleData.passengerCapacity.toString());
+    formData.append('status', vehicleData.status);
+    formData.append('companyId', vehicleData.companyId.toString());
+    formData.append('vehicleTypeId', vehicleData.vehicleTypeId.toString());
+    formData.append('inService', vehicleData.inService.toString());
     
-    // Add image files if they exist
+    // Agregar archivos si existen
     if (vehicleData.outboundImage) {
       formData.append('outboundImage', vehicleData.outboundImage);
     }
@@ -41,29 +37,25 @@ export class VehiclesApi {
       formData.append('returnImage', vehicleData.returnImage);
     }
     
-    return apiClient.postFormData<CrudResponse<Vehicle>>(API_ENDPOINTS.VEHICLES_WITH_FILES, formData);
+    return apiClient.postFormData<CrudResponse<Vehicle>>(API_ENDPOINTS.VEHICLES, formData);
   }
 
   static async updateVehicle(id: number, vehicleData: VehiculeFormData): Promise<CrudResponse<Vehicle>> {
     const formData = new FormData();
     
-    // Add basic vehicle data
+    // Agregar campos básicos
     formData.append('licencePlate', vehicleData.licencePlate);
     formData.append('brand', vehicleData.brand);
     formData.append('model', vehicleData.model);
-    formData.append('year', (vehicleData.year ?? 0).toString());
-    formData.append('color', vehicleData.color || '');
-    formData.append('passengerCapacity', (vehicleData.passengerCapacity ?? 0).toString());
-    formData.append('status', vehicleData.status || '');
-    if (vehicleData.companyId !== null && vehicleData.companyId !== undefined) {
-      formData.append('companyId', vehicleData.companyId.toString());
-    }
-    if (vehicleData.vehicleTypeId !== null && vehicleData.vehicleTypeId !== undefined) {
-      formData.append('vehicleTypeId', vehicleData.vehicleTypeId.toString());
-    }
-    formData.append('inService', (vehicleData.inService ?? false).toString());
+    formData.append('year', vehicleData.year.toString());
+    formData.append('color', vehicleData.color);
+    formData.append('passengerCapacity', vehicleData.passengerCapacity.toString());
+    formData.append('status', vehicleData.status);
+    formData.append('companyId', vehicleData.companyId.toString());
+    formData.append('vehicleTypeId', vehicleData.vehicleTypeId.toString());
+    formData.append('inService', vehicleData.inService.toString());
     
-    // Add image files if they exist
+    // Agregar archivos si existen
     if (vehicleData.outboundImage) {
       formData.append('outboundImage', vehicleData.outboundImage);
     }
@@ -71,7 +63,7 @@ export class VehiclesApi {
       formData.append('returnImage', vehicleData.returnImage);
     }
     
-    return apiClient.putFormData<CrudResponse<Vehicle>>(`${API_ENDPOINTS.VEHICLES_WITH_FILES}/${id}`, formData);
+    return apiClient.putFormData<CrudResponse<Vehicle>>(`${API_ENDPOINTS.VEHICLES}/${id}`, formData);
   }
 
   static async deleteVehicle(id: number): Promise<CrudResponse<void>> {
