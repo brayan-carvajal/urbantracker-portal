@@ -40,30 +40,30 @@ const Pagination: React.FC<PaginationProps> = ({
   return (
     <div className="flex items-center justify-between py-4">
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" onClick={() => onPageChange(1)} disabled={currentPage === 1 || isLoading} className="text-foreground hover:bg-accent">
+        <Button variant="ghost" size="icon" onClick={() => onPageChange(1)} disabled={currentPage === 1 || isLoading}>
           <ChevronsLeft className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon" onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1 || isLoading} className="text-foreground hover:bg-accent">
+        <Button variant="ghost" size="icon" onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1 || isLoading}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <span className="text-sm text-foreground">
+        <span className="text-sm">
           Página {currentPage} de {totalPages}
         </span>
-        <Button variant="ghost" size="icon" onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages || isLoading} className="text-foreground hover:bg-accent">
+        <Button variant="ghost" size="icon" onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages || isLoading}>
           <ChevronRight className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon" onClick={() => onPageChange(totalPages)} disabled={currentPage === totalPages || isLoading} className="text-foreground hover:bg-accent">
+        <Button variant="ghost" size="icon" onClick={() => onPageChange(totalPages)} disabled={currentPage === totalPages || isLoading}>
           <ChevronsRight className="h-4 w-4" />
         </Button>
       </div>
       {showItemsPerPageSelect && (
         <Select value={String(itemsPerPage)} onValueChange={v => onItemsPerPageChange?.(Number(v))}>
-          <SelectTrigger className="w-29 bg-card border-border text-foreground">
+          <SelectTrigger className="w-29">
             <SelectValue placeholder="Items" />
           </SelectTrigger>
-          <SelectContent className="bg-popover border-border">
+          <SelectContent>
             {itemsPerPageOptions.map(opt => (
-              <SelectItem key={opt} value={String(opt)} className="text-popover-foreground hover:bg-accent focus:bg-accent">{opt} por página</SelectItem>
+              <SelectItem key={opt} value={String(opt)}>{opt} por página</SelectItem>
             ))}
           </SelectContent>
         </Select>

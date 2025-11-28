@@ -30,15 +30,15 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-card text-card-foreground border-border">
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-foreground">Eliminar Asignación de Ruta</DialogTitle>
-          <DialogDescription className="text-muted-foreground">
+          <DialogTitle>Eliminar Asignación de Ruta</DialogTitle>
+          <DialogDescription>
             ¿Estás seguro que deseas eliminar la asignación de la ruta {assignment.routeId} al vehículo {assignment.vehicleId}?
           </DialogDescription>
         </DialogHeader>
         <div className="flex items-center gap-2 mb-4">
-          <AlertTriangle className="text-destructive" />
+          <AlertTriangle className="text-red-500" />
           <span className="text-muted-foreground">Esta acción no se puede deshacer.</span>
         </div>
         <DialogFooter>

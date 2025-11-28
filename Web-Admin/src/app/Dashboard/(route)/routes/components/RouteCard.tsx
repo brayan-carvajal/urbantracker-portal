@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge"
 import { Route, Edit, Trash2 } from "lucide-react"
 import { RouteResponse } from "../types/routeTypes"
 
-
 interface RouteCardProps {
   route: RouteResponse
   onEdit: (route: RouteResponse) => void
@@ -14,64 +13,48 @@ interface RouteCardProps {
 export function RouteCard({ route, onEdit, onDelete }: RouteCardProps) {
   const getStatusStyles = (active: boolean) => {
     return active
-      ? "bg-success text-success-foreground hover:bg-success/90"
-      : "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+      ? "bg-green-600 text-white hover:bg-green-700"
+      : "bg-red-600 text-white hover:bg-red-700"
   }
 
   return (
-    <Card className="bg-card border-border hover:bg-accent transition-all duration-300 hover:scale-[1.02]">
+    <Card className="bg-zinc-900 border-zinc-800 hover:bg-zinc-800 transition-all duration-300 hover:scale-[1.02]">
       <CardContent className="p-6">
-        <div className="flex items-start justify-between gap-6">
-          {/* Información de la ruta */}
-          <div className="flex-1 space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-primary/20 rounded-full">
-                <Route className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-foreground">
-                  Ruta {route.numberRoute}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <div className="p-4 bg-emerald-600/20 rounded-full">
+              <Route className="h-8 w-8 text-emerald-500" />
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <h3 className="text-xl font-bold text-white">
+                  {route.numberRoute}
                 </h3>
                 <Badge className={getStatusStyles(route.active)}>
                   {route.active ? "Activa" : "Inactiva"}
                 </Badge>
               </div>
-            </div>
-            
-            {route.description && (
-              <div className="text-muted-foreground">
-                <span className="font-medium text-foreground">
-                  {route.description}
-                </span>
-              </div>
-            )}
-            
-            <div className="text-sm space-y-1">
-              <div>
-                <span className="font-medium text-muted-foreground">
+              {route.description && (
+                <div className="text-zinc-400">
+                  <span className="font-medium text-white">
+                    {route.description}
+                  </span>
+                </div>
+              )}
+              <div className="text-sm">
+                <span className="font-medium text-zinc-400">
                   Distancia:{" "}
                 </span>
-                <span className="text-primary">{route.totalDistance || 0} km</span>
-              </div>
-              <div>
-                <span className="font-medium text-muted-foreground">
-                  Puntos de ruta:{" "}
+                <span className="text-emerald-500">{route.totalDistance || 0} km</span>
+                <span className="mx-2">•</span>
+                <span className="font-medium text-zinc-400">
+                  Puntos:{" "}
                 </span>
-                <span className="text-primary">{route.waypoints}</span>
-              </div>
-              <div>
-                <span className="font-medium text-muted-foreground">
-                  Creado:{" "}
-                </span>
-                <span className="text-muted-foreground">
-                  {new Date(route.createdAt).toLocaleDateString()}
-                </span>
+                <span className="text-emerald-500">{route.waypoints}</span>
               </div>
             </div>
           </div>
-
-          {/* Botones de acción */}
-          <div className="flex flex-col gap-2">
+          <div className="flex gap-2">
             <Button
               variant="outline"
               size="sm"
@@ -85,7 +68,7 @@ export function RouteCard({ route, onEdit, onDelete }: RouteCardProps) {
               variant="outline"
               size="sm"
               onClick={() => onDelete(route.id!)}
-              className="border-destructive/50 text-destructive hover:bg-destructive/10"
+              className="border-red-700 text-red-500 hover:bg-red-900/20"
             >
               <Trash2 className="h-4 w-4 mr-2" />
               Eliminar

@@ -31,20 +31,20 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-card text-foreground border-border">
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-foreground">Eliminar Vehículo</DialogTitle>
-          <DialogDescription className="text-muted-foreground">
-            ¿Estás seguro que deseas eliminar el vehículo <span className="font-bold text-foreground">{vehicle.licencePlate}</span>?
+          <DialogTitle>Eliminar Vehículo</DialogTitle>
+          <DialogDescription>
+            ¿Estás seguro que deseas eliminar el vehículo <span className="font-bold">{vehicle.licencePlate}</span>?
           </DialogDescription>
         </DialogHeader>
         <div className="flex items-center gap-2 mb-4">
-          <AlertTriangle className="text-destructive" />
+          <AlertTriangle className="text-red-500" />
           <span className="text-muted-foreground">Esta acción no se puede deshacer.</span>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={isDeleting} className="border-border text-foreground hover:bg-accent">Cancelar</Button>
-          <Button variant="destructive" onClick={handleConfirm} disabled={isDeleting} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+          <Button variant="outline" onClick={onClose} disabled={isDeleting}>Cancelar</Button>
+          <Button variant="destructive" onClick={handleConfirm} disabled={isDeleting}>
             {isDeleting ? <Loader2 className="animate-spin h-4 w-4" /> : "Eliminar"}
           </Button>
         </DialogFooter>

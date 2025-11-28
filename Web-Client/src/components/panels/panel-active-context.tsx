@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 
 interface PanelActiveContextProps {
   activePanel: string;
@@ -17,11 +17,6 @@ export function usePanelActive() {
 
 export function PanelActiveProvider({ children }: { children: ReactNode }) {
   const [activePanel, setActivePanel] = useState<string>("routes");
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
   return (
     <PanelActiveContext.Provider value={{ activePanel, setActivePanel }}>
       {children}

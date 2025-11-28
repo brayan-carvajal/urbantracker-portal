@@ -51,10 +51,9 @@ export const useDriverScheduleActions = (
       if (onRefreshSchedules) {
         await onRefreshSchedules();
       }
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error('Error deleting driver schedules:', error);
-      const message = error instanceof Error ? error.message : 'Error al eliminar los horarios del conductor';
-      alert(message);
+      alert(error.message || 'Error al eliminar los horarios del conductor');
     } finally {
       setIsDeleting(false);
     }
