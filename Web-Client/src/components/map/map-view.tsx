@@ -1,6 +1,8 @@
+"use client";
 
-import React, { createContext, useContext, useEffect, useRef, useMemo } from "react";
+import React, { createContext, useContext, useEffect, useRef, useMemo, useState } from "react";
 import { usePanelCollapse } from "components/panels/panel-collapse-context";
+import { useTheme } from "@/hooks/useTheme";
 import Map, { Layer, MapRef, Source } from "react-map-gl/mapbox";
 import { useRoutePoints, useRoute } from "./route-context";
 import { useVehiclePositions } from "./vehicle-context";
@@ -22,12 +24,24 @@ export function useMapboxRef() {
 
 const MapViewComponent = ({ children }: { children?: React.ReactNode }) => {
   const { isPanelCollapsed } = usePanelCollapse();
+  const { theme, mounted } = useTheme();
   const { vehiclePositions } = useVehiclePositions();
   const { routes, selectedRoutes } = useRoutePoints();
   const { focusedRoute } = useRoute();
   const mapRef = useRef<MapRef | null>(null);
-  const accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
-  const [mapLoaded, setMapLoaded] = React.useState(false);
+  const [mapLoaded, setMapLoaded] = useState(false);
+
+
+  // Safely access environment variables only on client
+  const accessToken = typeof window !== 'undefined' ? process.env.NEXT_PUBLIC_MAPBOX_TOKEN : undefined;
+
+  // Define map styles based on theme
+  const mapStyles = {
+    dark: "mapbox://styles/mapbox/dark-v11",
+    light: "mapbox://styles/mapbox/light-v11"
+  };
+
+  const currentMapStyle = theme ? mapStyles[theme as keyof typeof mapStyles] : mapStyles.dark;
 
   // Add arrow icon to map when it loads
   useEffect(() => {
@@ -49,6 +63,14 @@ const MapViewComponent = ({ children }: { children?: React.ReactNode }) => {
       }
     }
   }, [mapLoaded]);
+
+  // Update map style when theme changes
+  useEffect(() => {
+    if (mapRef.current && mapLoaded && theme) {
+      const map = mapRef.current.getMap();
+      map.setStyle(currentMapStyle);
+    }
+  }, [theme, currentMapStyle, mapLoaded]);
 
   useEffect(() => {
     if (mapRef.current) {
@@ -104,9 +126,9 @@ const MapViewComponent = ({ children }: { children?: React.ReactNode }) => {
     }
   }, [routes, selectedRoutes, focusedRoute]);
 
-  // Fixed colors: green for outbound, red for return
-  const outboundColor = "#5BE201";
-  const returnColor = "#FF4444";
+  // Fixed colors: green for outbound, red for return (matching web-admin colors)
+  const outboundColor = "#22CA0A";
+  const returnColor = "#E60305";
 
   // Memoizar los datos del mapa para múltiples rutas con optimización de rendimiento
   const routeSources = useMemo(() => {
@@ -170,6 +192,17 @@ const MapViewComponent = ({ children }: { children?: React.ReactNode }) => {
     ));
   }, [vehiclePositions]);
 
+  // Only render the map when mounted to avoid hydration mismatch
+  if (!mounted) {
+    return (
+      <MapboxRefContext.Provider value={mapRef}>
+        <div className="relative w-full h-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+          <div className="text-gray-500 dark:text-gray-400">Cargando mapa...</div>
+        </div>
+      </MapboxRefContext.Provider>
+    );
+  }
+
   return (
     <MapboxRefContext.Provider value={mapRef}>
       <div className="relative w-full h-full">
@@ -181,43 +214,47 @@ const MapViewComponent = ({ children }: { children?: React.ReactNode }) => {
             latitude: 2.9342900126616227,
             zoom: 15,
           }}
-          mapStyle="mapbox://styles/afsb114/cmf7eaden003301s563d81iss"
+          mapStyle={currentMapStyle}
           attributionControl={false}
           onLoad={() => setMapLoaded(true)}
         >
           {mapLoaded && vehicleMarkers}
           {mapLoaded && routeSources.map((source) => (
             <Source key={source.id} {...source}>
-              {/* Glow effect layer */}
-              <Layer
-                id={`${source.id}-glow`}
-                type="line"
-                source={source.id}
-                paint={{
-                  "line-color": source.data.properties.color,
-                  "line-width": 20,
-                  "line-opacity": 0.3,
-                  "line-blur": 3,
-                }}
-                layout={{
-                  "line-join": "round",
-                  "line-cap": "round",
-                }}
-              />
-              {/* Main line layer with dash pattern for overlapping routes */}
+              {/* Main line layer - enhanced visibility */}
               <Layer
                 id={`${source.id}-layer`}
                 type="line"
                 source={source.id}
                 paint={{
                   "line-color": source.data.properties.color,
-                  "line-width": 6,
-                  "line-opacity": 0.9,
+                  "line-width": source.data.properties.routeIndex === 0 ? 8 : 6, // Thicker for first route
+                  "line-opacity": source.data.properties.routeIndex === 0 ? 1.0 : 0.7,
                   "line-dasharray": source.data.properties.routeIndex > 0 ? [2, 1] : [1, 0], // Dashed for additional routes
+                  "line-blur": 0,
                 }}
                 layout={{
                   "line-join": "round",
                   "line-cap": "round",
+                  "visibility": "visible",
+                }}
+              />
+              
+              {/* Highlight layer for better visibility */}
+              <Layer
+                id={`${source.id}-highlight-layer`}
+                type="line"
+                source={source.id}
+                paint={{
+                  "line-color": source.data.properties.color,
+                  "line-width": source.data.properties.routeIndex === 0 ? 4 : 3,
+                  "line-opacity": source.data.properties.routeIndex === 0 ? 0.6 : 0.4,
+                  "line-dasharray": [1, 0], // Solid line for highlight
+                }}
+                layout={{
+                  "line-join": "round",
+                  "line-cap": "round",
+                  "visibility": "visible",
                 }}
               />
             </Source>

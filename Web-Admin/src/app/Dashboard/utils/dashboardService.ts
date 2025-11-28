@@ -20,10 +20,15 @@ export interface DashboardStats {
   outOfServiceVehicles: number;
 }
 
+export interface ChartData {
+  fleetEfficiency: Array<{ name: string; value: number; color: string }>;
+}
+
 export interface DashboardData {
   stats: DashboardStats;
   recentActivities: ActivityItem[];
   availableDrivers: DriverItem[];
+  charts: ChartData;
 }
 
 export interface ActivityItem {
@@ -101,10 +106,17 @@ class DashboardService {
       // Get available drivers
       const availableDrivers = this.getAvailableDrivers(drivers, assignments);
 
+      // Generate mock recent activities
+      const recentActivities = this.generateRecentActivities(drivers, vehicles, assignments);
+
+      // Calculate chart data
+      const charts = this.calculateChartData(drivers, vehicles, companies, assignments, stats);
+
       const dashboardData = {
         stats,
-        recentActivities: [],
-        availableDrivers
+        recentActivities,
+        availableDrivers,
+        charts
       };
 
       // Cache the result
@@ -172,6 +184,85 @@ class DashboardService {
       experience: '8 años', // Default, could be calculated from createdAt
       status: 'available' as const
     }));
+  }
+
+  private generateRecentActivities(drivers: DriverApiResponse[], vehicles: Vehicle[], assignments: VehicleAssigment[]): ActivityItem[] {
+    const activities: ActivityItem[] = [];
+
+    // Generate mock activities based on real data
+    if (assignments.length > 0) {
+      const recentAssignments = assignments.slice(-3);
+      recentAssignments.forEach((assignment, index) => {
+        const driver = drivers.find(d => d.id === assignment.driverId);
+        const vehicle = vehicles.find(v => v.id === assignment.vehicleId);
+        if (driver && vehicle) {
+          activities.push({
+            id: `assignment-${assignment.id}`,
+            type: 'route_scheduled',
+            message: `Ruta asignada a ${driver.userProfile.firstName} ${driver.userProfile.lastName} con vehículo ${vehicle.licencePlate}`,
+            timestamp: new Date(Date.now() - index * 3600000).toISOString(), // Hours ago
+            user: driver.userProfile.firstName
+          });
+        }
+      });
+    }
+
+    // Add some maintenance activities
+    const maintenanceVehicles = vehicles.filter(v => v.status === 'MAINTENANCE' || v.status === 'maintenance');
+    if (maintenanceVehicles.length > 0) {
+      maintenanceVehicles.slice(0, 2).forEach((vehicle, index) => {
+        activities.push({
+          id: `maintenance-${vehicle.id}`,
+          type: 'vehicle_maintenance',
+          message: `Vehículo ${vehicle.licencePlate} en mantenimiento programado`,
+          timestamp: new Date(Date.now() - (index + 1) * 7200000).toISOString(), // Hours ago
+          user: 'Sistema'
+        });
+      });
+    }
+
+    // Add some completed routes
+    if (assignments.length > 0) {
+      const completedAssignments = assignments.filter(a => a.assignmentStatus === 'COMPLETED' || a.assignmentStatus === 'completed');
+      if (completedAssignments.length > 0) {
+        completedAssignments.slice(-2).forEach((assignment, index) => {
+          const driver = drivers.find(d => d.id === assignment.driverId);
+          if (driver) {
+            activities.push({
+              id: `completed-${assignment.id}`,
+              type: 'route_completed',
+              message: `Ruta completada por ${driver.userProfile.firstName} ${driver.userProfile.lastName}`,
+              timestamp: new Date(Date.now() - (index + 2) * 1800000).toISOString(), // Hours ago
+              user: driver.userProfile.firstName
+            });
+          }
+        });
+      }
+    }
+
+    // Sort by timestamp descending and limit to 5
+    return activities
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .slice(0, 5);
+  }
+
+  private calculateChartData(
+    drivers: DriverApiResponse[],
+    vehicles: Vehicle[],
+    companies: Company[],
+    assignments: VehicleAssigment[],
+    stats: DashboardStats
+  ): ChartData {
+    // Fleet efficiency data
+    const fleetEfficiency = [
+      { name: 'En Uso', value: stats.vehiclesInRoute, color: '#10b981' },
+      { name: 'Disponibles', value: stats.availableVehicles, color: '#3b82f6' },
+      { name: 'Inactivos', value: Math.max(0, stats.totalVehicles - stats.activeVehicles), color: '#6b7280' }
+    ];
+
+    return {
+      fleetEfficiency
+    };
   }
 }
 

@@ -108,13 +108,13 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
                      returnRoute.geometry;
 
   return (
-    <div className="max-w-7xl mx-auto p-6 bg-zinc-900 text-white rounded-lg">
+    <div className="max-w-7xl mx-auto p-6 bg-card text-card-foreground rounded-lg border border-border">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">
+        <h1 className="text-3xl font-bold mb-2 text-foreground">
           {mode === 'create' ? 'Nueva Ruta' : mode === 'edit' ? 'Editar Ruta' : 'Ver Ruta'}
         </h1>
-        <p className="text-zinc-400">
+        <p className="text-muted-foreground">
           {mode === 'view' ? 'Vista de la ruta' : 'Complete el formulario y defina las rutas en el mapa'}
         </p>
       </div>
@@ -123,25 +123,25 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
         {/* Form Section */}
         <div className="lg:col-span-1 space-y-6">
           {/* Basic Info */}
-          <div className="bg-zinc-800 p-4 rounded-lg">
-            <h2 className="text-xl font-semibold mb-4">Información Básica</h2>
+          <div className="bg-muted/30 p-4 rounded-lg border border-border">
+            <h2 className="text-xl font-semibold mb-4 text-foreground">Información Básica</h2>
 
             <div className="space-y-4">
               <div>
-                <Label className="text-zinc-400">
+                <Label className="text-muted-foreground">
                   Número de Ruta *
                 </Label>
                 <Input
                   value={formData.numberRoute}
                   onChange={(e) => updateFormData('numberRoute', e.target.value)}
                   placeholder="Ej: 001, 092"
-                  className="bg-zinc-800 border-zinc-700 text-white"
+                  className="bg-card border-border text-card-foreground placeholder-muted-foreground"
                   maxLength={20}
                 />
               </div>
 
               <div>
-                <Label className="text-zinc-400">
+                <Label className="text-muted-foreground">
                   Descripción
                 </Label>
                 <textarea
@@ -149,103 +149,181 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
                   onChange={(e) => updateFormData('description', e.target.value)}
                   placeholder="Descripción de la ruta..."
                   rows={3}
-                  className="w-full px-3 py-2 border border-zinc-600 bg-zinc-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 py-2 border border-border bg-card text-card-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
           </div>
 
           {/* Images */}
-          <div className="bg-zinc-800 p-4 rounded-lg">
-            <h2 className="text-xl font-semibold mb-4">Imágenes de Referencia</h2>
+          <div className="bg-muted/30 p-4 rounded-lg border border-border">
+            <h2 className="text-xl font-semibold mb-4 text-foreground">Imágenes de Referencia</h2>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Imagen de Ida
                 </label>
-                <div className="border-2 border-dashed border-zinc-600 rounded-lg p-4 text-center">
+                <div className="border-2 border-dashed border-border rounded-xl p-6 text-center min-h-[200px] flex flex-col justify-center bg-accent/10 hover:bg-accent/20 transition-colors">
                   {formData.outboundImage ? (
-                    <div className="space-y-2">
-                      <p className="text-sm text-zinc-400">{formData.outboundImage.name}</p>
+                    <div className="space-y-4">
+                      {/* Vista previa de la imagen */}
+                      <div className="flex justify-center">
+                        <img
+                          src={URL.createObjectURL(formData.outboundImage)}
+                          alt="Vista previa imagen de ida"
+                          className="max-h-40 max-w-full object-contain rounded-lg shadow-sm"
+                          onLoad={(e) => {
+                            // Liberar el objeto URL después de cargar la imagen
+                            URL.revokeObjectURL((e.target as HTMLImageElement).src);
+                          }}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground font-medium break-all">
+                          {formData.outboundImage.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Tamaño: {(formData.outboundImage.size / 1024).toFixed(1)} KB
+                        </p>
+                      </div>
                       {mode !== 'view' && (
-                        <button
+                        <Button
+                          type="button"
+                          variant="outline"
                           onClick={() => handleFileChange('outboundImage', null)}
-                          className="text-red-400 hover:text-red-300 text-sm"
+                          className="text-destructive border-destructive/50 hover:bg-destructive/10"
+                          size="sm"
                         >
-                          Remover
-                        </button>
+                          Remover imagen
+                        </Button>
                       )}
                     </div>
                   ) : (
-                    <>
-                      <Upload className="mx-auto h-8 w-8 text-zinc-400 mb-2" />
-                      <p className="text-sm text-zinc-400 mb-2">Subir imagen de ida</p>
+                    <div className="space-y-4">
+                      <Upload className="mx-auto h-10 w-10 text-muted-foreground" />
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground font-medium">
+                          Subir imagen de ida
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Formatos soportados: JPG, PNG, WebP
+                        </p>
+                      </div>
                       {mode !== 'view' && (
                         <input
                           type="file"
                           accept="image/*"
-                          onChange={(e) => handleFileChange('outboundImage', e.target.files?.[0] || null)}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            handleFileChange(
+                              'outboundImage',
+                              e.target.files?.[0] || null
+                            );
+                          }}
                           className="hidden"
                           id="outbound-image"
                         />
                       )}
                       <Button
-                        asChild
-                        variant={mode === 'view' ? 'secondary' : 'default'}
-                        disabled={mode === 'view'}
-                        className={mode !== 'view' ? 'bg-emerald-600 hover:bg-emerald-700' : ''}
+                        type="button"
+                        variant="outline"
+                        className="border-border text-foreground hover:bg-accent"
+                        size="sm"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          document.getElementById('outbound-image')?.click();
+                        }}
                       >
-                        <label htmlFor="outbound-image" className="cursor-pointer">
-                          Seleccionar Archivo
-                        </label>
+                        <Upload className="h-4 w-4" />
+                        Seleccionar archivo
                       </Button>
-                    </>
+                    </div>
                   )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Imagen de Vuelta
                 </label>
-                <div className="border-2 border-dashed border-zinc-600 rounded-lg p-4 text-center">
+                <div className="border-2 border-dashed border-border rounded-xl p-6 text-center min-h-[200px] flex flex-col justify-center bg-accent/10 hover:bg-accent/20 transition-colors">
                   {formData.returnImage ? (
-                    <div className="space-y-2">
-                      <p className="text-sm text-zinc-400">{formData.returnImage.name}</p>
+                    <div className="space-y-4">
+                      {/* Vista previa de la imagen */}
+                      <div className="flex justify-center">
+                        <img
+                          src={URL.createObjectURL(formData.returnImage)}
+                          alt="Vista previa imagen de vuelta"
+                          className="max-h-40 max-w-full object-contain rounded-lg shadow-sm"
+                          onLoad={(e) => {
+                            // Liberar el objeto URL después de cargar la imagen
+                            URL.revokeObjectURL((e.target as HTMLImageElement).src);
+                          }}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground font-medium break-all">
+                          {formData.returnImage.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Tamaño: {(formData.returnImage.size / 1024).toFixed(1)} KB
+                        </p>
+                      </div>
                       {mode !== 'view' && (
-                        <button
+                        <Button
+                          type="button"
+                          variant="outline"
                           onClick={() => handleFileChange('returnImage', null)}
-                          className="text-red-400 hover:text-red-300 text-sm"
+                          className="text-destructive border-destructive/50 hover:bg-destructive/10"
+                          size="sm"
                         >
-                          Remover
-                        </button>
+                          Remover imagen
+                        </Button>
                       )}
                     </div>
                   ) : (
-                    <>
-                      <Upload className="mx-auto h-8 w-8 text-zinc-400 mb-2" />
-                      <p className="text-sm text-zinc-400 mb-2">Subir imagen de vuelta</p>
+                    <div className="space-y-4">
+                      <Upload className="mx-auto h-10 w-10 text-muted-foreground" />
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground font-medium">
+                          Subir imagen de vuelta
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Formatos soportados: JPG, PNG, WebP
+                        </p>
+                      </div>
                       {mode !== 'view' && (
                         <input
                           type="file"
                           accept="image/*"
-                          onChange={(e) => handleFileChange('returnImage', e.target.files?.[0] || null)}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            handleFileChange(
+                              'returnImage',
+                              e.target.files?.[0] || null
+                            );
+                          }}
                           className="hidden"
                           id="return-image"
                         />
                       )}
                       <Button
-                        asChild
-                        variant={mode === 'view' ? 'secondary' : 'default'}
-                        disabled={mode === 'view'}
-                        className={mode !== 'view' ? 'bg-emerald-600 hover:bg-emerald-700' : ''}
+                        type="button"
+                        variant="outline"
+                        className="border-border text-foreground hover:bg-accent"
+                        size="sm"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          document.getElementById('return-image')?.click();
+                        }}
                       >
-                        <label htmlFor="return-image" className="cursor-pointer">
-                          Seleccionar Archivo
-                        </label>
+                        <Upload className="h-4 w-4" />
+                        Seleccionar archivo
                       </Button>
-                    </>
+                    </div>
                   )}
                 </div>
               </div>
@@ -253,45 +331,45 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
           </div>
 
           {/* Route Status */}
-          <div className="bg-zinc-800 p-4 rounded-lg">
-            <h2 className="text-xl font-semibold mb-4">Estado de Rutas</h2>
+          <div className="bg-muted/30 p-4 rounded-lg border border-border">
+            <h2 className="text-xl font-semibold mb-4 text-foreground">Estado de Rutas</h2>
 
             <div className="space-y-3">
               <div className={`p-3 rounded-md border ${
-                outboundStatus.status === 'complete' ? 'border-green-600 bg-green-900/20' :
-                outboundStatus.status === 'incomplete' ? 'border-yellow-600 bg-yellow-900/20' :
-                'border-zinc-600 bg-zinc-700/20'
+                outboundStatus.status === 'complete' ? 'border-success/50 bg-success/10' :
+                outboundStatus.status === 'incomplete' ? 'border-yellow-500/50 bg-yellow-500/10' :
+                'border-border bg-muted/20'
               }`}>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">{outboundStatus.text}</span>
+                  <span className="text-sm font-medium text-foreground">{outboundStatus.text}</span>
                   <MapPin className={`h-4 w-4 ${
-                    outboundStatus.status === 'complete' ? 'text-green-400' :
-                    outboundStatus.status === 'incomplete' ? 'text-yellow-400' :
-                    'text-zinc-400'
+                    outboundStatus.status === 'complete' ? 'text-success' :
+                    outboundStatus.status === 'incomplete' ? 'text-yellow-500' :
+                    'text-muted-foreground'
                   }`} />
                 </div>
                 {outboundRoute.distance > 0 && (
-                  <p className="text-xs text-zinc-400 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     Distancia: {outboundRoute.distance} km
                   </p>
                 )}
               </div>
 
               <div className={`p-3 rounded-md border ${
-                returnStatus.status === 'complete' ? 'border-green-600 bg-green-900/20' :
-                returnStatus.status === 'incomplete' ? 'border-yellow-600 bg-yellow-900/20' :
-                'border-zinc-600 bg-zinc-700/20'
+                returnStatus.status === 'complete' ? 'border-success/50 bg-success/10' :
+                returnStatus.status === 'incomplete' ? 'border-yellow-500/50 bg-yellow-500/10' :
+                'border-border bg-muted/20'
               }`}>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">{returnStatus.text}</span>
+                  <span className="text-sm font-medium text-foreground">{returnStatus.text}</span>
                   <MapPin className={`h-4 w-4 ${
-                    returnStatus.status === 'complete' ? 'text-green-400' :
-                    returnStatus.status === 'incomplete' ? 'text-yellow-400' :
-                    'text-zinc-400'
+                    returnStatus.status === 'complete' ? 'text-success' :
+                    returnStatus.status === 'incomplete' ? 'text-yellow-500' :
+                    'text-muted-foreground'
                   }`} />
                 </div>
                 {returnRoute.distance > 0 && (
-                  <p className="text-xs text-zinc-400 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     Distancia: {returnRoute.distance} km
                   </p>
                 )}
@@ -301,9 +379,9 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
 
           {/* Errors */}
           {errors.length > 0 && (
-            <div className="bg-red-900/50 border border-red-600 rounded-lg p-4">
-              <h3 className="text-sm font-medium text-red-100 mb-2">Errores:</h3>
-              <ul className="text-sm text-red-200 space-y-1">
+            <div className="bg-destructive/10 border border-destructive/50 rounded-lg p-4">
+              <h3 className="text-sm font-medium text-destructive mb-2">Errores:</h3>
+              <ul className="text-sm text-destructive/90 space-y-1">
                 {errors.map((error, index) => (
                   <li key={index}>• {error}</li>
                 ))}
@@ -317,7 +395,7 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
               <Button
                 onClick={onClose}
                 variant="outline"
-                className="flex-1 border-zinc-700 text-white hover:bg-zinc-800 hover:text-gray-100"
+                className="flex-1 border-border text-foreground hover:bg-accent"
                 disabled={isLoading}
               >
                 Cancelar
@@ -325,11 +403,11 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
               <Button
                 onClick={handleSave}
                 disabled={!isFormValid || isLoading}
-                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center gap-2"
+                className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center gap-2"
               >
                 {isLoading ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div>
                     Guardando...
                   </>
                 ) : (
@@ -350,28 +428,28 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
             <Button
               onClick={() => setCurrentView('outbound')}
               variant={currentView === 'outbound' ? 'default' : 'secondary'}
-              className={currentView === 'outbound' ? 'bg-emerald-600 hover:bg-emerald-700' : ''}
+              className={currentView === 'outbound' ? 'bg-primary hover:bg-primary/90 text-primary-foreground' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}
             >
               Ruta de Ida
             </Button>
             <Button
               onClick={() => setCurrentView('return')}
               variant={currentView === 'return' ? 'default' : 'secondary'}
-              className={currentView === 'return' ? 'bg-emerald-600 hover:bg-emerald-700' : ''}
+              className={currentView === 'return' ? 'bg-primary hover:bg-primary/90 text-primary-foreground' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}
             >
               Ruta de Vuelta
             </Button>
             <Button
               onClick={() => setCurrentView('both')}
               variant={currentView === 'both' ? 'default' : 'secondary'}
-              className={currentView === 'both' ? 'bg-emerald-600 hover:bg-emerald-700' : ''}
+              className={currentView === 'both' ? 'bg-primary hover:bg-primary/90 text-primary-foreground' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}
             >
               Ambas Rutas
             </Button>
           </div>
 
           {/* Map Editor */}
-          <div className="bg-zinc-800 rounded-lg overflow-hidden h-[115vh]">
+          <div className="bg-card rounded-lg overflow-hidden h-[115vh] border border-border">
             <MapEditor
               mode={mode === 'view' ? 'view' : currentView === 'both' ? 'view' : 'edit'}
               routeType={currentView}
@@ -392,13 +470,13 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
 
       {/* Success Modal */}
       <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
-        <DialogContent className="bg-zinc-900 border-zinc-800">
+        <DialogContent className="bg-card border-border">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-green-400">
+            <DialogTitle className="flex items-center gap-2 text-success">
               <CheckCircle className="h-5 w-5" />
               ¡Éxito!
             </DialogTitle>
-            <DialogDescription className="text-zinc-300">
+            <DialogDescription className="text-muted-foreground">
               La ruta ha sido {mode === 'create' ? 'creada' : 'actualizada'} exitosamente.
             </DialogDescription>
           </DialogHeader>
@@ -408,7 +486,7 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
                 setShowSuccessModal(false);
                 onSuccess?.();
               }}
-              className="bg-emerald-600 hover:bg-emerald-700"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               Aceptar
             </Button>
