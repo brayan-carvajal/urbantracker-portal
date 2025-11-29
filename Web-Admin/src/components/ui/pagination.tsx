@@ -38,15 +38,15 @@ export function Pagination({
   return (
     <div className="flex items-center justify-between px-2">
       <div className="flex items-center gap-2">
-        <p className="text-sm text-muted-foreground">Filas por página</p>
+        <p className="text-sm text-zinc-400">Filas por página</p>
         <Select
           value={itemsPerPage.toString()}
           onValueChange={(value) => onItemsPerPageChange(Number(value))}
         >
-          <SelectTrigger className="w-[70px] bg-input border-input text-foreground">
+          <SelectTrigger className="w-[70px] bg-zinc-900 border-zinc-800 text-white">
             <SelectValue placeholder={itemsPerPage.toString()} />
           </SelectTrigger>
-          <SelectContent className="bg-popover border-border">
+          <SelectContent className="bg-zinc-900 border-zinc-800">
             <SelectItem value="9">9</SelectItem>
             <SelectItem value="18">18</SelectItem>
             <SelectItem value="27">27</SelectItem>
@@ -55,15 +55,15 @@ export function Pagination({
       </div>
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-2">
-          <p className="text-sm text-muted-foreground">
-            Página <span className="text-foreground">{currentPage}</span> de{" "}
-            <span className="text-foreground">{totalPages || 1}</span>
+          <p className="text-sm text-zinc-400">
+            Página <span className="text-white">{currentPage}</span> de{" "}
+            <span className="text-white">{totalPages || 1}</span>
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
-            className="h-8 w-8 p-0"
+            className="h-8 w-8 p-0 bg-zinc-900 border-zinc-800"
             onClick={handlePrevious}
             disabled={currentPage === 1}
           >
@@ -72,7 +72,7 @@ export function Pagination({
           </Button>
           <Button
             variant="outline"
-            className="h-8 w-8 p-0"
+            className="h-8 w-8 p-0 bg-zinc-900 border-zinc-800"
             onClick={handleNext}
             disabled={currentPage === totalPages || totalPages === 0}
           >

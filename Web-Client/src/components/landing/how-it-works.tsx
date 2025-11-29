@@ -26,11 +26,11 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-  <section id="como-funciona" className="py-16 bg-background">
+  <section id="como-funciona" className="py-16 bg-zinc-900">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground text-balance mb-4">¿Cómo Funciona?</h2>
-          <p className="text-xl text-muted-foreground text-balance max-w-2xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-zinc-100 text-balance mb-4">¿Cómo Funciona?</h2>
+          <p className="text-xl text-zinc-400 text-balance max-w-2xl mx-auto">
             Proceso simple y eficiente en tres pasos para optimizar el transporte urbano
           </p>
         </div>
@@ -38,7 +38,7 @@ export default function HowItWorks() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {steps.map((step, index) => (
             <div key={index} className="relative">
-                <Card className="text-center h-full bg-card border border-border text-card-foreground transition-all duration-200 hover:shadow-xl hover:scale-[1.02] min-h-[280px] flex flex-col justify-center">
+                <Card className="text-center h-full bg-zinc-800 border border-zinc-700 text-zinc-100 transition-all duration-200 hover:shadow-xl hover:scale-[1.02]">
                 <CardHeader>
                   <div className="mx-auto w-16 h-16 bg-accent rounded-full flex items-center justify-center mb-4">
                     <step.icon className="h-8 w-8 text-accent-foreground" />
@@ -47,7 +47,7 @@ export default function HowItWorks() {
                   <CardTitle className="text-xl">{step.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription className="text-muted-foreground">{step.description}</CardDescription>
+                  <CardDescription className="text-zinc-400">{step.description}</CardDescription>
                 </CardContent>
               </Card>
 

@@ -15,50 +15,50 @@ const getStatusLabel = (assignmentStatus: string): string => {
 };
 
 const getStatusColor = (assignmentStatus: string): string => {
-    return assignmentStatus === 'ACTIVE' ? 'bg-success text-success-foreground' : 'bg-destructive text-destructive-foreground';
+    return assignmentStatus === 'ACTIVE' ? 'bg-green-600' : 'bg-red-600';
 };
 
 export function RouteAssignmentCard({ routeAssignment, onEdit, onDelete }: RouteAssignmentCardProps) {
 
     return (
-        <Card className="bg-card border-border hover:bg-accent transition-all duration-300 hover:scale-[1.02]">
+        <Card className="bg-zinc-900 border-zinc-800 hover:bg-zinc-800 transition-all duration-300 hover:scale-[1.02]">
             <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-6">
-                        <div className="p-4 bg-primary/20 rounded-full">
-                            <Route className="h-8 w-8 text-primary" />
+                        <div className="p-4 bg-emerald-600/20 rounded-full">
+                            <Route className="h-8 w-8 text-emerald-500" />
                         </div>
                         <div className="space-y-3">
                             <div className="flex items-center gap-3">
-                                <h3 className="text-xl font-bold text-foreground">
+                                <h3 className="text-xl font-bold text-white">
                                     Ruta {routeAssignment.routeNumber} - Vehículo {routeAssignment.vehiclePlate}
                                 </h3>
                                 <Badge className={getStatusColor(routeAssignment.assignmentStatus)}>
                                     {getStatusLabel(routeAssignment.assignmentStatus)}
                                 </Badge>
                             </div>
-                            <div className="text-muted-foreground space-y-1">
+                            <div className="text-zinc-400 space-y-1">
                                 {routeAssignment.driverId && (
                                     <div>
-                                        <span className="font-medium text-foreground">Conductor ID: </span>
-                                        <span className="text-primary">{routeAssignment.driverId}</span>
+                                        <span className="font-medium text-white">Conductor ID: </span>
+                                        <span className="text-emerald-500">{routeAssignment.driverId}</span>
                                     </div>
                                 )}
                                 <div>
-                                    <span className="font-medium text-foreground">Estado: </span>
-                                    <span className={`font-medium ${routeAssignment.assignmentStatus === 'ACTIVE' ? 'text-success' : 'text-destructive'}`}>
+                                    <span className="font-medium text-white">Estado: </span>
+                                    <span className={`font-medium ${routeAssignment.assignmentStatus === 'ACTIVE' ? 'text-green-400' : 'text-red-400'}`}>
                                         {routeAssignment.assignmentStatus === 'ACTIVE' ? 'Activo' : 'Inactivo'}
                                     </span>
                                 </div>
                                 {routeAssignment.note && (
                                     <div>
-                                        <span className="font-medium text-foreground">Nota: </span>
-                                        <span className="text-muted-foreground">{routeAssignment.note}</span>
+                                        <span className="font-medium text-white">Nota: </span>
+                                        <span className="text-zinc-300">{routeAssignment.note}</span>
                                     </div>
                                 )}
                                 <div>
-                                    <span className="font-medium text-foreground">Creado: </span>
-                                    <span className="text-muted-foreground">{new Date(routeAssignment.createdAt).toLocaleDateString()}</span>
+                                    <span className="font-medium text-white">Creado: </span>
+                                    <span className="text-zinc-300">{new Date(routeAssignment.createdAt).toLocaleDateString()}</span>
                                 </div>
                             </div>
                         </div>
@@ -77,7 +77,7 @@ export function RouteAssignmentCard({ routeAssignment, onEdit, onDelete }: Route
                             variant="outline"
                             size="sm"
                             onClick={() => onDelete(routeAssignment.id)}
-                            className="border-destructive/50 text-destructive hover:bg-destructive/10"
+                            className="border-red-700 text-red-500 hover:bg-red-900/20"
                         >
                             <Trash2 className="h-4 w-4 mr-2" />
                             Eliminar

@@ -112,13 +112,13 @@ export const DriverModal: React.FC<DriverModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md bg-card text-foreground">
+      <DialogContent className="sm:max-w-md bg-zinc-900 text-white">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-foreground">
             <User className="h-5 w-5" />
             {isEditing ? "Editar conductor" : "Agregar nuevo conductor"}
           </DialogTitle>
-          <DialogDescription className="text-muted-foreground">
+          <DialogDescription>
             {isEditing
               ? "Actualice la información del conductor a continuación."
               : "Ingrese la información del nuevo conductor a continuación."}
@@ -127,8 +127,8 @@ export const DriverModal: React.FC<DriverModalProps> = ({
 
         {/* Success Message Display */}
         {successMessage && (
-          <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 mb-4">
-            <p className="text-foreground/80 text-sm">{successMessage}</p>
+          <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-3 mb-4">
+            <p className="text-green-200/80 text-sm">{successMessage}</p>
           </div>
         )}
 
@@ -136,18 +136,18 @@ export const DriverModal: React.FC<DriverModalProps> = ({
         {(localApiError || apiError) && (() => {
           const errorToShow = localApiError || apiError;
           return (
-            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3 mb-4">
+            <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-3 mb-4">
               <div className="flex items-start gap-2">
-                <AlertTriangle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
+                <AlertTriangle className="h-4 w-4 text-red-400 mt-0.5 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-foreground/80 text-sm">
+                  <p className="text-red-200/80 text-sm">
                     {errorToShow!.message}
                   </p>
                   {/* Mostrar errores de validación del servidor si existen */}
                   {errorToShow!.errors && Object.keys(errorToShow!.errors).length > 0 && (
                     <div className="mt-2 space-y-1">
                       {Object.entries(errorToShow!.errors).map(([field, messages]) => (
-                        <div key={field} className="text-foreground/70 text-xs">
+                        <div key={field} className="text-red-200/70 text-xs">
                           <strong className="capitalize">{field}:</strong>{" "}
                           {Array.isArray(messages) ? messages.join(", ") : String(messages)}
                         </div>
@@ -162,7 +162,7 @@ export const DriverModal: React.FC<DriverModalProps> = ({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="idNumber" className="text-foreground">
+            <Label htmlFor="idNumber" className="text-zinc-400">
               Número de Identificación *
             </Label>
             <div className="relative">
@@ -172,19 +172,19 @@ export const DriverModal: React.FC<DriverModalProps> = ({
                 value={formData.idNumber}
                 onChange={handleInputChange("idNumber")}
                 placeholder="Ingrese el número de identificación"
-                className={`pl-10 bg-input border-border text-foreground ${
-                  errors.idNumber ? "border-destructive " : ""
+                className={`pl-10 bg-zinc-800 border-zinc-700 text-white ${
+                  errors.idNumber ? "border-red-500 " : ""
                 }`}
                 disabled={isLoading}
               />
             </div>
             {errors.idNumber && (
-              <p className="text-sm text-destructive">{errors.idNumber}</p>
+              <p className="text-sm text-red-500">{errors.idNumber}</p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-foreground">
+            <Label htmlFor="password" className="text-zinc-400">
               Contraseña *
             </Label>
             <Input
@@ -193,18 +193,18 @@ export const DriverModal: React.FC<DriverModalProps> = ({
               value={formData.password}
               onChange={handleInputChange("password")}
               placeholder="Ingrese la contraseña"
-              className={` bg-input border-border text-foreground ${
-                errors.password ? "border-destructive " : ""
+              className={` bg-zinc-800 border-zinc-700 text-white ${
+                errors.password ? "border-red-500 " : ""
               }`}
               disabled={isLoading}
             />
             {errors.password && (
-              <p className="text-sm text-destructive">{errors.password}</p>
+              <p className="text-sm text-red-500">{errors.password}</p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="firstName" className="text-foreground">
+            <Label htmlFor="firstName" className="text-zinc-400">
               Nombre *
             </Label>
             <Input
@@ -212,18 +212,18 @@ export const DriverModal: React.FC<DriverModalProps> = ({
               value={formData.firstName}
               onChange={handleInputChange("firstName")}
               placeholder="Ingrese el nombre"
-              className={` bg-input border-border text-foreground ${
-                errors.firstName ? "border-destructive " : ""
+              className={` bg-zinc-800 border-zinc-700 text-white ${
+                errors.firstName ? "border-red-500 " : ""
               }`}
               disabled={isLoading}
             />
             {errors.firstName && (
-              <p className="text-sm text-destructive">{errors.firstName}</p>
+              <p className="text-sm text-red-500">{errors.firstName}</p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="lastName" className="text-foreground">
+            <Label htmlFor="lastName" className="text-zinc-400">
               Apellido *
             </Label>
             <Input
@@ -231,18 +231,18 @@ export const DriverModal: React.FC<DriverModalProps> = ({
               value={formData.lastName}
               onChange={handleInputChange("lastName")}
               placeholder="Ingrese el apellido"
-              className={` bg-input border-border text-foreground ${
-                errors.lastName ? "border-destructive " : ""
+              className={` bg-zinc-800 border-zinc-700 text-white ${
+                errors.lastName ? "border-red-500 " : ""
               }`}
               disabled={isLoading}
             />
             {errors.lastName && (
-              <p className="text-sm text-destructive">{errors.lastName}</p>
+              <p className="text-sm text-red-500">{errors.lastName}</p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-foreground">
+            <Label htmlFor="email" className="text-zinc-400">
               Email *
             </Label>
             <Input
@@ -251,18 +251,18 @@ export const DriverModal: React.FC<DriverModalProps> = ({
               value={formData.email}
               onChange={handleInputChange("email")}
               placeholder="Ingrese el email"
-              className={` bg-input border-border text-foreground ${
-                errors.email ? "border-destructive " : ""
+              className={` bg-zinc-800 border-zinc-700 text-white ${
+                errors.email ? "border-red-500 " : ""
               }`}
               disabled={isLoading}
             />
             {errors.email && (
-              <p className="text-sm text-destructive">{errors.email}</p>
+              <p className="text-sm text-red-500">{errors.email}</p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone" className="text-foreground">
+            <Label htmlFor="phone" className="text-zinc-400">
               Teléfono *
             </Label>
             <Input
@@ -271,13 +271,13 @@ export const DriverModal: React.FC<DriverModalProps> = ({
               value={formData.phone}
               onChange={handleInputChange("phone")}
               placeholder="Ingrese el teléfono"
-              className={` bg-input border-border text-foreground ${
-                errors.phone ? "border-destructive " : ""
+              className={` bg-zinc-800 border-zinc-700 text-white ${
+                errors.phone ? "border-red-500 " : ""
               }`}
               disabled={isLoading}
             />
             {errors.phone && (
-              <p className="text-sm text-destructive">{errors.phone}</p>
+              <p className="text-sm text-red-500">{errors.phone}</p>
             )}
           </div>
 

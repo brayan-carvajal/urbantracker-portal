@@ -34,7 +34,7 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
   const handleConfirm = async () => {
     try {
       await onConfirm();
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error('Error deleting driver:', error);
       throw error; // Re-lanzamos el error para que pueda ser manejado por el componente padre
     }
@@ -42,9 +42,9 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md bg-card">
+      <DialogContent className="sm:max-w-md bg-zinc-900">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-destructive">
+          <DialogTitle className="flex items-center gap-2 text-red-600">
             <AlertTriangle className="h-5 w-5" />
             Eliminar Conductor
           </DialogTitle>
@@ -55,11 +55,11 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
 
         {/* API Error Display */}
         {apiError && (
-          <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3 mb-4">
+          <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-3 mb-4">
             <div className="flex items-start gap-2">
-              <AlertTriangle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
+              <AlertTriangle className="h-4 w-4 text-red-400 mt-0.5 flex-shrink-0" />
               <div className="flex-1 min-w-0">
-                <p className="text-foreground/80 text-sm">
+                <p className="text-red-200/80 text-sm">
                   {apiError.message}
                 </p>
               </div>
@@ -68,31 +68,31 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
         )}
 
         {/* Driver info to be deleted */}
-        <div className="bg-accent/30 border border-border rounded-lg p-4 space-y-3">
+        <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 space-y-3 ">
           <div className="flex items-center gap-2">
-            <User className="h-4 w-4 text-foreground" />
-            <span className="font-medium text-foreground">Nombre:</span>
-            <span className="text-foreground">{driver.firstName} {driver.lastName}</span>
+            <User className="h-4 w-4 text-white" />
+            <span className="font-medium text-white">Nombre:</span>
+            <span className="text-white">{driver.firstName} {driver.lastName}</span>
           </div>
           <div className="flex items-center gap-2">
-            <CreditCard className="h-4 w-4 text-muted-foreground" />
-            <span className="font-medium text-foreground">ID:</span>
-            <span className="font-mono text-muted-foreground px-2 py-1 rounded border border-border">
+            <CreditCard className="h-4 w-4 text-white" />
+            <span className="font-medium text-white">ID:</span>
+            <span className="font-mono text-white px-2 py-1 rounded">
               {driver.idNumber}
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Mail className="h-4 w-4 text-muted-foreground" />
-            <span className="font-medium text-foreground">Email:</span>
-            <span className="text-primary">{driver.email}</span>
+            <Mail className="h-4 w-4 text-zinc-400" />
+            <span className="font-medium text-zinc-400">Email:</span>
+            <span className="text-emerald-500">{driver.email}</span>
           </div>
         </div>
 
         {/* Warning message */}
-        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
-          <p className="text-sm text-foreground">
-            <strong>Advertencia:</strong> Esta acción no se puede deshacer. El
-            conductor se eliminará permanentemente del sistema.
+        <div className=" bg-zinc-900 border-red-700 rounded-lg p-4">
+          <p className="text-sm text-red-800">
+            <strong>advertencia:</strong> Esta acción no se puede deshacer. El
+            controlador se eliminará permanentemente del sistema.
           </p>
         </div>
 

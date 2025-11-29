@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 
 interface PanelCollapseContextProps {
   isPanelCollapsed: boolean;
@@ -16,13 +16,7 @@ export function usePanelCollapse() {
 }
 
 export function PanelCollapseProvider({ children }: { children: ReactNode }) {
-  const [isPanelCollapsed, setIsPanelCollapsed] = useState(false); // Cambiar a true para probar si está colapsado
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
+  const [isPanelCollapsed, setIsPanelCollapsed] = useState(false);
   const togglePanelCollapse = () => setIsPanelCollapsed((prev) => !prev);
   return (
     <PanelCollapseContext.Provider value={{ isPanelCollapsed, togglePanelCollapse }}>

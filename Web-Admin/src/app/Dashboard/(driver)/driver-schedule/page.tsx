@@ -110,16 +110,15 @@ export default function DriverSchedulePage() {
       await fetchDriverSchedules();
       console.log('Data refreshed successfully');
       handleCloseFormModal();
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Error desconocido';
+    } catch (error: any) {
       console.error('Error saving schedules:', {
         error,
-        message,
-        stack: error instanceof Error ? error.stack : undefined,
+        message: error.message,
+        stack: error.stack,
         data: JSON.stringify(data, null, 2)
       });
       // Mostrar el error al usuario en lugar de lanzarlo
-      alert(`Error al guardar los horarios: ${message}`);
+      alert(`Error al guardar los horarios: ${error.message || 'Error desconocido'}`);
     } finally {
       setIsFormLoading(false);
     }
@@ -131,10 +130,10 @@ export default function DriverSchedulePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background p-6">
+      <div className="min-h-screen bg-black p-6">
         <div className="flex items-center justify-center h-64">
-          <div className="flex items-center gap-3 text-muted-foreground">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <div className="flex items-center gap-3 text-zinc-300">
+            <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
             <span className="text-lg">Cargando Horarios...</span>
           </div>
         </div>
@@ -144,9 +143,9 @@ export default function DriverSchedulePage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-background p-6">
+      <div className="min-h-screen bg-black p-6">
         <div className="text-center py-12">
-          <div className="text-muted-foreground text-lg">
+          <div className="text-zinc-400 text-lg">
             Error al cargar los horarios: {error}
           </div>
         </div>
@@ -155,7 +154,7 @@ export default function DriverSchedulePage() {
   }
 
   return (
-    <div className="space-y-8 bg-background min-h-screen p-6">
+    <div className="space-y-8 bg-black min-h-screen p-6">
       {/* Header */}
       <DriverScheduleHeader onCreateSchedule={handleCreateSchedule} />
 
@@ -178,7 +177,7 @@ export default function DriverSchedulePage() {
       <section className="space-y-6">
         {paginatedDriversWithSchedules.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-muted-foreground text-lg">
+            <div className="text-zinc-400 text-lg">
               {searchTerm || dayFilter !== "all" || driverFilter !== "all" || statusFilter !== "all"
                 ? "No se encontraron horarios con los filtros aplicados"
                 : "No hay horarios registrados"}
@@ -186,7 +185,7 @@ export default function DriverSchedulePage() {
             {!searchTerm && dayFilter === "all" && driverFilter === "all" && statusFilter === "all" && (
               <button
                 onClick={handleCreateSchedule}
-                className="mt-4 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-lg transition-colors"
+                className="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg transition-colors"
               >
                 Crear primer horario
               </button>
@@ -224,9 +223,9 @@ export default function DriverSchedulePage() {
 
       {/* Form Modal */}
       <Sheet open={isFormModalOpen} onOpenChange={handleCloseFormModal}>
-        <SheetContent side="right" className="bg-card text-card-foreground w-full sm:max-w-2xl p-4">
+        <SheetContent side="right" className="bg-zinc-900 text-white w-full sm:max-w-2xl p-4">
           <div className="flex flex-col gap-4">
-            <SheetTitle className="text-lg font-semibold text-foreground">
+            <SheetTitle className="text-lg font-semibold text-white">
               {editingSchedules.length > 0 ? 'Editar Horario' : 'Crear Horario'}
             </SheetTitle>
             <DriverScheduleFormManager
