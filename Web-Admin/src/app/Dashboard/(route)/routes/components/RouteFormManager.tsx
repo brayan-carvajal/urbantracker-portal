@@ -46,6 +46,10 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
   const [errors, setErrors] = useState<string[]>([]);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
+  // Estado para imágenes existentes
+  const [hasOutboundImage, setHasOutboundImage] = useState(false);
+  const [hasReturnImage, setHasReturnImage] = useState(false);
+
   useEffect(() => { 
     if (id) {
       getRouteById(parseInt(id), 'WAYPOINT').then((res) => {
@@ -62,6 +66,11 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
       // Load editing data
       updateFormData('numberRoute', editingRoute.numberRoute);
       updateFormData('description', editingRoute.description || '');
+
+      // Set existing image flags
+      setHasOutboundImage(!!editingRoute.outboundImageUrl);
+      setHasReturnImage(!!editingRoute.returnImageUrl);
+
       // TODO: Load waypoints and geometries from editingRoute
     }
   }, [editingRoute, mode, updateFormData]);
@@ -167,7 +176,7 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
                 <div className="border-2 border-dashed border-border rounded-xl p-6 text-center min-h-[200px] flex flex-col justify-center bg-accent/10 hover:bg-accent/20 transition-colors">
                   {formData.outboundImage ? (
                     <div className="space-y-4">
-                      {/* Vista previa de la imagen */}
+                      {/* Vista previa de la nueva imagen seleccionada */}
                       <div className="flex justify-center">
                         <img
                           src={URL.createObjectURL(formData.outboundImage)}
@@ -187,7 +196,7 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
                           Tamaño: {(formData.outboundImage.size / 1024).toFixed(1)} KB
                         </p>
                       </div>
-                      {mode !== 'view' && (
+                      {(mode === 'create' || mode === 'edit') && (
                         <Button
                           type="button"
                           variant="outline"
@@ -198,6 +207,68 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
                           Remover imagen
                         </Button>
                       )}
+                    </div>
+                  ) : mode === 'edit' && hasOutboundImage && editingRoute?.outboundImageUrl ? (
+                    <div className="space-y-4">
+                      {/* Mostrar imagen existente de la ruta */}
+                      <div className="flex justify-center">
+                        <img
+                          src={`${editingRoute.outboundImageUrl}?t=${Date.now()}`}
+                          alt="Imagen actual de ida"
+                          className="max-h-40 max-w-full object-contain rounded-lg shadow-sm"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            // Show fallback icon when image fails
+                            const parent = target.parentElement;
+                            if (parent && !parent.querySelector('.fallback-icon')) {
+                              const fallbackDiv = document.createElement('div');
+                              fallbackDiv.className = 'fallback-icon w-20 h-20 flex items-center justify-center bg-primary/10 rounded-lg border border-border';
+                              fallbackDiv.innerHTML = '<svg class="h-7 w-7 text-primary" fill="currentColor" viewBox="0 0 20 20"><path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"/></svg>';
+                              parent.appendChild(fallbackDiv);
+                            }
+                          }}
+                        />
+                      </div>
+                      <div className="space-y-3">
+                        <p className="text-sm text-muted-foreground font-medium">
+                          Imagen actual de ida
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Puedes seleccionar una nueva imagen para reemplazarla
+                        </p>
+                        {mode === 'edit' && (
+                          <div className="flex gap-2 justify-center">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                e.stopPropagation();
+                                handleFileChange(
+                                  'outboundImage',
+                                  e.target.files?.[0] || null
+                                );
+                              }}
+                              className="hidden"
+                              id="change-outbound-image"
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="border-border text-foreground hover:bg-accent"
+                              size="sm"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                document.getElementById('change-outbound-image')?.click();
+                              }}
+                            >
+                              <Upload className="h-4 w-4 mr-2" />
+                              Cambiar imagen
+                            </Button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ) : (
                     <div className="space-y-4">
@@ -210,7 +281,7 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
                           Formatos soportados: JPG, PNG, WebP
                         </p>
                       </div>
-                      {mode !== 'view' && (
+                      {(mode === 'create' || mode === 'edit') && (
                         <input
                           type="file"
                           accept="image/*"
@@ -251,7 +322,7 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
                 <div className="border-2 border-dashed border-border rounded-xl p-6 text-center min-h-[200px] flex flex-col justify-center bg-accent/10 hover:bg-accent/20 transition-colors">
                   {formData.returnImage ? (
                     <div className="space-y-4">
-                      {/* Vista previa de la imagen */}
+                      {/* Vista previa de la nueva imagen seleccionada */}
                       <div className="flex justify-center">
                         <img
                           src={URL.createObjectURL(formData.returnImage)}
@@ -271,7 +342,7 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
                           Tamaño: {(formData.returnImage.size / 1024).toFixed(1)} KB
                         </p>
                       </div>
-                      {mode !== 'view' && (
+                      {(mode === 'create' || mode === 'edit') && (
                         <Button
                           type="button"
                           variant="outline"
@@ -282,6 +353,68 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
                           Remover imagen
                         </Button>
                       )}
+                    </div>
+                  ) : mode === 'edit' && hasReturnImage && editingRoute?.returnImageUrl ? (
+                    <div className="space-y-4">
+                      {/* Mostrar imagen existente de la ruta */}
+                      <div className="flex justify-center">
+                        <img
+                          src={`${editingRoute.returnImageUrl}?t=${Date.now()}`}
+                          alt="Imagen actual de vuelta"
+                          className="max-h-40 max-w-full object-contain rounded-lg shadow-sm"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            // Show fallback icon when image fails
+                            const parent = target.parentElement;
+                            if (parent && !parent.querySelector('.fallback-icon')) {
+                              const fallbackDiv = document.createElement('div');
+                              fallbackDiv.className = 'fallback-icon w-20 h-20 flex items-center justify-center bg-primary/10 rounded-lg border border-border';
+                              fallbackDiv.innerHTML = '<svg class="h-7 w-7 text-primary" fill="currentColor" viewBox="0 0 20 20"><path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"/></svg>';
+                              parent.appendChild(fallbackDiv);
+                            }
+                          }}
+                        />
+                      </div>
+                      <div className="space-y-3">
+                        <p className="text-sm text-muted-foreground font-medium">
+                          Imagen actual de vuelta
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Puedes seleccionar una nueva imagen para reemplazarla
+                        </p>
+                        {mode === 'edit' && (
+                          <div className="flex gap-2 justify-center">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                e.stopPropagation();
+                                handleFileChange(
+                                  'returnImage',
+                                  e.target.files?.[0] || null
+                                );
+                              }}
+                              className="hidden"
+                              id="change-return-image"
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="border-border text-foreground hover:bg-accent"
+                              size="sm"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                document.getElementById('change-return-image')?.click();
+                              }}
+                            >
+                              <Upload className="h-4 w-4 mr-2" />
+                              Cambiar imagen
+                            </Button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ) : (
                     <div className="space-y-4">
@@ -294,7 +427,7 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
                           Formatos soportados: JPG, PNG, WebP
                         </p>
                       </div>
-                      {mode !== 'view' && (
+                      {(mode === 'create' || mode === 'edit') && (
                         <input
                           type="file"
                           accept="image/*"
@@ -390,7 +523,7 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
           )}
 
           {/* Actions */}
-          {mode !== 'view' && (
+          {(mode === 'create' || mode === 'edit') && (
             <div className="flex gap-3">
               <Button
                 onClick={onClose}

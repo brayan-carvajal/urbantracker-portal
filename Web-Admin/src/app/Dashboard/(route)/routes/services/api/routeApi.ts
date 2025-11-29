@@ -40,7 +40,7 @@ export class RoutesApi {
   ): Promise<CrudResponse<RouteResponse>> {
     const formData = this.createFormData(routeData);
 
-    return apiClient.postFormData<CrudResponse<RouteResponse>>(
+    return apiClient.putFormData<CrudResponse<RouteResponse>>(
       `${API_ENDPOINTS.ROUTES}/${id}`,
       formData
     );
@@ -58,7 +58,7 @@ export class RoutesApi {
     const formData = this.createFormData(routeData);
 
     return apiClient.postFormData<CrudResponse<RouteResponse>>(
-      `${API_ENDPOINTS.ROUTES}/with-images`,
+      API_ENDPOINTS.ROUTES,
       formData
     );
   }

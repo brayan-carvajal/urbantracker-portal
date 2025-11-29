@@ -11,6 +11,9 @@ export interface Vehicle {
     companyId: number;
     vehicleTypeId: number;
     inService: boolean;
+    // Image availability flags (for performance - don't send BLOB data in lists)
+    hasOutboundImage?: boolean;
+    // Legacy URL fields for backward compatibility
     outboundImageUrl?: string;
     returnImageUrl?: string;
 }
@@ -27,7 +30,6 @@ export interface VehiculeFormData {
     vehicleTypeId: number | null;
     inService: boolean;
     outboundImage: File | null;
-    returnImage: File | null;
 }
 
 

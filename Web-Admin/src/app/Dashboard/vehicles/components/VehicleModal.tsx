@@ -12,6 +12,7 @@ import type {
   VehiculeFormData,
   Company,
   VehicleType,
+  Vehicle,
 } from "../types/vehiculeTypes";
 import { Loader2, Upload, Car } from "lucide-react";
 import {
@@ -25,6 +26,7 @@ import {
 interface VehicleModalProps {
   isOpen: boolean;
   isEditing: boolean;
+  editingVehicle?: Vehicle | null;
   formData: VehiculeFormData;
   onClose: () => void;
   onSave: () => void;
@@ -53,6 +55,7 @@ const getStatusLabel = (status: string): string => {
 export const VehicleModal: React.FC<VehicleModalProps> = ({
   isOpen,
   isEditing,
+  editingVehicle,
   formData,
   onClose,
   onSave,
@@ -60,7 +63,7 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
   companies,
   vehicleTypes,
 }) => {
-  const handleFileChange = (field: 'outboundImage' | 'returnImage', file: File | null) => {
+  const handleFileChange = (field: 'outboundImage', file: File | null) => {
     onFormChange(field, file);
   };
   const [isLoading, setIsLoading] = useState(false);
@@ -429,7 +432,7 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                     <div className="border-2 border-dashed border-border rounded-xl p-6 text-center min-h-[200px] flex flex-col justify-center bg-accent/10 hover:bg-accent/20 transition-colors">
                       {formData.outboundImage ? (
                         <div className="space-y-4">
-                          {/* Vista previa de la imagen */}
+                          {/* Vista previa de la nueva imagen seleccionada */}
                           <div className="flex justify-center">
                             <img
                               src={URL.createObjectURL(formData.outboundImage)}
@@ -458,6 +461,66 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                           >
                             Remover imagen
                           </Button>
+                        </div>
+                      ) : isEditing && editingVehicle?.hasOutboundImage ? (
+                        <div className="space-y-4">
+                          {/* Mostrar imagen existente del vehículo */}
+                          <div className="flex justify-center">
+                            <img
+                              src={`http://localhost:8080/api/v1/vehicles/${editingVehicle.id}/images/outbound?t=${Date.now()}`}
+                              alt="Imagen actual del vehículo"
+                              className="max-h-40 max-w-full object-contain rounded-lg shadow-sm"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                                // Show fallback icon when image fails
+                                const parent = target.parentElement;
+                                if (parent && !parent.querySelector('.fallback-icon')) {
+                                  const fallbackDiv = document.createElement('div');
+                                  fallbackDiv.className = 'fallback-icon w-20 h-20 flex items-center justify-center bg-primary/10 rounded-lg border border-border';
+                                  fallbackDiv.innerHTML = '<svg class="h-7 w-7 text-primary" fill="currentColor" viewBox="0 0 20 20"><path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"/></svg>';
+                                  parent.appendChild(fallbackDiv);
+                                }
+                              }}
+                            />
+                          </div>
+                          <div className="space-y-3">
+                            <p className="text-sm text-muted-foreground font-medium">
+                              Imagen actual del vehículo
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Puedes seleccionar una nueva imagen para reemplazarla
+                            </p>
+                            <div className="flex gap-2 justify-center">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => {
+                                  e.stopPropagation();
+                                  handleFileChange(
+                                    "outboundImage",
+                                    e.target.files?.[0] || null
+                                  );
+                                }}
+                                className="hidden"
+                                id="change-image"
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                className="border-border text-foreground hover:bg-accent"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  document.getElementById('change-image')?.click();
+                                }}
+                              >
+                                <Upload className="h-4 w-4 mr-2" />
+                                Cambiar imagen
+                              </Button>
+                            </div>
+                          </div>
                         </div>
                       ) : (
                         <div className="space-y-4">

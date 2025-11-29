@@ -37,9 +37,6 @@ export class VehiclesApi {
     if (vehicleData.outboundImage) {
       formData.append('outboundImage', vehicleData.outboundImage);
     }
-    if (vehicleData.returnImage) {
-      formData.append('returnImage', vehicleData.returnImage);
-    }
     
     return apiClient.postFormData<CrudResponse<Vehicle>>(API_ENDPOINTS.VEHICLES_WITH_FILES, formData);
   }
@@ -66,9 +63,6 @@ export class VehiclesApi {
     // Add image files if they exist
     if (vehicleData.outboundImage) {
       formData.append('outboundImage', vehicleData.outboundImage);
-    }
-    if (vehicleData.returnImage) {
-      formData.append('returnImage', vehicleData.returnImage);
     }
     
     return apiClient.putFormData<CrudResponse<Vehicle>>(`${API_ENDPOINTS.VEHICLES_WITH_FILES}/${id}`, formData);

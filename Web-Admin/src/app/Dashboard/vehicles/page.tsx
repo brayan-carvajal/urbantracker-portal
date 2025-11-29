@@ -58,9 +58,9 @@ export default function VehiclesPage() {
       
       if (error instanceof Error) {
         errorMessage = error.message;
-      } else if (error && typeof error === 'object') {
+      } else if (error && typeof error === 'object' && 'message' in error) {
         // Handle API errors or other objects
-        errorMessage = (error as any).message || errorMessage;
+        errorMessage = (error as { message: string }).message || errorMessage;
       } else if (typeof error === 'string') {
         errorMessage = error;
       }
@@ -170,6 +170,7 @@ export default function VehiclesPage() {
       <VehicleModal
         isOpen={isDialogOpen}
         isEditing={isEditing}
+        editingVehicle={editingVehicle}
         formData={formData}
         onClose={closeModal}
         onSave={handleSaveDriver}

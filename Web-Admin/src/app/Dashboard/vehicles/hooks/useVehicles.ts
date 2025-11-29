@@ -33,7 +33,6 @@ const INITIAL_FORM_DATA: VehiculeFormData = {
   vehicleTypeId: null,
   inService: true,
   outboundImage: null,
-  returnImage: null,
 };
 
 export function useVehicles(): UseVehiculesReturn {
@@ -186,8 +185,7 @@ export function useVehicles(): UseVehiculesReturn {
       companyId: vehicle.companyId || null,
       vehicleTypeId: vehicle.vehicleTypeId || null,
       inService: vehicle.inService ?? false,
-      outboundImage: null,
-      returnImage: null,
+      outboundImage: null, // Keep as null for file input, but we'll show existing image
     });
     setIsDialogOpen(true);
   }, []);
@@ -282,9 +280,9 @@ export function useVehicles(): UseVehiculesReturn {
     
     if (error instanceof Error) {
       errorMessage = error.message;
-    } else if (error && typeof error === 'object') {
+    } else if (error && typeof error === 'object' && 'message' in error) {
       // Handle API errors that might not be Error instances
-      errorMessage = (error as any).message || errorMessage;
+      errorMessage = (error as { message: string }).message || errorMessage;
     } else if (typeof error === 'string') {
       errorMessage = error;
     }
