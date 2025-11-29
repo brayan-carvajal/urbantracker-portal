@@ -1,9 +1,5 @@
 
-"use client"
-
 import { Github, Linkedin, Mail, MapPin } from "lucide-react"
-import { useTheme } from "@/hooks/useTheme"
-import { useEffect, useState } from "react"
 
 // Animación suave personalizada para el scroll
 const smoothScrollTo = (targetY: number, duration = 600) => {
@@ -37,30 +33,20 @@ const scrollToSection = (id: string) => {
 };
 
 export default function Footer() {
-  const { theme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Determinar logo según tema - con placeholder durante hidratación
-  const logoSrc = mounted ? (theme === "dark" ? "/logo-full-white.svg" : "/logo-full-black.svg") : "/logo-full-white.svg";
-
   return (
-    <footer className="bg-background text-foreground border-t border-border">
+    <footer className="bg-zinc-900 text-zinc-100 border-t border-zinc-800">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo y descripción */}
           <div className="md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
-              <img src={logoSrc} alt="Logo UrbanTracker" className="h-10" />
+              <img src="/logo-full-white.svg" alt="Logo UrbanTracker" className="h-10" />
             </div>
-            <p className="text-muted-foreground mb-4 max-w-md">
+            <p className="text-zinc-400 mb-4 max-w-md">
               Sistema de gestión y visualización de rutas de transporte público en tiempo real. Desarrollado por
               aprendices SENA comprometidos con la innovación urbana.
             </p>
-            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+            <div className="flex items-center space-x-2 text-sm text-zinc-400">
               <MapPin className="h-4 w-4" />
               <span>SENA - Centro de Tecnología, Colombia</span>
             </div>
@@ -68,12 +54,12 @@ export default function Footer() {
 
           {/* Enlaces rápidos */}
           <div>
-            <h3 className="font-semibold mb-4 text-foreground">Enlaces Rápidos</h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <h3 className="font-semibold mb-4 text-zinc-100">Enlaces Rápidos</h3>
+            <ul className="space-y-2 text-sm text-zinc-400">
               <li>
                 <button
                   type="button"
-                  className="hover:text-foreground transition-colors text-left w-full cursor-pointer"
+                  className="hover:text-zinc-100 transition-colors text-left w-full cursor-pointer"
                   onClick={() => scrollToSection("inicio")}
                 >
                   Inicio
@@ -82,7 +68,7 @@ export default function Footer() {
               <li>
                 <button
                   type="button"
-                  className="hover:text-foreground transition-colors text-left w-full cursor-pointer"
+                  className="hover:text-zinc-100 transition-colors text-left w-full cursor-pointer"
                   onClick={() => scrollToSection("funciones")}
                 >
                   Funciones
@@ -91,7 +77,7 @@ export default function Footer() {
               <li>
                 <button
                   type="button"
-                  className="hover:text-foreground transition-colors text-left w-full cursor-pointer"
+                  className="hover:text-zinc-100 transition-colors text-left w-full cursor-pointer"
                   onClick={() => scrollToSection("como-funciona")}
                 >
                   Cómo funciona
@@ -100,7 +86,7 @@ export default function Footer() {
               <li>
                 <button
                   type="button"
-                  className="hover:text-foreground transition-colors text-left w-full cursor-pointer"
+                  className="hover:text-zinc-100 transition-colors text-left w-full cursor-pointer"
                   onClick={() => scrollToSection("equipo")}
                 >
                   Equipo
@@ -109,7 +95,7 @@ export default function Footer() {
               <li>
                 <button
                   type="button"
-                  className="hover:text-foreground transition-colors text-left w-full cursor-pointer"
+                  className="hover:text-zinc-100 transition-colors text-left w-full cursor-pointer"
                   onClick={() => scrollToSection("privacidad")}
                 >
                   Privacidad
@@ -120,13 +106,13 @@ export default function Footer() {
 
           {/* Redes sociales */}
           <div>
-            <h3 className="font-semibold mb-4 text-foreground">Contáctanos</h3>
+            <h3 className="font-semibold mb-4 text-zinc-100">Contáctanos</h3>
             <div className="flex space-x-4">
               <a
                 href="https://github.com/AFSB114/UrbanTracker"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center hover:bg-muted-foreground transition-colors"
+                className="w-10 h-10 bg-zinc-800 rounded-lg flex items-center justify-center hover:bg-zinc-700 transition-colors"
               >
                 <Github className="h-5 w-5" />
               </a>
@@ -134,7 +120,7 @@ export default function Footer() {
                 href="mailto:urbantracker.sena@gmail.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center hover:bg-muted-foreground transition-colors"
+                className="w-10 h-10 bg-zinc-800 rounded-lg flex items-center justify-center hover:bg-zinc-700 transition-colors"
               >
                 <Mail className="h-5 w-5" />
               </a>
@@ -144,7 +130,7 @@ export default function Footer() {
 
         <div className="mt-8 pt-8">
           <div className="flex justify-center items-center">
-            <div className="text-sm text-muted-foreground text-center">
+            <div className="text-sm text-primary-foreground/80 text-center">
               © 2025 UrbanTracker - Todos los derechos reservados
             </div>
           </div>

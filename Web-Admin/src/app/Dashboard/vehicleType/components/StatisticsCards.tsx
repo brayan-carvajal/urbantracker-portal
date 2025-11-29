@@ -24,11 +24,11 @@ const StatisticsCards: React.FC<StatisticsCardsProps> = ({ statistics }) => {
       {cards.map((card) => (
         <Card
           key={card.title}
-          className="bg-card border-border hover:bg-accent transition-all duration-300 hover:scale-105"
+          className="bg-zinc-900 border-zinc-800 hover:bg-zinc-800 transition-all duration-300 hover:scale-105"
         >
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">{card.value}</div>
-            <p className="text-xs text-muted-foreground">{card.description}</p>
+            <div className="text-2xl font-bold text-white">{card.value}</div>
+            <p className="text-xs text-zinc-400">{card.description}</p>
           </CardContent>
         </Card>
       ))}

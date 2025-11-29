@@ -5,10 +5,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogHeader, DialogTitle,} from "@/components/ui/dialog"
 import type { VehicleAssigmentFormData } from "../types/VehicleAssigmentsType"
-import { Loader2 } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useVehicles } from "../../vehicles/hooks/useVehicles"
-import { useDrivers } from "../../drivers/hooks/useDrivers"
+import { Loader2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useVehicles } from "../../vehicles/hooks/useVehicles";
+import { useDrivers } from "../../drivers/hooks/useDrivers";
 
 interface VehicleAssigmentModalProps {
   isOpen: boolean
@@ -28,11 +28,10 @@ export const VehicleAssigmentModal: React.FC<VehicleAssigmentModalProps> = ({
   onClose,
   onSave,
   onFormChange,
-  isSaving,
-  errors
-}) => {
+  }) => {
 
-    const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
+    const [isLoading, setIsLoading] = useState(false);
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     const { filteredVehicles: vehicles } = useVehicles();
     const { filteredDrivers: drivers } = useDrivers();
@@ -60,7 +59,7 @@ export const VehicleAssigmentModal: React.FC<VehicleAssigmentModalProps> = ({
         newErrors.note = 'Nota debe tener al menos 2 caracteres';
       }
 
-      setLocalErrors(newErrors);
+      setErrors(newErrors);
       return Object.keys(newErrors).length === 0;
     };
   
@@ -70,87 +69,89 @@ export const VehicleAssigmentModal: React.FC<VehicleAssigmentModalProps> = ({
         onFormChange(field, value);
 
         // Clear error when user starts typing
-        if (localErrors[field]) {
-          setLocalErrors(prev => ({ ...prev, [field]: '' }));
+        if (errors[field]) {
+          setErrors(prev => ({ ...prev, [field]: '' }));
         }
       };
   
     const handleSubmit = async (event: React.FormEvent) => {
       event.preventDefault();
-         
+        
       if (!validateForm()) return;
   
-      setLocalErrors({});
+      setIsLoading(true);
       try {
         await onSave();
       } catch (error) {
         console.error('Error cargando conductores:', error);
         // You can add a toast notification here
+      } finally {
+        setIsLoading(false);
       }
     };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-card text-foreground max-w-4xl border-border">
+      <DialogContent className="bg-zinc-900 text-white max-w-4xl">
         <DialogHeader>
-          <DialogTitle className="text-foreground">
+          <DialogTitle>
             {isEditing ? "Editar Asignación" : "Nueva Asignación"}
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="vehicle_id" className="text-foreground">
+              <Label htmlFor="vehicle_id" className="text-zinc-400">
                 Vehículo *
               </Label>
               <Select
                 value={formData.vehicleId ? formData.vehicleId.toString() : ""}
                 onValueChange={(value: string) => onFormChange("vehicleId", value)}
               >
-                <SelectTrigger className="w-full bg-input border-border text-foreground">
+                <SelectTrigger className="w-full bg-zinc-800 border-zinc-700 text-white">
                   <SelectValue placeholder="Seleccione un vehículo" />
                 </SelectTrigger>
-                <SelectContent className="bg-popover border-border min-w-[300px]">
+                <SelectContent className="bg-zinc-800 border-zinc-700 min-w-[300px]">
                   {vehicles.map(vehicle => (
-                    <SelectItem key={vehicle.id} value={vehicle.id.toString()} className="text-popover-foreground hover:bg-accent focus:bg-accent">
+                    <SelectItem key={vehicle.id} value={vehicle.id.toString()}>
                       {vehicle.licencePlate}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {(localErrors.vehicleId || errors.vehicleId) && (
-                <p className="text-sm text-destructive">{(localErrors.vehicleId || errors.vehicleId)}</p>
+              {errors.vehicle_id && (
+                <p className="text-sm text-red-500">{errors.vehicle_id}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="driver_id" className="text-foreground">
+              <Label htmlFor="driver_id" className="text-zinc-400">
                 Conductor *
               </Label>
               <Select
                 value={formData.driverId ? formData.driverId.toString() : ""}
                 onValueChange={(value: string) => onFormChange("driverId", value)}
               >
-                <SelectTrigger className="w-full bg-input border-border text-foreground">
+                <SelectTrigger className="w-full bg-zinc-800 border-zinc-700 text-white">
                   <SelectValue placeholder="Seleccione un conductor" />
                 </SelectTrigger>
-                <SelectContent className="bg-popover border-border min-w-[300px]">
+                <SelectContent className="bg-zinc-800 border-zinc-700 min-w-[300px]">
                   {drivers.map(driver => (
-                    <SelectItem key={driver.id} value={driver.id.toString()} className="text-popover-foreground hover:bg-accent focus:bg-accent">
+                    <SelectItem key={driver.id} value={driver.id.toString()}>
                       {driver.firstName} {driver.lastName}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {(localErrors.driverId || errors.driverId) && (
-                <p className="text-sm text-destructive">{(localErrors.driverId || errors.driverId)}</p>
+              {errors.driver_id && (
+                <p className="text-sm text-red-500">{errors.driver_id}</p>
               )}
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="assignmentStatus" className="text-foreground">
+              <Label htmlFor="assignmentStatus" className="text-zinc-400">
                 Estado *
               </Label>
               <Select
@@ -159,18 +160,18 @@ export const VehicleAssigmentModal: React.FC<VehicleAssigmentModalProps> = ({
                   onFormChange("assignmentStatus", value)
                 }
               >
-                <SelectTrigger className="w-full bg-input border-border text-foreground">
+                <SelectTrigger className="w-full bg-zinc-800 border-zinc-700 text-white">
                   <SelectValue placeholder="Seleccione el estado" />
                 </SelectTrigger>
-                <SelectContent className="bg-popover border-border min-w-[200px]">
-                  <SelectItem value="ACTIVE" className="text-popover-foreground hover:bg-accent focus:bg-accent">Activo</SelectItem>
-                  <SelectItem value="INACTIVE" className="text-popover-foreground hover:bg-accent focus:bg-accent">Inactivo</SelectItem>
+                <SelectContent className="bg-zinc-800 border-zinc-700 min-w-[200px]">
+                  <SelectItem value="ACTIVE">Activo</SelectItem>
+                  <SelectItem value="INACTIVE">Inactivo</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="note" className="text-foreground">
+              <Label htmlFor="note" className="text-zinc-400">
                 Nota *
               </Label>
               <textarea
@@ -179,17 +180,17 @@ export const VehicleAssigmentModal: React.FC<VehicleAssigmentModalProps> = ({
                 onChange={(event) => {
                   const value = event.target.value;
                   onFormChange("note", value);
-                  if (localErrors.note || errors.note) {
-                    setLocalErrors(prev => ({ ...prev, note: '' }));
+                  if (errors.note) {
+                    setErrors(prev => ({ ...prev, note: '' }));
                   }
                 }}
-                className="w-full bg-input border-border text-foreground rounded px-3 py-2 resize-none placeholder-muted-foreground"
+                className="w-full bg-zinc-800 border-zinc-700 text-white rounded px-3 py-2 resize-none"
                 placeholder="Nota de asignación"
-                disabled={isSaving}
+                disabled={isLoading}
                 rows={3}
               />
-              {(localErrors.note || errors.note) && (
-                <p className="text-sm text-destructive">{(localErrors.note || errors.note)}</p>
+              {errors.note && (
+                <p className="text-sm text-red-500">{errors.note}</p>
               )}
             </div>
           </div>
@@ -199,17 +200,17 @@ export const VehicleAssigmentModal: React.FC<VehicleAssigmentModalProps> = ({
               type="button"
               variant="outline"
               onClick={onClose}
-              className="border-border text-foreground hover:bg-accent"
-              disabled={isSaving}
+              className="border-zinc-700 text-white hover:bg-zinc-800"
+              disabled={isLoading}
             >
               Cancelar
             </Button>
             <Button
               type="submit"
-              disabled={isSaving}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+              disabled={isLoading}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
             >
-              {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {isEditing ? "Editar" : "Crear"} Asignación
             </Button>
           </div>

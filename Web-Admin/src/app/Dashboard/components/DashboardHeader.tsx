@@ -21,14 +21,14 @@ export function DashboardHeader() {
   };
 
   return (
-    <header className="h-20 border-b border-border bg-background/90 backdrop-blur-sm overflow-hidden">
+    <header className="h-20 border-b border-zinc-800 bg-zinc-950/90 backdrop-blur-sm overflow-hidden">
       <div className="flex h-20 items-center justify-between px-8">
         <div className="flex items-center gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-foreground">
+            <h2 className="text-2xl font-bold text-white">
               Panel de Control
             </h2>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-zinc-400">
               Gestiona tu flota de transporte
             </p>
           </div>
@@ -38,7 +38,7 @@ export function DashboardHeader() {
             onClick={handleRefresh}
             variant="ghost"
             size="sm"
-            className="text-foreground hover:bg-accent"
+            className="text-white hover:bg-zinc-800"
             aria-label="Actualizar datos del dashboard"
           >
             <RefreshCw className="h-4 w-4" />
@@ -47,7 +47,7 @@ export function DashboardHeader() {
             onClick={handleLogout}
             variant="ghost"
             size="sm"
-            className="text-foreground hover:bg-destructive hover:text-destructive-foreground"
+            className="text-white hover:bg-red-700"
             aria-label="Cerrar sesión"
           >
             <LogOut className="h-4 w-4" />

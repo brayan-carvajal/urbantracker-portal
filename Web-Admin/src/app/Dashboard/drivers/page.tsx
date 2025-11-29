@@ -83,10 +83,10 @@ export default function DriversPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background p-6">
+      <div className="min-h-screen bg-black p-6">
         <div className="flex items-center justify-center h-64">
-          <div className="flex items-center gap-3 text-muted-foreground">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <div className="flex items-center gap-3 text-zinc-300">
+            <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
             <span className="text-lg">Cargando Conductores...</span>
           </div>
         </div>
@@ -95,14 +95,14 @@ export default function DriversPage() {
   }
 
   return (
-    <div className="space-y-8 bg-background min-h-screen p-6">
+    <div className="space-y-8 bg-black min-h-screen p-6">
       {/* Header */}
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">
+          <h1 className="text-3xl font-bold text-white">
             Gestión de conductores
           </h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-zinc-400 mt-2">
             Controle y gestione su flota de conductores
           </p>
         </div>
@@ -111,14 +111,14 @@ export default function DriversPage() {
             onClick={handleRefresh}
             disabled={isRefreshing}
             variant="outline"
-            className="border-border text-foreground hover:bg-accent"
+            className="border-zinc-600 text-zinc-300 hover:bg-zinc-800"
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
             Actualizar
           </Button>
           <Button
             onClick={openCreateModal}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white transition-all duration-300 hover:scale-105"
           >
             <Plus className="h-4 w-4 mr-2" />
             Nuevo conductor
@@ -128,15 +128,15 @@ export default function DriversPage() {
 
       {/* Error Alert - Simple y directo */}
       {hasError && (
-        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+        <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
           <div className="flex items-start justify-between">
             <div className="flex items-start gap-3">
-              <AlertTriangle className="h-5 w-5 text-destructive mt-0.5 flex-shrink-0" />
+              <AlertTriangle className="h-5 w-5 text-red-400 mt-0.5 flex-shrink-0" />
               <div>
-                <h4 className="text-destructive font-medium mb-1">
+                <h4 className="text-red-300 font-medium mb-1">
                   {apiError.status === 0 ? "Error de Conexión" : "Error"}
                 </h4>
-                <p className="text-foreground/80 text-sm">
+                <p className="text-red-200/80 text-sm">
                   {apiError.message}
                 </p>
               </div>
@@ -147,7 +147,7 @@ export default function DriversPage() {
                   variant="ghost"
                   size="sm"
                   onClick={handleRefresh}
-                  className="text-destructive hover:text-destructive/80 hover:bg-destructive/10"
+                  className="text-red-300 hover:text-red-200 hover:bg-red-900/30"
                 >
                   <RefreshCw className="h-3 w-3 mr-1" />
                   Reintentar
@@ -157,7 +157,7 @@ export default function DriversPage() {
                 variant="ghost"
                 size="sm"
                 onClick={clearApiError}
-                className="text-destructive hover:text-destructive/80 hover:bg-destructive/10"
+                className="text-red-300 hover:text-red-200 hover:bg-red-900/30"
               >
                 ✕
               </Button>
@@ -181,12 +181,12 @@ export default function DriversPage() {
       <section className="space-y-6">
         {isEmpty && (
           <div className="text-center py-12">
-            <div className="text-muted-foreground text-lg mb-4">
+            <div className="text-zinc-400 text-lg mb-4">
               No hay conductores disponibles. ¡Agregue su primer conductor!
             </div>
             <Button
               onClick={openCreateModal}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
             >
               <Plus className="h-4 w-4 mr-2" />
               Agregar conductor
@@ -196,13 +196,13 @@ export default function DriversPage() {
 
         {noResults && (
           <div className="text-center py-12">
-            <div className="text-muted-foreground text-lg mb-4">
+            <div className="text-zinc-400 text-lg mb-4">
               No se encontraron conductores que coincidan con su búsqueda.
             </div>
             <Button
               onClick={() => setSearchTerm('')}
               variant="outline"
-              className="border-border text-foreground hover:bg-accent"
+              className="border-zinc-600 text-zinc-300 hover:bg-zinc-800"
             >
               Limpiar búsqueda
             </Button>

@@ -96,10 +96,10 @@ export default function RouteSchedulePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background p-6">
+      <div className="min-h-screen bg-black p-6">
         <div className="flex items-center justify-center h-64">
-          <div className="flex items-center gap-3 text-muted-foreground">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <div className="flex items-center gap-3 text-zinc-300">
+            <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
             <span className="text-lg">Cargando Horarios...</span>
           </div>
         </div>
@@ -109,9 +109,9 @@ export default function RouteSchedulePage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-background p-6">
+      <div className="min-h-screen bg-black p-6">
         <div className="text-center py-12">
-          <div className="text-destructive text-lg">
+          <div className="text-zinc-400 text-lg">
             Error al cargar los horarios: {error}
           </div>
         </div>
@@ -120,7 +120,7 @@ export default function RouteSchedulePage() {
   }
 
   return (
-    <div className="space-y-8 bg-background min-h-screen p-6">
+    <div className="space-y-8 bg-black min-h-screen p-6">
       {/* Header */}
       <RouteScheduleHeader onCreateSchedule={handleCreateSchedule} />
 
@@ -143,7 +143,7 @@ export default function RouteSchedulePage() {
       <section className="space-y-6">
         {paginatedRoutesWithSchedules.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-muted-foreground text-lg">
+            <div className="text-zinc-400 text-lg">
               {searchTerm || dayFilter !== "all" || routeFilter !== "all" || statusFilter !== "all"
                 ? "No se encontraron horarios con los filtros aplicados"
                 : "No hay horarios registrados"}
@@ -151,7 +151,7 @@ export default function RouteSchedulePage() {
             {!searchTerm && dayFilter === "all" && routeFilter === "all" && statusFilter === "all" && (
               <button
                 onClick={handleCreateSchedule}
-                className="mt-4 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-lg transition-colors"
+                className="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg transition-colors"
               >
                 Crear primer horario
               </button>
@@ -182,8 +182,8 @@ export default function RouteSchedulePage() {
 
       {/* Form Modal */}
       <Sheet open={isFormModalOpen} onOpenChange={handleCloseFormModal}>
-        <SheetContent side="right" className="bg-card text-card-foreground w-full sm:max-w-2xl p-4 border-border">
-          <SheetTitle className="text-lg font-semibold mb-4 text-foreground">
+        <SheetContent side="right" className="bg-zinc-900 text-white w-full sm:max-w-2xl p-4">
+          <SheetTitle className="text-lg font-semibold mb-4">
             {editingSchedules.length > 0 ? 'Editar Horario' : 'Crear Horario'}
           </SheetTitle>
           <RouteScheduleFormManager

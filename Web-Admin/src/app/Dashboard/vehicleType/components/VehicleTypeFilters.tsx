@@ -10,12 +10,12 @@ const VehicleTypeFilters: React.FC<VehicleTypeFiltersProps> = ({ searchTerm, onS
   return (
     <div className="flex gap-4 items-center">
       <div className="relative flex-1 max-w-md">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 h-4 w-4" />
         <Input
           placeholder="Buscar por nombre o descripción..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-10 bg-input border-border text-foreground placeholder-muted-foreground"
+          className="pl-10 bg-zinc-900 border-zinc-700 text-white placeholder-zinc-400"
         />
       </div>
     </div>
