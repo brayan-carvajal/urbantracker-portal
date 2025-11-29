@@ -1,7 +1,9 @@
 "use client"
 
 import { useState } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { Plus, Loader2 } from "lucide-react"
 import { Plus, Loader2 } from "lucide-react"
 import { useVehicles } from "./hooks/useVehicles"
 import { VehicleCard } from "./components/VehicleCard"
@@ -11,21 +13,36 @@ import { VehicleModal } from "./components/VehicleModal"
 import { Pagination } from "./components/Pagination"
 import { DeleteConfirmationModal } from "./components/DeleteConfirmationModal"
 import { Vehicle } from "./types/vehiculeTypes"
+import { Pagination } from "./components/Pagination"
+import { DeleteConfirmationModal } from "./components/DeleteConfirmationModal"
+import { Vehicle } from "./types/vehiculeTypes"
 
 export default function VehiclesPage() {
   const {
     paginatedVehicles,
+    paginatedVehicles,
     filteredVehicles,
+    pagination,
+    searchTerm,
     pagination,
     searchTerm,
     statusFilter,
     statistics,
+    statistics,
     isDialogOpen,
+    isDeleteModalOpen,
+    openDeleteModal,
     isDeleteModalOpen,
     openDeleteModal,
     editingVehicle,
     vehicleToDelete,
+    vehicleToDelete,
     formData,
+    isLoading,
+    isDeleting,
+    isSaving,
+    companies,
+    vehicleTypes,
     isLoading,
     isDeleting,
     isSaving,
@@ -35,12 +52,16 @@ export default function VehiclesPage() {
     setStatusFilter,
     setPage,
     setItemsPerPage,
+    setPage,
+    setItemsPerPage,
     openCreateModal,
     openEditModal,
     closeModal,
     closeDeleteModal,
+    closeDeleteModal,
     updateFormData,
     saveVehicle,
+    confirmDeleteVehicle,
     confirmDeleteVehicle,
   } = useVehicles()
 
@@ -67,10 +88,10 @@ export default function VehiclesPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black p-6">
+      <div className="min-h-screen bg-background p-6">
         <div className="flex items-center justify-center h-64">
-          <div className="flex items-center gap-3 text-zinc-300">
-            <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+          <div className="flex items-center gap-3 text-muted-foreground">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
             <span className="text-lg">Cargando Conductores...</span>
           </div>
         </div>
@@ -79,22 +100,23 @@ export default function VehiclesPage() {
   }
 
   return (
-    <div className="space-y-8 bg-black min-h-screen p-6">
+    <div className="space-y-8 bg-background min-h-screen p-6">
       {/* Header */}
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">
+          <h1 className="text-3xl font-bold text-foreground">
             Gestión de vehículos
           </h1>
-          <p className="text-zinc-400 mt-2">
+          <p className="text-muted-foreground mt-2">
             Controle y gestione su flota de vehículos
           </p>
         </div>
         <Button
           onClick={openCreateModal}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white transition-all duration-300 hover:scale-105"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105"
         >
           <Plus className="h-4 w-4 mr-2" />
+          Nuevo vehículo
           Nuevo vehículo
         </Button>
       </header>
@@ -107,6 +129,7 @@ export default function VehiclesPage() {
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         statusFilter={statusFilter}
+        statusFilter={statusFilter}
         onStatusFilterChange={setStatusFilter}
       />
 
@@ -114,22 +137,43 @@ export default function VehiclesPage() {
       <section className="space-y-6">
         {filteredVehicles.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-zinc-400 text-lg">
+            <div className="text-muted-foreground text-lg">
               {searchTerm
                 ? "No vehicles found with the applied filters"
                 : "No vehicles registered"}
             </div>
             {!searchTerm && (
+            {!searchTerm && (
               <Button
                 onClick={openCreateModal}
-                className="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="mt-4 bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 <Plus className="h-4 w-4 mr-2" />
+                Agregar primer vehículo
                 Agregar primer vehículo
               </Button>
             )}
           </div>
         ) : (
+          <>
+            <div className="grid gap-6">
+              {paginatedVehicles.map((vehicle) => (
+                <VehicleCard
+                  key={vehicle.id}
+                  vehicle={vehicle}
+                  onEdit={openEditModal}
+                  onDelete={() => handleDeleteClick(vehicle.id)}
+                />
+              ))}
+            </div>
+            {/* Pagination component */}
+            <Pagination
+              pagination={pagination}
+              onPageChange={setPage}
+              onItemsPerPageChange={setItemsPerPage}
+              isLoading={isLoading}
+            />
+          </>
           <>
             <div className="grid gap-6">
               {paginatedVehicles.map((vehicle) => (
@@ -156,8 +200,10 @@ export default function VehiclesPage() {
       <VehicleModal
         isOpen={isDialogOpen}
         isEditing={isEditing}
+        isEditing={isEditing}
         formData={formData}
         onClose={closeModal}
+        onSave={handleSaveDriver}
         onSave={handleSaveDriver}
         onFormChange={updateFormData}
         isSaving={isSaving}
@@ -172,7 +218,20 @@ export default function VehiclesPage() {
         onConfirm={confirmDeleteVehicle}
         vehicle={vehicleToDelete}
         isDeleting={isDeleting}
+        isSaving={isSaving}
+        errors={formErrors}
+        companies={companies}
+        vehicleTypes={vehicleTypes}
+      />
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={confirmDeleteVehicle}
+        vehicle={vehicleToDelete}
+        isDeleting={isDeleting}
       />
     </div>
+  );
   );
 }

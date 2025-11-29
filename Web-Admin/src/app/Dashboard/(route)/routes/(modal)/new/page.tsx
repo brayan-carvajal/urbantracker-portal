@@ -26,7 +26,7 @@ export default function NewRoutePage() {
   };
 
   return (
-    <div className="min-h-screen bg-black p-4">
+    <div className="min-h-screen bg-background p-4">
       <RouteFormManager
         onSave={handleSave}
         onSuccess={() => router.push("/Dashboard/routes")}

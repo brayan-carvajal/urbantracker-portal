@@ -1,26 +1,9 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import type {
-  VehiculeFormData,
-  Company,
-  VehicleType,
-} from "../types/vehiculeTypes";
-import { Loader2, Upload } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { VehicleFormData, VehicleType, VehicleStatus } from "../hooks/useVehicles"
 
 interface VehicleModalProps {
   isOpen: boolean;
@@ -147,7 +130,7 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-zinc-900  text-white max-w-2xl">
+      <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-2xl">
         <DialogHeader>
           <DialogTitle>
             {isEditing ? "Editar Vehiculo" : "Nuevo Vehiculo"}
@@ -156,265 +139,118 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="licencePlate" className="text-zinc-400">
+              <Label htmlFor="licensePlate" className="text-gray-400">
                 Matrícula *
               </Label>
               <Input
-                id="licencePlate"
-                value={formData.licencePlate}
-                onChange={handleInputChange("licencePlate")}
-                className="bg-zinc-800 border-zinc-700 text-white"
+                id="licensePlate"
+                value={formData.licensePlate}
+                onChange={(e) => onFormChange('licensePlate', e.target.value)}
+                className="bg-gray-800 border-gray-700 text-white"
                 placeholder="ABC-123"
-                disabled={isLoading}
+                required
               />
-              {errors.licencePlate && (
-                <p className="text-sm text-red-500">{errors.licencePlate}</p>
-              )}
             </div>
-
+            
             <div className="space-y-2">
-              <Label htmlFor="vehicleTypeId" className="text-zinc-400">
-                Tipo de Vehículo *
+              <Label htmlFor="type" className="text-gray-400">
+                Tipo *
               </Label>
-              <Select
-                value={`${formData.vehicleTypeId}`}
-                onValueChange={(value) =>
-                  onFormChange("vehicleTypeId", Number(value))
-                }
+              <Select 
+                value={formData.type} 
+                onValueChange={(value: VehicleType) => onFormChange('type', value)}
               >
-                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
-                  <SelectValue placeholder="Seleccione el tipo de vehículo" />
+                <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                  <SelectValue placeholder="Seleccione el tipo" />
                 </SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-700">
-                  {vehicleTypes.map((type) => (
-                    <SelectItem key={type.id} value={type.id.toString()}>
-                      {type.name}
-                    </SelectItem>
+                <SelectContent className="bg-gray-800 border-gray-700">
+                  {VEHICLE_TYPES.map(type => (
+                    <SelectItem key={type} value={type}>{type}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {errors.vehicleTypeId && (
-                <p className="text-sm text-red-500">{errors.vehicleTypeId}</p>
-              )}
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="brand" className="text-zinc-400">
+              <Label htmlFor="brand" className="text-gray-400">
                 Marca *
               </Label>
               <Input
                 id="brand"
                 value={formData.brand}
-                onChange={handleInputChange("brand")}
-                className="bg-zinc-800 border-zinc-700 text-white"
+                onChange={(e) => onFormChange('brand', e.target.value)}
+                className="bg-gray-800 border-gray-700 text-white"
                 placeholder="Volvo"
-                disabled={isLoading}
+                required
               />
-              {errors.brand && (
-                <p className="text-sm text-red-500">{errors.brand}</p>
-              )}
             </div>
-
+            
             <div className="space-y-2">
-              <Label htmlFor="model" className="text-zinc-400">
+              <Label htmlFor="model" className="text-gray-400">
                 Modelo *
               </Label>
               <Input
                 id="model"
                 value={formData.model}
-                onChange={handleInputChange("model")}
-                className="bg-zinc-800 border-zinc-700 text-white"
+                onChange={(e) => onFormChange('model', e.target.value)}
+                className="bg-gray-800 border-gray-700 text-white"
                 placeholder="FH16"
-                disabled={isLoading}
+                required
               />
-              {errors.model && (
-                <p className="text-sm text-red-500">{errors.model}</p>
-              )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="companyId" className="text-zinc-400">
-                Compañía *
-              </Label>
-              <Select
-                value={`${formData.companyId}`}
-                onValueChange={(value) =>
-                  onFormChange("companyId", Number(value))
-                }
-              >
-                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
-                  <SelectValue placeholder="Seleccione la compañía" />
-                </SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-700">
-                  {companies.map((company) => (
-                    <SelectItem key={company.id} value={company.id.toString()}>
-                      {company.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.companyId && (
-                <p className="text-sm text-red-500">{errors.companyId}</p>
-              )}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="year" className="text-zinc-400">
-                Año *
+              <Label htmlFor="company" className="text-gray-400">
+                Compañia *
               </Label>
               <Input
-                id="year"
-                type="number"
-                value={formData.year}
-                onChange={handleInputChange("year")}
-                className="bg-zinc-800 border-zinc-700 text-white"
-                placeholder="2023"
-                disabled={isLoading}
-              />
-              {errors.year && (
-                <p className="text-sm text-red-500">{errors.year}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="color" className="text-zinc-400">
-                Color
-              </Label>
-              <Input
-                id="color"
-                value={formData.color}
-                onChange={handleInputChange("color")}
-                className="bg-zinc-800 border-zinc-700 text-white"
-                placeholder="Rojo"
-                disabled={isLoading}
+                id="company"
+                value={formData.company}
+                onChange={(e) => onFormChange('company', e.target.value)}
+                className="bg-gray-800 border-gray-700 text-white"
+                placeholder="Transporte SA"
+                required
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="passengerCapacity" className="text-zinc-400">
-                Capacidad de Pasajeros *
-              </Label>
-              <Input
-                id="passengerCapacity"
-                type="number"
-                value={formData.passengerCapacity}
-                onChange={handleInputChange("passengerCapacity")}
-                className="bg-zinc-800 border-zinc-700 text-white"
-                placeholder="10"
-                disabled={isLoading}
-              />
-              {errors.passengerCapacity && (
-                <p className="text-sm text-red-500">
-                  {errors.passengerCapacity}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="status" className="text-zinc-400">
+              <Label htmlFor="status" className="text-gray-400">
                 Estado *
               </Label>
               <Select
                 value={formData.status}
-                onValueChange={(value: VehicleStatus) =>
-                  onFormChange("status", value)
-                }
+                onValueChange={(value: VehicleStatus) => onFormChange('status', value)}
               >
-                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
-                  <SelectValue placeholder="Seleccione el estado">
-                    {formData.status
-                      ? getStatusLabel(formData.status)
-                      : "Seleccione el estado"}
-                  </SelectValue>
+                <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                  <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-700">
-                  {VEHICLE_STATUSES.map((status) => (
-                    <SelectItem key={status.value} value={status.value}>
-                      {status.label}
-                    </SelectItem>
+                <SelectContent className="bg-gray-800 border-gray-700">
+                  {VEHICLE_STATUSES.map(status => (
+                    <SelectItem key={status} value={status}>{status}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="inService" className="text-zinc-400">
-              En Servicio
-            </Label>
-            <input
-              id="inService"
-              type="checkbox"
-              checked={formData.inService}
-              onChange={(e) => onFormChange("inService", e.target.checked)}
-              className="bg-zinc-800 border-zinc-700 text-white"
-              disabled={isLoading}
-            />
-          </div>
-
-          {/* Images */}
-          <div className="bg-zinc-800 p-4 rounded-lg">
-            <h2 className="text-xl font-semibold mb-4">
-              Imágenes de Referencia
-            </h2>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">
-                  Imagen
-                </label>
-                <div className="border-2 border-dashed border-zinc-600 rounded-lg p-4 text-center">
-                  {formData.outboundImage ? (
-                    <div className="space-y-2">
-                      <p className="text-sm text-zinc-400">
-                        {formData.outboundImage.name}
-                      </p>
-                        <button
-                          onClick={() =>
-                            handleFileChange("outboundImage", null)
-                          }
-                          className="text-red-400 hover:text-red-300 text-sm"
-                        >
-                          Remover
-                        </button>
-                    </div>
-                  ) : (
-                    <>
-                      <Upload className="mx-auto h-8 w-8 text-zinc-400 mb-2" />
-                      <p className="text-sm text-zinc-400 mb-2">
-                        Subir imagen 
-                      </p>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) =>
-                            handleFileChange(
-                              "outboundImage",
-                              e.target.files?.[0] || null
-                            )
-                          }
-                          className="hidden"
-                          id="outbound-image"
-                        />
-                      <Button>
-                        <label
-                          htmlFor="outbound-image"
-                          className="cursor-pointer"
-                        >
-                          Seleccionar Archivo
-                        </label>
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="driver" className="text-gray-400">
+                Conductor
+              </Label>
+              <Input
+                id="driver"
+                value={formData.driver}
+                onChange={(e) => onFormChange('driver', e.target.value)}
+                className="bg-gray-800 border-gray-700 text-white"
+                placeholder="Nombre del conductor"
+              />
             </div>
+
           </div>
 
           <div className="flex justify-end gap-3 pt-6">
@@ -422,24 +258,19 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
               type="button"
               variant="outline"
               onClick={onClose}
-              className="border-zinc-700 text-white hover:bg-zinc-800"
-              disabled={isLoading}
+              className="border-gray-700 text-white hover:bg-gray-800"
             >
               Cancelar
             </Button>
-            <Button
+            <Button 
               type="submit"
-              disabled={isLoading}
               className="bg-emerald-600 hover:bg-emerald-700 text-white"
             >
-              {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {isEditing ? "Editar" : "Crear"} Vehiculo
             </Button>
           </div>
         </form>
       </DialogContent>
     </Dialog>
-  );
-};
-
-
+  )
+}
