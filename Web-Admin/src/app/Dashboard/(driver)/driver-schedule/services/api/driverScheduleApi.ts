@@ -45,9 +45,10 @@ export class DriverScheduleApi {
         throw new Error(response.message || 'Error al eliminar los horarios del conductor');
       }
       return response;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('API Error:', error);
-      throw new Error(error.message || 'Error al comunicarse con el servidor');
+      const message = error instanceof Error ? error.message : 'Error al comunicarse con el servidor';
+      throw new Error(message);
     }
   }
 }

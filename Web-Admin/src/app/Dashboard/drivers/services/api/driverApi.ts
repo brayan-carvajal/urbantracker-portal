@@ -10,9 +10,10 @@ export class DriversApi {
     try {
       const response = await apiClient.get<CrudResponse<DriverApiResponse[]>>(API_ENDPOINTS.DRIVERS);
       return response;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching drivers:', error);
-      throw new Error(error.message || 'Error al obtener los conductores');
+      const message = error instanceof Error ? error.message : 'Error al obtener los conductores';
+      throw new Error(message);
     }
   }
 
@@ -35,9 +36,10 @@ export class DriversApi {
         throw new Error(response.message || 'Error al eliminar el conductor');
       }
       return response;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('API Error:', error);
-      throw new Error(error.message || 'Error al comunicarse con el servidor');
+      const message = error instanceof Error ? error.message : 'Error al comunicarse con el servidor';
+      throw new Error(message);
     }
   }
 }

@@ -57,44 +57,44 @@ const VehicleTypeModal: React.FC<VehicleTypeModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-zinc-900 text-white max-w-2xl">
+      <DialogContent className="bg-card text-foreground max-w-2xl border-border">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="text-foreground">
             {isEditing ? "Editar Tipo de Vehículo" : "Nuevo Tipo de Vehículo"}
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-zinc-400">
+              <Label htmlFor="name" className="text-foreground">
                 Nombre *
               </Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={handleInputChange("name")}
-                className="bg-zinc-800 border-zinc-700 text-white"
+                className="bg-input border-border text-foreground"
                 placeholder="Nombre del tipo de vehículo"
                 disabled={isSaving}
               />
               {localErrors.name && (
-                <p className="text-sm text-red-500">{localErrors.name}</p>
+                <p className="text-sm text-destructive">{localErrors.name}</p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description" className="text-zinc-400">
+              <Label htmlFor="description" className="text-foreground">
                 Descripción
               </Label>
               <Input
                 id="description"
                 value={formData.description}
                 onChange={handleInputChange("description")}
-                className="bg-zinc-800 border-zinc-700 text-white"
+                className="bg-input border-border text-foreground"
                 placeholder="Descripción del tipo de vehículo"
                 disabled={isSaving}
               />
               {localErrors.description && (
-                <p className="text-sm text-red-500">{localErrors.description}</p>
+                <p className="text-sm text-destructive">{localErrors.description}</p>
               )}
             </div>
           </div>
@@ -103,7 +103,7 @@ const VehicleTypeModal: React.FC<VehicleTypeModalProps> = ({
               type="button"
               variant="outline"
               onClick={onClose}
-              className="border-zinc-700 text-white hover:bg-zinc-800"
+              className="border-border text-foreground hover:bg-accent"
               disabled={isSaving}
             >
               Cancelar
@@ -111,7 +111,7 @@ const VehicleTypeModal: React.FC<VehicleTypeModalProps> = ({
             <Button
               type="submit"
               disabled={isSaving}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {isEditing ? "Editar" : "Crear"} Tipo de Vehículo
