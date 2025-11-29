@@ -77,6 +77,7 @@ export function SearchBar({ onPlaceSelect, placeholder = "Buscar direcciones o l
         <Input
           ref={inputRef}
           type="text"
+<<<<<<< HEAD
           value={query}
           onChange={handleInputChange}
           onFocus={handleInputFocus}
@@ -99,6 +100,10 @@ export function SearchBar({ onPlaceSelect, placeholder = "Buscar direcciones o l
           aria-describedby={error ? "search-error" : undefined}
           role="combobox"
           autoComplete="off"
+=======
+          placeholder="Buscar..."
+          className="pl-10 border-border text-foreground placeholder-muted-foreground rounded-full focus:bg-transparent focus:ring-1 focus:ring-border focus:border-border w-full bg-transparent transition-colors duration-200 hover:border-border hover:ring-0"
+>>>>>>> 3875d8517a1b40b03f0b5291e2efa1301caa1e0e
         />
         {query && (
           <button

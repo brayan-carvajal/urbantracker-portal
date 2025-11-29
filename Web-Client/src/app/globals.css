@@ -39,7 +39,11 @@
 
 .dark {
   /* Modo oscuro - esquema negro moderno */
+<<<<<<< HEAD
   --background:24 24 27;
+=======
+  --background: 0 0 0;
+>>>>>>> 3875d8517a1b40b03f0b5291e2efa1301caa1e0e
   --foreground: 255 255 255;
   --card: 33 33 33;
   --card-foreground: 255 255 255;

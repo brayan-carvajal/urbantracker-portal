@@ -12,7 +12,10 @@ import { usePanelActive } from "components/panels/panel-active-context"
 import { usePanelCollapse } from "components/panels/panel-collapse-context"
 import { useRoute } from "components/map/route-context"
 import { useRouter, useParams } from "next/navigation"
+<<<<<<< HEAD
 import { GeocodingFeature } from "@/lib/mapbox-api"
+=======
+>>>>>>> 3875d8517a1b40b03f0b5291e2efa1301caa1e0e
 
 export function FixedPanel() {
   const { activePanel } = usePanelActive();
@@ -24,6 +27,7 @@ export function FixedPanel() {
 
   const detailSelected = params?.id ? parseInt(params.id as string, 10) : null;
 
+<<<<<<< HEAD
   const handlePlaceSelect = (place: GeocodingFeature) => {
     setSelectedPlace(place);
   };
@@ -32,6 +36,8 @@ export function FixedPanel() {
     setSelectedPlace(null);
   };
 
+=======
+>>>>>>> 3875d8517a1b40b03f0b5291e2efa1301caa1e0e
   const handleRouteSelection = (routeId: number | null, userAction = false) => {
     if (userAction) {
       if (routeId !== null && !window.location.pathname.includes(`/map/routes/${routeId}`)) {
@@ -80,7 +86,11 @@ export function FixedPanel() {
 
         {/* Search Bar Section */}
         <div className="p-4 bg-muted/95">
+<<<<<<< HEAD
           <SearchBar onPlaceSelect={handlePlaceSelect} />
+=======
+          <SearchBar />
+>>>>>>> 3875d8517a1b40b03f0b5291e2efa1301caa1e0e
         </div>
 
         {/* Contenido del panel */}

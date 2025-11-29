@@ -129,7 +129,11 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
               // Tarjeta resumen de cada ruta
               <div
                 key={route.id}
+<<<<<<< HEAD
                 className={`bg-background text-foreground p-4 rounded-xl w-full font-sans flex flex-col shadow-sm transition-all duration-200 hover:shadow-xl hover:scale-[1.02] cursor-pointer border${
+=======
+                className={`bg-background text-foreground p-4 rounded-xl w-full font-sans flex flex-col shadow-sm transition-all duration-200 hover:shadow-xl hover:scale-[1.02] cursor-pointer ${
+>>>>>>> 3875d8517a1b40b03f0b5291e2efa1301caa1e0e
                   isSelected ? 'bg-accent'  : ''
                 }`}
                 onClick={async (e) => {
@@ -203,13 +207,21 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
                <div className="flex flex-col gap-1">
                  {/* Línea de información de inicio */}
                  <div className="flex items-center gap-2">
+<<<<<<< HEAD
                    <div className="w-3 h-3 bg-red-500 rounded-full" />
+=======
+                   <div className="w-3 h-3 bg-primary rounded-full" />
+>>>>>>> 3875d8517a1b40b03f0b5291e2efa1301caa1e0e
                    <span className="text-xs text-muted-foreground font-medium">Ida:</span>
                    <span className="text-xs text-card-foreground">{route.start || 'Cargando...'}</span>
                  </div>
                  {/* Línea de información de fin */}
                  <div className="flex items-center gap-2">
+<<<<<<< HEAD
                    <div className="w-3 h-3 bg-green-500 rounded-full" />
+=======
+                   <div className="w-3 h-3 bg-secondary rounded-full" />
+>>>>>>> 3875d8517a1b40b03f0b5291e2efa1301caa1e0e
                    <span className="text-xs text-muted-foreground font-medium">Vuelta:</span>
                    <span className="text-xs text-card-foreground">{route.end || 'Cargando...'}</span>
                  </div>

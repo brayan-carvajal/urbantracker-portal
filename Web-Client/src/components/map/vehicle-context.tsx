@@ -16,6 +16,7 @@ export function VehicleProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setMounted(true);
   }, []);
+<<<<<<< HEAD
 
   // Limpiar vehículos inactivos cada 30 segundos
   useEffect(() => {
@@ -38,6 +39,8 @@ export function VehicleProvider({ children }: { children: React.ReactNode }) {
 
     return () => clearInterval(interval);
   }, []);
+=======
+>>>>>>> 3875d8517a1b40b03f0b5291e2efa1301caa1e0e
 
   return (
     <VehicleContext.Provider value={{ vehiclePositions, setVehiclePositions }}>
