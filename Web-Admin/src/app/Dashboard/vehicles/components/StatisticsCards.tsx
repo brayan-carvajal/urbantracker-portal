@@ -2,14 +2,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Car } from "lucide-react"
 
 import type { VehiculeStatistics } from "../types/vehiculeTypes";
+import { Car } from "lucide-react"
+
+import type { VehiculeStatistics } from "../types/vehiculeTypes";
 
 interface StatisticsCardsProps {
+  statistics: VehiculeStatistics;
   statistics: VehiculeStatistics;
 }
 
 export function StatisticsCards({ statistics }: StatisticsCardsProps) {
   const cards = [
     {
+      title: "Total Vehículos",
+      value: statistics.totalVehicules,
+      description: "En la flota",
       title: "Total Vehículos",
       value: statistics.totalVehicules,
       description: "En la flota",
@@ -20,6 +27,9 @@ export function StatisticsCards({ statistics }: StatisticsCardsProps) {
       title: "Vehículos Activos",
       value: statistics.activeVehicules,
       description: "En operación",
+      title: "Vehículos Activos",
+      value: statistics.activeVehicules,
+      description: "En operación",
       icon: Car,
       iconColor: "text-success"
     },
@@ -27,14 +37,19 @@ export function StatisticsCards({ statistics }: StatisticsCardsProps) {
       title: "Vehículos Inactivos",
       value: statistics.inactiveVehicules,
       description: "Fuera de servicio",
+      title: "Vehículos Inactivos",
+      value: statistics.inactiveVehicules,
+      description: "Fuera de servicio",
       icon: Car,
       iconColor: "text-destructive"
     }
+  ];
   ];
 
   return (
     <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
       {cards.map((card) => (
+        <Card
         <Card
           key={card.title}
           className="bg-card border-border hover:bg-accent transition-all duration-300 hover:scale-105"
@@ -52,5 +67,6 @@ export function StatisticsCards({ statistics }: StatisticsCardsProps) {
         </Card>
       ))}
     </div>
+  );
   );
 }

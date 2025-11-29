@@ -23,6 +23,17 @@ export function VehicleCard({ vehicle, onEdit, onDelete }: VehicleCardProps) {
     }
   };
 
+  const getStatusInSpanish = (status: string): string => {
+    switch (status) {
+      case 'ACTIVE':
+        return 'Activo';
+      case 'INACTIVE':
+        return 'Inactivo';
+      default:
+        return status;
+    }
+  };
+
   const getStatusStyles = (status: Vehicle['status']) => {
     const styles: Record<string, string> = {
       "ACTIVE": "bg-success text-success-foreground hover:bg-success/90",
@@ -96,5 +107,6 @@ export function VehicleCard({ vehicle, onEdit, onDelete }: VehicleCardProps) {
         </div>
       </CardContent>
     </Card>
+  );
   );
 }

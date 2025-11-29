@@ -21,6 +21,7 @@ export function VehicleFilters({
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
         <Input
           placeholder="Buscar por matrícula, marca, modelo o conductor..."
+          placeholder="Buscar por matrícula, marca, modelo o conductor..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
           className="pl-10 bg-card border-border text-card-foreground placeholder-muted-foreground"
@@ -38,5 +39,6 @@ export function VehicleFilters({
         </SelectContent>
       </Select>
     </div>
+  );
   );
 }
