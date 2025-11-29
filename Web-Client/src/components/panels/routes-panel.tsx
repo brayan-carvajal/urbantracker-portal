@@ -27,20 +27,59 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
         if (!response.ok) throw new Error('Error al cargar rutas');
         const data = await response.json();
         
-        const mappedRoutes: Route[] = data.data.map((r: RouteResDto) => ({
-          id: r.id,
-          name: r.numberRoute,
-          description: r.description,
-          start: '', 
-          end: '',
-          imageStart: r.outboundImageUrl,
-          imageEnd: r.returnImageUrl,
-          startDetail: '',
-          endDetail: '',
+        const routesWithDetails = await Promise.all(data.data.map(async (r: RouteResDto) => {
+          try {
+            // Obtener geometría para cada ruta
+            const geometryResponse = await fetch(`http://localhost:8080/api/v1/public/route/${r.id}/GEOMETRY`);
+            let startPoint = 'Cargando...';
+            let endPoint = 'Cargando...';
+            
+            if (geometryResponse.ok) {
+              const geometryData = await geometryResponse.json();
+              const waypoints = geometryData.data?.waypoints || [];
+              
+              if (waypoints.length > 0) {
+                const first = waypoints.find((w: any) => w.sequence === 1) || waypoints[0];
+                const last = waypoints.reduce((prev: any, curr: any) => 
+                  (prev && curr && curr.sequence > prev.sequence) ? curr : prev, waypoints[0] || first);
+                
+                if (first && last) {
+                  startPoint = `${first.latitude.toFixed(6)}, ${first.longitude.toFixed(6)}`;
+                  endPoint = `${last.latitude.toFixed(6)}, ${last.longitude.toFixed(6)}`;
+                }
+              }
+            }
+            
+            return {
+              id: r.id,
+              name: r.numberRoute,
+              description: r.description,
+              start: startPoint, 
+              end: endPoint,
+              imageStart: r.outboundImageUrl || '',
+              imageEnd: r.returnImageUrl || '',
+              startDetail: startPoint !== 'Cargando...' ? `Inicio: ${startPoint}` : '',
+              endDetail: endPoint !== 'Cargando...' ? `Fin: ${endPoint}` : '',
+            };
+          } catch (detailErr) {
+            console.warn(`Error cargando detalles de ruta ${r.id}:`, detailErr);
+            return {
+              id: r.id,
+              name: r.numberRoute,
+              description: r.description,
+              start: 'No disponible',
+              end: 'No disponible',
+              imageStart: r.outboundImageUrl || '',
+              imageEnd: r.returnImageUrl || '',
+              startDetail: '',
+              endDetail: '',
+            };
+          }
         }));
-        setRoutes(mappedRoutes);
+        
+        setRoutes(routesWithDetails);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error desconocido');
+        setError('No se encontraron rutas');
       } finally {
         setLoading(false);
       }
@@ -48,8 +87,8 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
     fetchRoutes();
   }, []);
 
-  if (loading) return <div className="text-zinc-100">Cargando rutas...</div>;
-  if (error) return <div className="text-red-500">Error: {error}</div>;
+  if (loading) return <div className="text-foreground">Cargando rutas...</div>;
+  if (error) return <div className="text-destructive">Error: {error}</div>;
 
   return (
     <div className="h-full overflow-y-auto hide-scrollbar px-2 py-2 p-1">
@@ -58,7 +97,7 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
         <div className="flex items-center gap-2 mb-4">
           {selected !== null && (
             <button
-              className="flex items-center gap-1 text-zinc-400 text-sm font-medium px-0.5 py-0 rounded-md border border-transparent transition-colors duration-200 focus:outline-none focus:ring-1 focus:ring-zinc-800 bg-transparent cursor-pointer hover:bg-zinc-900 hover:border-zinc-400 hover:text-zinc-100"
+              className="flex items-center gap-1 text-muted-foreground text-sm font-medium px-0.5 py-0 rounded-md border border-transparent transition-colors duration-200 focus:outline-none focus:ring-1 focus:ring-border bg-transparent cursor-pointer hover:bg-accent hover:border-border hover:text-foreground"
               onClick={() => setSelected(null)}
               title="Volver a la lista"
               type="button"
@@ -67,7 +106,7 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
             </button>
           )}
-          <h2 className="text-lg font-semibold text-zinc-100">
+          <h2 className="text-lg font-semibold text-foreground">
             {selected === null ? "Rutas recomendadas" : `Ruta ${routes.find(r => r.id === selected)?.name || selected}`}
           </h2>
         </div>
@@ -77,9 +116,9 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
       {selected === null ? (
         <div className="space-y-3">
           {selectedRoutes.length > 0 && (
-            <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3 mb-4">
-              <div className="flex items-center gap-2 text-blue-300 text-sm font-medium">
-                <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
+            <div className="bg-primary/10 rounded-lg p-3 mb-4">
+              <div className="flex items-center gap-2 text-primary text-sm font-medium">
+                <span className="w-2 h-2 bg-primary rounded-full"></span>
                 {selectedRoutes.length} ruta{selectedRoutes.length !== 1 ? 's' : ''} seleccionada{selectedRoutes.length !== 1 ? 's' : ''} para comparación
               </div>
             </div>
@@ -90,8 +129,8 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
               // Tarjeta resumen de cada ruta
               <div
                 key={route.id}
-                className={`bg-zinc-800 text-zinc-100 p-4 rounded-xl w-full font-sans border flex flex-col shadow-sm transition-all duration-200 hover:shadow-xl hover:scale-[1.02] cursor-pointer ${
-                  isSelected ? 'border-blue-500 bg-zinc-700'  : 'border-zinc-700'
+                className={`bg-background text-foreground p-4 rounded-xl w-full font-sans flex flex-col shadow-sm transition-all duration-200 hover:shadow-xl hover:scale-[1.02] cursor-pointer border${
+                  isSelected ? 'bg-accent'  : ''
                 }`}
                 onClick={async (e) => {
                   // Solo mostrar detalles si no se hizo clic en el checkbox
@@ -148,9 +187,9 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
                           removeRoute(route.id);
                         }
                       }}
-                      className="w-4 h-4 text-blue-600 bg-zinc-700 border-zinc-600 rounded focus:ring-blue-500 focus:ring-2"
+                      className="w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary focus:ring-2"
                     />
-                    <h4 className="text-base font-semibold leading-tight text-zinc-100">{route.name}</h4>
+                    <h4 className="text-base font-semibold leading-tight text-card-foreground">{route.name}</h4>
                   </div>
                   <div className="flex items-center justify-center -ml-2">
                     {/* Imagen del bus */}
@@ -158,21 +197,21 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
                   </div>
                 </div>
                 <div className="flex flex-col">
-                  <p className="text-xs text-zinc-400 leading-tight">{route.description}</p>
+                  <p className="text-xs text-muted-foreground leading-tight">{route.description}</p>
                 </div>
-                <div className="border-t border-zinc-700 my-2" />
+                <div className="border-t border-border my-2" />
                <div className="flex flex-col gap-1">
                  {/* Línea de información de inicio */}
                  <div className="flex items-center gap-2">
-                   <div className="w-3 h-3 bg-green-500 rounded-full border border-zinc-700" />
-                   <span className="text-xs text-zinc-400 font-medium">Ida:</span>
-                   <span className="text-xs text-zinc-100">{route.start || 'Cargando...'}</span>
+                   <div className="w-3 h-3 bg-red-500 rounded-full" />
+                   <span className="text-xs text-muted-foreground font-medium">Ida:</span>
+                   <span className="text-xs text-card-foreground">{route.start || 'Cargando...'}</span>
                  </div>
                  {/* Línea de información de fin */}
                  <div className="flex items-center gap-2">
-                   <div className="w-3 h-3 bg-red-500 rounded-full border border-zinc-700" />
-                   <span className="text-xs text-zinc-400 font-medium">Vuelta:</span>
-                   <span className="text-xs text-zinc-100">{route.end || 'Cargando...'}</span>
+                   <div className="w-3 h-3 bg-green-500 rounded-full" />
+                   <span className="text-xs text-muted-foreground font-medium">Vuelta:</span>
+                   <span className="text-xs text-card-foreground">{route.end || 'Cargando...'}</span>
                  </div>
                </div>
              </div>

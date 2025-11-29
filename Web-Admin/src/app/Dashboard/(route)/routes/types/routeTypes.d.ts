@@ -35,6 +35,8 @@ export interface RouteResponse {
   description?: string;
   totalDistance: number;
   waypoints: number;
+  outboundImageUrl?: string;
+  returnImageUrl?: string;
   createdAt: string;
   updatedAt: string;
 }
