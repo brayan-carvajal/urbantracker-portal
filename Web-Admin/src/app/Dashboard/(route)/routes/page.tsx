@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { useRoutes } from './hooks/useRoutes';
 import { useRouteActions } from './hooks/useRouteActions';
@@ -14,6 +15,9 @@ import { DeleteConfirmationModal } from './components/DeleteConfirmationModal';
 import { RouteResponse } from './types/routeTypes';
 
 export default function RouteDashboard() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const {
     paginatedRoutes,
     filteredRoutes,
@@ -41,8 +45,38 @@ export default function RouteDashboard() {
   } = useRouteActions(fetchRoutes);
 
   useEffect(() => {
+    console.log('[RouteDashboard] Initial load - calling fetchRoutes');
     fetchRoutes();
-  }, []);
+  }, []); // Remover fetchRoutes de dependencias para evitar bucle infinito
+
+  useEffect(() => {
+    // Verificar si hay parámetro refresh=true en la URL (viene de editar)
+    const refresh = searchParams.get('refresh');
+    if (refresh === 'true') {
+      console.log('[RouteDashboard] Refresh parameter detected - calling fetchRoutes');
+      fetchRoutes();
+      // Limpiar el parámetro de la URL
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete('refresh');
+      router.replace(newUrl.pathname + newUrl.search);
+    }
+  }, [searchParams, router]); // Remover fetchRoutes de dependencias
+
+  useEffect(() => {
+    // Refrescar rutas cuando la ventana vuelve a tener foco (usuario regresa de editar)
+    const handleFocus = () => {
+      console.log('[RouteDashboard] Window focus detected - calling fetchRoutes');
+      fetchRoutes();
+    };
+
+    console.log('[RouteDashboard] Adding focus event listener');
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      console.log('[RouteDashboard] Removing focus event listener');
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []); // Remover fetchRoutes de dependencias para evitar bucle infinito
 
   const handleDeleteClick = (route: RouteResponse) => {
     openDeleteModal(route);

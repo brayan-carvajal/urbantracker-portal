@@ -51,7 +51,7 @@ export function VehicleCard({ vehicle, companies, vehicleTypes, onEdit, onDelete
           <div className="flex-shrink-0">
             {vehicle.hasOutboundImage ? (
               <img
-                src={`http://localhost:8080/api/v1/vehicles/${vehicle.id}/images/outbound?t=${Date.now()}`}
+                src={`http://localhost:8080/api/v1/vehicles/${vehicle.id}/images/outbound?t=${Date.now()}-${vehicle.hasOutboundImage}`}
                 alt={`Imagen del vehículo ${vehicle.licencePlate}`}
                 className="w-20 h-20 object-cover rounded-lg border border-border"
                 onError={(e) => {

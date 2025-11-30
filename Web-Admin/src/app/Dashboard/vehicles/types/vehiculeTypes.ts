@@ -19,17 +19,18 @@ export interface Vehicle {
 }
 
 export interface VehiculeFormData {
-    licencePlate: string;
-    brand: string;
-    model: string;
-    year: number;
-    color: string;
-    passengerCapacity: number;
-    status: string;
-    companyId: number | null;
-    vehicleTypeId: number | null;
-    inService: boolean;
-    outboundImage: File | null;
+  licencePlate: string;
+  brand: string;
+  model: string;
+  year: number;
+  color: string;
+  passengerCapacity: number;
+  status: string;
+  companyId: number | null;
+  vehicleTypeId: number | null;
+  inService: boolean;
+  outboundImage: File | null;
+  deleteOutboundImage?: boolean;
 }
 
 

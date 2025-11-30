@@ -16,7 +16,7 @@ export default function NewRoutePage() {
   const { createRouteWithImages } = useRouteService();
 
 
-  const handleSave = async (data: CompleteRouteData) => {
+  const handleSave = async (data: CompleteRouteData, deleteOutboundImage?: boolean, deleteReturnImage?: boolean) => {
     try {
       await createRouteWithImages(data);
     } catch (err) {

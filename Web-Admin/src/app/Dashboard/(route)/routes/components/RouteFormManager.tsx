@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Save, Upload, MapPin, Eye, Edit, CheckCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +13,7 @@ import { useRouteService } from '../services/RouteServices';
 import { get } from 'http';
 
 interface RouteFormManagerProps {
-  onSave: (data: CompleteRouteData) => Promise<void>;
+  onSave: (data: CompleteRouteData, deleteOutboundImage?: boolean, deleteReturnImage?: boolean) => Promise<void>;
   onSuccess?: () => void;
   onClose?: () => void;
   editingRoute?: RouteResponse | null;
@@ -28,6 +29,8 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
   mode = 'create',
   id = ''
 }) => {
+  const router = useRouter();
+
   const {
     formData,
     outboundRoute,
@@ -50,11 +53,18 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
   const [hasOutboundImage, setHasOutboundImage] = useState(false);
   const [hasReturnImage, setHasReturnImage] = useState(false);
 
-  useEffect(() => { 
+  // Estado para marcar imágenes para eliminar
+  const [deleteOutboundImage, setDeleteOutboundImage] = useState(false);
+  const [deleteReturnImage, setDeleteReturnImage] = useState(false);
+
+  useEffect(() => {
     if (id) {
       getRouteById(parseInt(id), 'WAYPOINT').then((res) => {
         if (res.data) {
           setInitialData(res.data);
+          // Set existing image flags based on loaded data
+          setHasOutboundImage(!!res.data.outboundImageUrl);
+          setHasReturnImage(!!res.data.returnImageUrl);
         }
       });
     }
@@ -79,6 +89,25 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
     updateFormData(field, file);
   };
 
+  const handleRemoveImage = (imageType: 'outbound' | 'return') => {
+    // Just hide the image and show file selector
+    if (imageType === 'outbound') {
+      setHasOutboundImage(false);
+      // Si había imagen existente, marcar para eliminar
+      if (editingRoute?.outboundImageUrl) {
+        setDeleteOutboundImage(true);
+      }
+    } else {
+      setHasReturnImage(false);
+      // Si había imagen existente, marcar para eliminar
+      if (editingRoute?.returnImageUrl) {
+        setDeleteReturnImage(true);
+      }
+    }
+    // Clear form data if it was set
+    updateFormData(imageType === 'outbound' ? 'outboundImage' : 'returnImage', null);
+  };
+
   const handleSave = async () => {
     const completeData = getCompleteRouteData();
     if (!completeData) {
@@ -91,7 +120,27 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
     setIsLoading(true);
     setErrors([]);
     try {
-      await onSave(completeData);
+      // Pasar los flags de eliminación si estamos en modo edición
+      if (mode === 'edit') {
+        await onSave(completeData, deleteOutboundImage, deleteReturnImage);
+      } else {
+        await onSave(completeData);
+      }
+
+      // After successful update in edit mode, reload route data to update local state
+      if (mode === 'edit' && id) {
+        const res = await getRouteById(parseInt(id), 'WAYPOINT');
+        if (res.data) {
+          setInitialData(res.data);
+          // Update image states based on the updated route data
+          setHasOutboundImage(!!res.data.outboundImageUrl);
+          setHasReturnImage(!!res.data.returnImageUrl);
+          // Reset delete flags
+          setDeleteOutboundImage(false);
+          setDeleteReturnImage(false);
+        }
+      }
+
       setShowSuccessModal(true);
     } catch (error) {
       console.error('Error saving route:', error);
@@ -208,12 +257,12 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
                         </Button>
                       )}
                     </div>
-                  ) : mode === 'edit' && hasOutboundImage && editingRoute?.outboundImageUrl ? (
+                  ) : mode === 'edit' && hasOutboundImage ? (
+                    // Mostrar imagen existente con botón eliminar
                     <div className="space-y-4">
-                      {/* Mostrar imagen existente de la ruta */}
                       <div className="flex justify-center">
                         <img
-                          src={`${editingRoute.outboundImageUrl}?t=${Date.now()}`}
+                          src={`http://localhost:8080/api/v1/routes/${id}/images/outbound?t=${Date.now()}`}
                           alt="Imagen actual de ida"
                           className="max-h-40 max-w-full object-contain rounded-lg shadow-sm"
                           onError={(e) => {
@@ -238,33 +287,18 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
                           Puedes seleccionar una nueva imagen para reemplazarla
                         </p>
                         {mode === 'edit' && (
-                          <div className="flex gap-2 justify-center">
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => {
-                                e.stopPropagation();
-                                handleFileChange(
-                                  'outboundImage',
-                                  e.target.files?.[0] || null
-                                );
-                              }}
-                              className="hidden"
-                              id="change-outbound-image"
-                            />
+                          <div className="flex justify-center">
                             <Button
                               type="button"
                               variant="outline"
-                              className="border-border text-foreground hover:bg-accent"
+                              className="border-destructive text-destructive hover:bg-destructive/10"
                               size="sm"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                document.getElementById('change-outbound-image')?.click();
-                              }}
+                              onClick={() => handleRemoveImage('outbound')}
                             >
-                              <Upload className="h-4 w-4 mr-2" />
-                              Cambiar imagen
+                              <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                              Remover imagen
                             </Button>
                           </div>
                         )}
@@ -354,12 +388,12 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
                         </Button>
                       )}
                     </div>
-                  ) : mode === 'edit' && hasReturnImage && editingRoute?.returnImageUrl ? (
+                  ) : mode === 'edit' && hasReturnImage ? (
+                    // Mostrar imagen existente con botón eliminar
                     <div className="space-y-4">
-                      {/* Mostrar imagen existente de la ruta */}
                       <div className="flex justify-center">
                         <img
-                          src={`${editingRoute.returnImageUrl}?t=${Date.now()}`}
+                          src={`http://localhost:8080/api/v1/routes/${id}/images/return?t=${Date.now()}`}
                           alt="Imagen actual de vuelta"
                           className="max-h-40 max-w-full object-contain rounded-lg shadow-sm"
                           onError={(e) => {
@@ -384,33 +418,18 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
                           Puedes seleccionar una nueva imagen para reemplazarla
                         </p>
                         {mode === 'edit' && (
-                          <div className="flex gap-2 justify-center">
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => {
-                                e.stopPropagation();
-                                handleFileChange(
-                                  'returnImage',
-                                  e.target.files?.[0] || null
-                                );
-                              }}
-                              className="hidden"
-                              id="change-return-image"
-                            />
+                          <div className="flex justify-center">
                             <Button
                               type="button"
                               variant="outline"
-                              className="border-border text-foreground hover:bg-accent"
+                              className="border-destructive text-destructive hover:bg-destructive/10"
                               size="sm"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                document.getElementById('change-return-image')?.click();
-                              }}
+                              onClick={() => handleRemoveImage('return')}
                             >
-                              <Upload className="h-4 w-4 mr-2" />
-                              Cambiar imagen
+                              <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                              Eliminar imagen
                             </Button>
                           </div>
                         )}

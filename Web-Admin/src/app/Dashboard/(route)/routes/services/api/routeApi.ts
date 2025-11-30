@@ -13,7 +13,10 @@ const apiClient = new ApiClient("http://localhost:8080");
 
 export class RoutesApi {
   static async getAllRoutes(): Promise<CrudResponse<RouteResponse[]>> {
-    return apiClient.get<CrudResponse<RouteResponse[]>>(API_ENDPOINTS.ROUTES);
+    console.log('[RoutesApi] getAllRoutes called - endpoint:', API_ENDPOINTS.ROUTES);
+    const result = await apiClient.get<CrudResponse<RouteResponse[]>>(API_ENDPOINTS.ROUTES);
+    console.log('[RoutesApi] getAllRoutes response:', result);
+    return result;
   }
 
   static async getRouteById(
@@ -36,9 +39,11 @@ export class RoutesApi {
 
   static async updateRoute(
     id: number,
-    routeData: CompleteRouteData
+    routeData: CompleteRouteData,
+    deleteOutboundImage?: boolean,
+    deleteReturnImage?: boolean
   ): Promise<CrudResponse<RouteResponse>> {
-    const formData = this.createFormData(routeData);
+    const formData = this.createFormData(routeData, deleteOutboundImage, deleteReturnImage);
 
     return apiClient.putFormData<CrudResponse<RouteResponse>>(
       `${API_ENDPOINTS.ROUTES}/${id}`,
@@ -49,6 +54,15 @@ export class RoutesApi {
   static async deleteRoute(id: number): Promise<CrudResponse<void>> {
     return apiClient.delete<CrudResponse<void>>(
       `${API_ENDPOINTS.ROUTES}/${id}`
+    );
+  }
+
+  static async deleteRouteImage(
+    routeId: number,
+    imageType: "outbound" | "return"
+  ): Promise<CrudResponse<void>> {
+    return apiClient.delete<CrudResponse<void>>(
+      `${API_ENDPOINTS.ROUTES}/${routeId}/images/${imageType}`
     );
   }
 
@@ -63,7 +77,7 @@ export class RoutesApi {
     );
   }
 
-  private static createFormData(routeData: CompleteRouteData): FormData {
+  private static createFormData(routeData: CompleteRouteData, deleteOutboundImage?: boolean, deleteReturnImage?: boolean): FormData {
     const formData = new FormData();
 
     const waypointsGeometry: RouteWaypointRequest[] = [
@@ -110,6 +124,14 @@ export class RoutesApi {
     formData.append("description", routeData.description);
     formData.append("totalDistance", routeData.totalDistance.toString());
     formData.append("waypoints", JSON.stringify(waypointList));
+
+    // Agregar flags de eliminación si es necesario
+    if (deleteOutboundImage) {
+      formData.append("deleteOutboundImage", "true");
+    }
+    if (deleteReturnImage) {
+      formData.append("deleteReturnImage", "true");
+    }
 
     if (routeData.outboundImage) {
       formData.append("outboundImage", routeData.outboundImage);

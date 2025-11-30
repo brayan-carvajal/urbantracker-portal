@@ -242,14 +242,12 @@ export function useVehicles(): UseVehiculesReturn {
 
     if (editingVehicle) {
       console.log("Actualizando vehículo:", formData);
+
       savedVehicle = await vehicleService.update(editingVehicle.id, formData);
       console.log("Vehículo actualizado:", savedVehicle);
 
-      setVehicles((prev) =>
-        prev.map((vehicle) =>
-          vehicle.id === editingVehicle.id ? savedVehicle : vehicle
-        )
-      );
+      // Recargar la lista para asegurar que se actualice correctamente
+      await loadVehicles();
     } else {
       console.log("Creando vehículo:", formData);
       savedVehicle = await vehicleService.create(formData);
@@ -309,6 +307,9 @@ export function useVehicles(): UseVehiculesReturn {
       setIsDeleting(false);
     }
   }, [vehicleToDelete, isDeleting, closeDeleteModal, loadVehicles]);
+
+
+
 
   return {
 

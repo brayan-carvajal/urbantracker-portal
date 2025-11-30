@@ -43,7 +43,7 @@ export class VehiclesApi {
 
   static async updateVehicle(id: number, vehicleData: VehiculeFormData): Promise<CrudResponse<Vehicle>> {
     const formData = new FormData();
-    
+
     // Add basic vehicle data
     formData.append('licencePlate', vehicleData.licencePlate);
     formData.append('brand', vehicleData.brand);
@@ -59,16 +59,22 @@ export class VehiclesApi {
       formData.append('vehicleTypeId', vehicleData.vehicleTypeId.toString());
     }
     formData.append('inService', (vehicleData.inService ?? false).toString());
-    
+
+    // Add image operation flags
+    if (vehicleData.deleteOutboundImage) {
+      formData.append('deleteOutboundImage', 'true');
+    }
+
     // Add image files if they exist
     if (vehicleData.outboundImage) {
       formData.append('outboundImage', vehicleData.outboundImage);
     }
-    
+
     return apiClient.putFormData<CrudResponse<Vehicle>>(`${API_ENDPOINTS.VEHICLES_WITH_FILES}/${id}`, formData);
   }
 
   static async deleteVehicle(id: number): Promise<CrudResponse<void>> {
     return apiClient.delete<CrudResponse<void>>(`${API_ENDPOINTS.VEHICLES}/${id}`);
   }
+
 }

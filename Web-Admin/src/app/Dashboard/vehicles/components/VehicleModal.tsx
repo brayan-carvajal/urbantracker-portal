@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +14,7 @@ import type {
   VehicleType,
   Vehicle,
 } from "../types/vehiculeTypes";
-import { Loader2, Upload, Car } from "lucide-react";
+import { Loader2, Upload, Car, Trash2 } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -60,57 +60,62 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
   onClose,
   onSave,
   onFormChange,
+  isSaving,
+  errors,
   companies,
   vehicleTypes,
 }) => {
+  const [localHasImage, setLocalHasImage] = useState(editingVehicle?.hasOutboundImage || false);
+
+  // Update local state when editingVehicle changes
+  useEffect(() => {
+    setLocalHasImage(editingVehicle?.hasOutboundImage || false);
+  }, [editingVehicle?.hasOutboundImage]);
+
   const handleFileChange = (field: 'outboundImage', file: File | null) => {
     onFormChange(field, file);
   };
-  const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleRemoveImage = () => {
+    setLocalHasImage(false); // Hide image and show file selector
+  };
 
   const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
-
+    // Los errores se manejan desde el hook padre ahora
+    // Esta función solo valida y retorna si es válido
     if (!formData.licencePlate.trim()) {
-      newErrors.licencePlate = "Número de matrícula requerido";
+      return false;
     } else if (formData.licencePlate.trim().length < 4) {
-      newErrors.licencePlate =
-        "Número de matrícula debe tener al menos 4 caracteres";
+      return false;
     } else if (!/^[A-Z]{3}-\d{3}$/.test(formData.licencePlate.trim())) {
-      newErrors.licencePlate = "Número de matrícula debe tener formato AAA-123";
+      return false;
     }
 
-    if (!formData.brand.trim()) {
-      newErrors.brand = "Marca requerida";
-    } else if (formData.brand.trim().length < 2) {
-      newErrors.brand = "Marca debe tener al menos 2 caracteres";
+    if (!formData.brand.trim() || formData.brand.trim().length < 2) {
+      return false;
     }
 
-    if (!formData.model.trim()) {
-      newErrors.model = "Modelo requerido";
-    } else if (formData.model.trim().length < 2) {
-      newErrors.model = "Modelo debe tener al menos 2 caracteres";
+    if (!formData.model.trim() || formData.model.trim().length < 2) {
+      return false;
     }
 
     if (!formData.companyId || formData.companyId === 0) {
-      newErrors.companyId = "Compañía requerida";
+      return false;
     }
 
     if (!formData.vehicleTypeId || formData.vehicleTypeId === 0) {
-      newErrors.vehicleTypeId = "Tipo de vehículo requerido";
+      return false;
     }
 
     if (formData.year <= 0) {
-      newErrors.year = "Año debe ser mayor a 0";
+      return false;
     }
 
     if (formData.passengerCapacity <= 0) {
-      newErrors.passengerCapacity = "Capacidad debe ser mayor a 0";
+      return false;
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return true;
   };
 
   const handleInputChange =
@@ -121,15 +126,6 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
           ? Number(event.target.value)
           : event.target.value;
       onFormChange(field, value);
-
-      // Clear error when user starts typing
-      if (errors[field as string]) {
-        setErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors[field as string];
-          return newErrors;
-        });
-      }
     };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -137,14 +133,12 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
 
     if (!validateForm()) return;
 
-    setIsLoading(true);
+    // El estado de carga se maneja desde el hook padre
     try {
       await onSave();
     } catch (error) {
-      console.error("Error cargando conductores:", error);
+      console.error("Error guardando vehículo:", error);
       // You can add a toast notification here
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -191,7 +185,7 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                     onChange={handleInputChange("licencePlate")}
                     className="bg-input border-border text-foreground h-12 text-base"
                     placeholder="ABC-123"
-                    disabled={isLoading}
+                    disabled={isSaving}
                   />
                   {errors.licencePlate && (
                     <p className="text-sm text-destructive font-medium">{errors.licencePlate}</p>
@@ -236,7 +230,7 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                     onChange={handleInputChange("brand")}
                     className="bg-input border-border text-foreground h-12 text-base"
                     placeholder="Volvo, Mercedes, Scania..."
-                    disabled={isLoading}
+                    disabled={isSaving}
                   />
                   {errors.brand && (
                     <p className="text-sm text-destructive font-medium">{errors.brand}</p>
@@ -254,7 +248,7 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                     onChange={handleInputChange("model")}
                     className="bg-input border-border text-foreground h-12 text-base"
                     placeholder="FH16, Sprinter, etc."
-                    disabled={isLoading}
+                    disabled={isSaving}
                   />
                   {errors.model && (
                     <p className="text-sm text-destructive font-medium">{errors.model}</p>
@@ -316,7 +310,7 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                     placeholder="2023"
                     min="1900"
                     max="2030"
-                    disabled={isLoading}
+                    disabled={isSaving}
                   />
                   {errors.year && (
                     <p className="text-sm text-destructive font-medium">{errors.year}</p>
@@ -334,7 +328,7 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                     onChange={handleInputChange("color")}
                     className="bg-input border-border text-foreground h-12 text-base"
                     placeholder="Rojo, azul, blanco..."
-                    disabled={isLoading}
+                    disabled={isSaving}
                   />
                 </div>
               </div>
@@ -354,7 +348,7 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                     placeholder="10"
                     min="1"
                     max="100"
-                    disabled={isLoading}
+                    disabled={isSaving}
                   />
                   {errors.passengerCapacity && (
                     <p className="text-sm text-destructive font-medium">{errors.passengerCapacity}</p>
@@ -401,7 +395,7 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                       checked={formData.inService ?? false}
                       onChange={(e) => onFormChange("inService", e.target.checked)}
                       className="h-5 w-5 text-primary border-border rounded focus:ring-primary focus:ring-2"
-                      disabled={isLoading}
+                      disabled={isSaving}
                     />
                     <Label htmlFor="inService" className="text-foreground font-medium cursor-pointer">
                       En servicio activo
@@ -462,12 +456,12 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                             Remover imagen
                           </Button>
                         </div>
-                      ) : isEditing && editingVehicle?.hasOutboundImage ? (
+                      ) : isEditing && editingVehicle && localHasImage ? (
                         <div className="space-y-4">
                           {/* Mostrar imagen existente del vehículo */}
                           <div className="flex justify-center">
                             <img
-                              src={`http://localhost:8080/api/v1/vehicles/${editingVehicle.id}/images/outbound?t=${Date.now()}`}
+                              src={`http://localhost:8080/api/v1/vehicles/${editingVehicle.id}/images/outbound?t=${Date.now()}-${editingVehicle.hasOutboundImage}`}
                               alt="Imagen actual del vehículo"
                               className="max-h-40 max-w-full object-contain rounded-lg shadow-sm"
                               onError={(e) => {
@@ -488,38 +482,17 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                             <p className="text-sm text-muted-foreground font-medium">
                               Imagen actual del vehículo
                             </p>
-                            <p className="text-xs text-muted-foreground">
-                              Puedes seleccionar una nueva imagen para reemplazarla
-                            </p>
-                            <div className="flex gap-2 justify-center">
-                              <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => {
-                                  e.stopPropagation();
-                                  handleFileChange(
-                                    "outboundImage",
-                                    e.target.files?.[0] || null
-                                  );
-                                }}
-                                className="hidden"
-                                id="change-image"
-                              />
-                              <Button
-                                type="button"
-                                variant="outline"
-                                className="border-border text-foreground hover:bg-accent"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  document.getElementById('change-image')?.click();
-                                }}
-                              >
-                                <Upload className="h-4 w-4 mr-2" />
-                                Cambiar imagen
-                              </Button>
-                            </div>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="border-destructive/50 text-destructive hover:bg-destructive/10"
+                              size="sm"
+                              onClick={handleRemoveImage}
+                              disabled={isSaving}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Remover imagen
+                            </Button>
                           </div>
                         </div>
                       ) : (
@@ -546,10 +519,10 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                             className="hidden"
                             id="outbound-image"
                           />
-                          <Button 
+                          <Button
                             type="button"
-                            variant="outline" 
-                            className="border-border text-foreground hover:bg-accent" 
+                            variant="outline"
+                            className="border-border text-foreground hover:bg-accent"
                             size="sm"
                             onClick={(e) => {
                               e.preventDefault();
@@ -593,16 +566,16 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                   variant="outline"
                   onClick={onClose}
                   className="w-full sm:w-auto border-border text-foreground hover:bg-accent transition-colors h-12 text-base font-medium"
-                  disabled={isLoading}
+                  disabled={isSaving}
                 >
                   Cancelar
                 </Button>
                 <Button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={isSaving}
                   className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground transition-colors h-12 text-base font-medium"
                 >
-                  {isLoading && <Loader2 className="h-5 w-5 mr-2 animate-spin" />}
+                  {isSaving && <Loader2 className="h-5 w-5 mr-2 animate-spin" />}
                   {isEditing ? "Actualizar Vehículo" : "Crear Vehículo"}
                 </Button>
               </div>

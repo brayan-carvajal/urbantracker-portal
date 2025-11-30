@@ -18,22 +18,6 @@ export function RouteCard({ route, onEdit, onDelete }: RouteCardProps) {
       : "bg-destructive text-destructive-foreground hover:bg-destructive/90"
   }
 
-  // Función para corregir URLs de imágenes que apuntan al frontend en lugar del backend
-  const getCorrectedImageUrl = (imageUrl: string | undefined): string | undefined => {
-    if (!imageUrl) return undefined;
-
-    // Si la URL contiene localhost:3000 (frontend), convertirla a localhost:8080 (backend)
-    if (imageUrl.includes('localhost:3000')) {
-      return imageUrl.replace('localhost:3000', 'localhost:8080');
-    }
-
-    // Si la URL es relativa (empieza con /), convertirla a URL absoluta del backend
-    if (imageUrl.startsWith('/')) {
-      return `http://localhost:8080${imageUrl}`;
-    }
-
-    return imageUrl;
-  }
 
   return (
     <Card className="bg-card border-border hover:bg-accent transition-all duration-300 hover:scale-[1.02]">
@@ -45,18 +29,17 @@ export function RouteCard({ route, onEdit, onDelete }: RouteCardProps) {
             <div className="w-16 h-16">
               {route.outboundImageUrl ? (
                 <img
-                  src={getCorrectedImageUrl(route.outboundImageUrl)}
-                  alt={`Imagen de ida - Ruta ${route.numberRoute}`}
+                  src={`${route.outboundImageUrl}?t=${Date.now()}`}
+                  alt="Imagen de ida"
                   className="w-full h-full object-cover rounded-lg border border-border"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
-                    // Show fallback icon when image fails
                     const parent = target.parentElement;
-                    if (parent && !parent.querySelector('.fallback-icon-outbound')) {
+                    if (parent && !parent.querySelector('.fallback-icon')) {
                       const fallbackDiv = document.createElement('div');
-                      fallbackDiv.className = 'fallback-icon-outbound w-full h-full flex items-center justify-center bg-primary/10 rounded-lg border border-border';
-                      fallbackDiv.innerHTML = '<svg class="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 20 20"><path d="M9 20l-1-3H5l-1 3H1l4-6V9h2v5l4 6H9z"/><path d="M13 2v6h2V4h3V2h-5z"/></svg>';
+                      fallbackDiv.className = 'fallback-icon w-full h-full bg-primary/10 rounded-lg border border-border flex items-center justify-center';
+                      fallbackDiv.innerHTML = '<svg class="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 20 20"><path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"/></svg>';
                       parent.appendChild(fallbackDiv);
                     }
                   }}
@@ -72,18 +55,17 @@ export function RouteCard({ route, onEdit, onDelete }: RouteCardProps) {
             <div className="w-16 h-16">
               {route.returnImageUrl ? (
                 <img
-                  src={getCorrectedImageUrl(route.returnImageUrl)}
-                  alt={`Imagen de vuelta - Ruta ${route.numberRoute}`}
+                  src={`${route.returnImageUrl}?t=${Date.now()}`}
+                  alt="Imagen de vuelta"
                   className="w-full h-full object-cover rounded-lg border border-border"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
-                    // Show fallback icon when image fails
                     const parent = target.parentElement;
-                    if (parent && !parent.querySelector('.fallback-icon-return')) {
+                    if (parent && !parent.querySelector('.fallback-icon')) {
                       const fallbackDiv = document.createElement('div');
-                      fallbackDiv.className = 'fallback-icon-return w-full h-full flex items-center justify-center bg-primary/10 rounded-lg border border-border';
-                      fallbackDiv.innerHTML = '<svg class="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 20 20"><path d="M9 20l-1-3H5l-1 3H1l4-6V9h2v5l4 6H9z"/><path d="M13 2v6h2V4h3V2h-5z"/></svg>';
+                      fallbackDiv.className = 'fallback-icon w-full h-full bg-primary/10 rounded-lg border border-border flex items-center justify-center';
+                      fallbackDiv.innerHTML = '<svg class="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 20 20"><path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"/></svg>';
                       parent.appendChild(fallbackDiv);
                     }
                   }}
