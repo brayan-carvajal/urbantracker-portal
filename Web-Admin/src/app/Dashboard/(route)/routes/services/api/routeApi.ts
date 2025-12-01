@@ -77,7 +77,7 @@ export class RoutesApi {
     );
   }
 
-  private static createFormData(routeData: CompleteRouteData, deleteOutboundImage?: boolean, deleteReturnImage?: boolean): FormData {
+  private static createFormData(routeData: CompleteRouteData, deleteOutboundImage: boolean = false, deleteReturnImage: boolean = false): FormData {
     const formData = new FormData();
 
     const waypointsGeometry: RouteWaypointRequest[] = [
@@ -125,7 +125,7 @@ export class RoutesApi {
     formData.append("totalDistance", routeData.totalDistance.toString());
     formData.append("waypoints", JSON.stringify(waypointList));
 
-    // Agregar flags de eliminación si es necesario
+    // Agregar flags de eliminación solo si son true
     if (deleteOutboundImage) {
       formData.append("deleteOutboundImage", "true");
     }

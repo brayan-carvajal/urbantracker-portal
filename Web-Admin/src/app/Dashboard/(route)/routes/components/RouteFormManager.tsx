@@ -87,6 +87,14 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
 
   const handleFileChange = (field: 'outboundImage' | 'returnImage', file: File | null) => {
     updateFormData(field, file);
+    // Si se selecciona una nueva imagen, limpiar los flags de eliminación
+    if (file) {
+      if (field === 'outboundImage') {
+        setDeleteOutboundImage(false);
+      } else {
+        setDeleteReturnImage(false);
+      }
+    }
   };
 
   const handleRemoveImage = (imageType: 'outbound' | 'return') => {
