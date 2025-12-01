@@ -37,9 +37,15 @@ const MapEditor: React.FC<MapEditorProps> = ({
 
   // Initialize with initial data
   useEffect(() => {
-    if (initialWaypoints.length > 0 && waypointList.length === 0) {
+    // Reset waypoint list and geometry when routeType changes
+    setWaypointList([]);
+    setRouteGeometry(null);
+    setRouteGeometryReturn(null);
+
+    if (initialWaypoints.length > 0) {
       setWaypointList(initialWaypoints);
     }
+
     if (initialGeometry) {
       if (routeType === 'outbound') {
         setRouteGeometry(initialGeometry);
@@ -58,7 +64,7 @@ const MapEditor: React.FC<MapEditorProps> = ({
     } else {
       setDisplayMode('VIEW');
     }
-  }, [initialWaypoints, initialGeometry, routeType, waypointList.length, setWaypointList, setRouteGeometry, setRouteGeometryReturn, setDisplayMode]);
+  }, [initialWaypoints, initialGeometry, routeType, setWaypointList, setRouteGeometry, setRouteGeometryReturn, setDisplayMode]);
 
   const handleSave = async () => {
     if (waypointList.length < 2) {

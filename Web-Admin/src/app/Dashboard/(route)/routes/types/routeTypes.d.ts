@@ -37,6 +37,8 @@ export interface RouteResponse {
   waypoints: number;
   outboundImageUrl?: string;
   returnImageUrl?: string;
+  hasOutboundImage: boolean;
+  hasReturnImage: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -49,6 +51,8 @@ export interface RouteDetailsResponse {
   totalDistance: number;
   outboundImageUrl?: string;
   returnImageUrl?: string;
+  hasOutboundImage: boolean;
+  hasReturnImage: boolean;
   waypoints: RouteWaypointResponse[];
 }
 

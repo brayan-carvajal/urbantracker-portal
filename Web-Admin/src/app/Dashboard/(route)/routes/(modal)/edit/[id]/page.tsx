@@ -15,6 +15,10 @@ export default function EditRoutePage() {
     router.push("/Dashboard/routes");
   };
 
+  const handleSuccess = () => {
+    router.push("/Dashboard/routes?refresh=true");
+  };
+
   const { updateRoute } = useRouteService();
 
 
@@ -31,7 +35,7 @@ export default function EditRoutePage() {
     <div className="min-h-screen bg-background p-4">
       <RouteFormManager
         onSave={handleSave}
-        onSuccess={handleClose}
+        onSuccess={handleSuccess}
         onClose={handleClose}
         mode="edit"
         id={id as string}

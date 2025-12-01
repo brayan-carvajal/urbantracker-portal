@@ -63,8 +63,8 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
         if (res.data) {
           setInitialData(res.data);
           // Set existing image flags based on loaded data
-          setHasOutboundImage(!!res.data.outboundImageUrl);
-          setHasReturnImage(!!res.data.returnImageUrl);
+          setHasOutboundImage(res.data.hasOutboundImage);
+          setHasReturnImage(res.data.hasReturnImage);
         }
       });
     }
@@ -78,8 +78,8 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
       updateFormData('description', editingRoute.description || '');
 
       // Set existing image flags
-      setHasOutboundImage(!!editingRoute.outboundImageUrl);
-      setHasReturnImage(!!editingRoute.returnImageUrl);
+      setHasOutboundImage(editingRoute.hasOutboundImage);
+      setHasReturnImage(editingRoute.hasReturnImage);
 
       // TODO: Load waypoints and geometries from editingRoute
     }
@@ -102,13 +102,13 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
     if (imageType === 'outbound') {
       setHasOutboundImage(false);
       // Si había imagen existente, marcar para eliminar
-      if (editingRoute?.outboundImageUrl) {
+      if (editingRoute?.hasOutboundImage) {
         setDeleteOutboundImage(true);
       }
     } else {
       setHasReturnImage(false);
       // Si había imagen existente, marcar para eliminar
-      if (editingRoute?.returnImageUrl) {
+      if (editingRoute?.hasReturnImage) {
         setDeleteReturnImage(true);
       }
     }
@@ -120,6 +120,21 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
     const completeData = getCompleteRouteData();
     if (!completeData) {
       setErrors(['Complete todos los campos requeridos y ambas rutas']);
+      return;
+    }
+
+    // ✅ VALIDACIÓN: Ambas imágenes son obligatorias
+    const hasOutboundImageValid = formData.outboundImage !== null ||
+                                 (mode === 'edit' && hasOutboundImage && !deleteOutboundImage);
+    const hasReturnImageValid = formData.returnImage !== null ||
+                               (mode === 'edit' && hasReturnImage && !deleteReturnImage);
+
+    if (!hasOutboundImageValid) {
+      setErrors(['La imagen de ida es obligatoria para la ruta.']);
+      return;
+    }
+    if (!hasReturnImageValid) {
+      setErrors(['La imagen de vuelta es obligatoria para la ruta.']);
       return;
     }
 
@@ -137,15 +152,19 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
 
       // After successful update in edit mode, reload route data to update local state
       if (mode === 'edit' && id) {
+        // Reset image states immediately to prevent showing deleted images during reload
+        setHasOutboundImage(false);
+        setHasReturnImage(false);
+        // Reset delete flags
+        setDeleteOutboundImage(false);
+        setDeleteReturnImage(false);
+
         const res = await getRouteById(parseInt(id), 'WAYPOINT');
         if (res.data) {
           setInitialData(res.data);
           // Update image states based on the updated route data
-          setHasOutboundImage(!!res.data.outboundImageUrl);
-          setHasReturnImage(!!res.data.returnImageUrl);
-          // Reset delete flags
-          setDeleteOutboundImage(false);
-          setDeleteReturnImage(false);
+          setHasOutboundImage(res.data.hasOutboundImage);
+          setHasReturnImage(res.data.hasReturnImage);
         }
       }
 
@@ -223,12 +242,17 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
 
           {/* Images */}
           <div className="bg-muted/30 p-4 rounded-lg border border-border">
-            <h2 className="text-xl font-semibold mb-4 text-foreground">Imágenes de Referencia</h2>
+            <h2 className="text-xl font-semibold mb-4 text-foreground">
+              Imágenes de Referencia <span className="text-destructive">*</span>
+            </h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Ambas imágenes (de ida y vuelta) son obligatorias para la ruta.
+            </p>
 
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-muted-foreground mb-2">
-                  Imagen de Ida
+                  Imagen de Ida <span className="text-destructive">*</span>
                 </label>
                 <div className="border-2 border-dashed border-border rounded-xl p-6 text-center min-h-[200px] flex flex-col justify-center bg-accent/10 hover:bg-accent/20 transition-colors">
                   {formData.outboundImage ? (
@@ -359,7 +383,7 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
 
               <div>
                 <label className="block text-sm font-medium text-muted-foreground mb-2">
-                  Imagen de Vuelta
+                  Imagen de Vuelta <span className="text-destructive">*</span>
                 </label>
                 <div className="border-2 border-dashed border-border rounded-xl p-6 text-center min-h-[200px] flex flex-col justify-center bg-accent/10 hover:bg-accent/20 transition-colors">
                   {formData.returnImage ? (
@@ -613,7 +637,9 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
             <MapEditor
               mode={mode === 'view' ? 'view' : currentView === 'both' ? 'view' : 'edit'}
               routeType={currentView}
-              initialWaypoints={[...outboundRoute.waypoints, ...returnRoute.waypoints]}
+              initialWaypoints={currentView === 'outbound' ? outboundRoute.waypoints :
+                               currentView === 'return' ? returnRoute.waypoints :
+                               [...outboundRoute.waypoints, ...returnRoute.waypoints]}
               initialGeometry={currentView === 'outbound' ? (outboundRoute.geometry ?? undefined) :
                               currentView === 'return' ? (returnRoute.geometry ?? undefined) : undefined}
               onSave={(waypoints, geometry) => {

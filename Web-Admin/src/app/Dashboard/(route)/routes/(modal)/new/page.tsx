@@ -13,6 +13,10 @@ export default function NewRoutePage() {
     router.push("/Dashboard/routes");
   };
 
+  const handleSuccess = () => {
+    router.push("/Dashboard/routes?refresh=true");
+  };
+
   const { createRouteWithImages } = useRouteService();
 
 
@@ -29,7 +33,7 @@ export default function NewRoutePage() {
     <div className="min-h-screen bg-background p-4">
       <RouteFormManager
         onSave={handleSave}
-        onSuccess={() => router.push("/Dashboard/routes")}
+        onSuccess={handleSuccess}
         onClose={handleClose}
         mode="create"
       />

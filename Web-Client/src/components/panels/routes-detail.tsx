@@ -199,8 +199,29 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
           {/* Imagen y datos de inicio */}
           <div className="flex flex-col items-center">
-            <div className="w-24 h-24 flex items-center justify-center bg-muted rounded-lg">
-              <Bus className="h-8 w-8 text-muted-foreground" />
+            <div className="w-24 h-24">
+              {fullRoute.imageStart ? (
+                <img
+                  src={`http://localhost:8080/api/v1/route/${fullRoute.id}/images/outbound?t=${Date.now()}`}
+                  alt="Imagen de ida"
+                  className="w-full h-full object-cover rounded-lg border border-border"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    const parent = target.parentElement;
+                    if (parent && !parent.querySelector('.fallback-icon')) {
+                      const fallbackDiv = document.createElement('div');
+                      fallbackDiv.className = 'fallback-icon w-full h-full bg-muted rounded-lg border border-border flex items-center justify-center';
+                      fallbackDiv.innerHTML = '<svg class="h-8 w-8 text-muted-foreground" fill="currentColor" viewBox="0 0 20 20"><path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"/></svg>';
+                      parent.appendChild(fallbackDiv);
+                    }
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full bg-muted rounded-lg border border-border flex items-center justify-center">
+                  <Bus className="h-8 w-8 text-muted-foreground" />
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-1 mt-2">
               <span className="bg-primary w-3 h-3 rounded-full" />
@@ -210,8 +231,29 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
           </div>
           {/* Imagen y datos de fin */}
           <div className="flex flex-col items-center">
-            <div className="w-24 h-24 flex items-center justify-center bg-muted rounded-lg">
-              <Bus className="h-8 w-8 text-muted-foreground" />
+            <div className="w-24 h-24">
+              {fullRoute.imageEnd ? (
+                <img
+                  src={`http://localhost:8080/api/v1/route/${fullRoute.id}/images/return?t=${Date.now()}`}
+                  alt="Imagen de vuelta"
+                  className="w-full h-full object-cover rounded-lg border border-border"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    const parent = target.parentElement;
+                    if (parent && !parent.querySelector('.fallback-icon')) {
+                      const fallbackDiv = document.createElement('div');
+                      fallbackDiv.className = 'fallback-icon w-full h-full bg-muted rounded-lg border border-border flex items-center justify-center';
+                      fallbackDiv.innerHTML = '<svg class="h-8 w-8 text-muted-foreground" fill="currentColor" viewBox="0 0 20 20"><path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"/></svg>';
+                      parent.appendChild(fallbackDiv);
+                    }
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full bg-muted rounded-lg border border-border flex items-center justify-center">
+                  <Bus className="h-8 w-8 text-muted-foreground" />
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-1 mt-2">
               <span className="bg-secondary w-3 h-3 rounded-full" />

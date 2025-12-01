@@ -27,9 +27,9 @@ export function RouteCard({ route, onEdit, onDelete }: RouteCardProps) {
           <div className="flex-shrink-0 flex gap-2">
             {/* Outbound Image */}
             <div className="w-16 h-16">
-              {route.outboundImageUrl ? (
+              {route.hasOutboundImage ? (
                 <img
-                  src={`${route.outboundImageUrl}?t=${Date.now()}`}
+                  src={`http://localhost:8080/api/v1/routes/${route.id}/images/outbound?t=${Date.now()}`}
                   alt="Imagen de ida"
                   className="w-full h-full object-cover rounded-lg border border-border"
                   onError={(e) => {
@@ -53,9 +53,9 @@ export function RouteCard({ route, onEdit, onDelete }: RouteCardProps) {
 
             {/* Return Image */}
             <div className="w-16 h-16">
-              {route.returnImageUrl ? (
+              {route.hasReturnImage ? (
                 <img
-                  src={`${route.returnImageUrl}?t=${Date.now()}`}
+                  src={`http://localhost:8080/api/v1/routes/${route.id}/images/return?t=${Date.now()}`}
                   alt="Imagen de vuelta"
                   className="w-full h-full object-cover rounded-lg border border-border"
                   onError={(e) => {
