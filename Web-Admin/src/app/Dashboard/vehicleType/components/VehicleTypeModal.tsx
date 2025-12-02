@@ -57,7 +57,15 @@ const VehicleTypeModal: React.FC<VehicleTypeModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-card text-foreground max-w-2xl border-border">
+      <DialogContent 
+        className="bg-card text-foreground max-w-2xl border-border"
+        aria-describedby="vehicletype-modal-description"
+      >
+        {/* Hidden description for accessibility */}
+        <div id="vehicletype-modal-description" className="sr-only">
+          Formulario para crear o editar tipos de vehículos
+        </div>
+        
         <DialogHeader>
           <DialogTitle className="text-foreground">
             {isEditing ? "Editar Tipo de Vehículo" : "Nuevo Tipo de Vehículo"}

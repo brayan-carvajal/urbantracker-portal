@@ -6,6 +6,14 @@ import type { FeatureCollection } from "geojson";
 import { useRouteMapEditor } from "../../context/RouteMapEditorContext";
 import { useTheme } from "@/hooks/useTheme";
 
+// Transform request to block Mapbox telemetry
+const transformRequest = (url: string, resourceType?: string) => {
+  if (resourceType === 'Tile' && url.indexOf('events.mapbox.com') > -1) {
+    return { url: '' };
+  }
+  return { url };
+};
+
 export default function MapView() {
   const {
     waypointList,
@@ -221,6 +229,7 @@ export default function MapView() {
         mapStyle={currentMapStyle}
         onLoad={getRoute}
         onClick={handleClickMap}
+        transformRequest={transformRequest}
       >
         {/* Mostrar outbound (ida) si displayMode permite */}
         {(displayMode === "OUTBOUND" || displayMode === "BOTH") &&
@@ -306,3 +315,4 @@ export default function MapView() {
     </div>
   );
 }
+

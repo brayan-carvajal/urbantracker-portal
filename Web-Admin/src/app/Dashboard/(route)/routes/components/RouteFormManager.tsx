@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Save, Upload, MapPin, Eye, Edit, CheckCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +13,7 @@ import { useRouteService } from '../services/RouteServices';
 import { get } from 'http';
 
 interface RouteFormManagerProps {
-  onSave: (data: CompleteRouteData) => Promise<void>;
+  onSave: (data: CompleteRouteData, deleteOutboundImage?: boolean, deleteReturnImage?: boolean) => Promise<void>;
   onSuccess?: () => void;
   onClose?: () => void;
   editingRoute?: RouteResponse | null;
@@ -28,6 +29,8 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
   mode = 'create',
   id = ''
 }) => {
+  const router = useRouter();
+
   const {
     formData,
     outboundRoute,
@@ -46,11 +49,22 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
   const [errors, setErrors] = useState<string[]>([]);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  useEffect(() => { 
+  // Estado para imágenes existentes
+  const [hasOutboundImage, setHasOutboundImage] = useState(false);
+  const [hasReturnImage, setHasReturnImage] = useState(false);
+
+  // Estado para marcar imágenes para eliminar
+  const [deleteOutboundImage, setDeleteOutboundImage] = useState(false);
+  const [deleteReturnImage, setDeleteReturnImage] = useState(false);
+
+  useEffect(() => {
     if (id) {
       getRouteById(parseInt(id), 'WAYPOINT').then((res) => {
         if (res.data) {
           setInitialData(res.data);
+          // Set existing image flags based on loaded data
+          setHasOutboundImage(res.data.hasOutboundImage);
+          setHasReturnImage(res.data.hasReturnImage);
         }
       });
     }
@@ -62,12 +76,44 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
       // Load editing data
       updateFormData('numberRoute', editingRoute.numberRoute);
       updateFormData('description', editingRoute.description || '');
+
+      // Set existing image flags
+      setHasOutboundImage(editingRoute.hasOutboundImage);
+      setHasReturnImage(editingRoute.hasReturnImage);
+
       // TODO: Load waypoints and geometries from editingRoute
     }
   }, [editingRoute, mode, updateFormData]);
 
   const handleFileChange = (field: 'outboundImage' | 'returnImage', file: File | null) => {
     updateFormData(field, file);
+    // Si se selecciona una nueva imagen, limpiar los flags de eliminación
+    if (file) {
+      if (field === 'outboundImage') {
+        setDeleteOutboundImage(false);
+      } else {
+        setDeleteReturnImage(false);
+      }
+    }
+  };
+
+  const handleRemoveImage = (imageType: 'outbound' | 'return') => {
+    // Just hide the image and show file selector
+    if (imageType === 'outbound') {
+      setHasOutboundImage(false);
+      // Si había imagen existente, marcar para eliminar
+      if (editingRoute?.hasOutboundImage) {
+        setDeleteOutboundImage(true);
+      }
+    } else {
+      setHasReturnImage(false);
+      // Si había imagen existente, marcar para eliminar
+      if (editingRoute?.hasReturnImage) {
+        setDeleteReturnImage(true);
+      }
+    }
+    // Clear form data if it was set
+    updateFormData(imageType === 'outbound' ? 'outboundImage' : 'returnImage', null);
   };
 
   const handleSave = async () => {
@@ -77,12 +123,51 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
       return;
     }
 
+    // ✅ VALIDACIÓN: Ambas imágenes son obligatorias
+    const hasOutboundImageValid = formData.outboundImage !== null ||
+                                 (mode === 'edit' && hasOutboundImage && !deleteOutboundImage);
+    const hasReturnImageValid = formData.returnImage !== null ||
+                               (mode === 'edit' && hasReturnImage && !deleteReturnImage);
+
+    if (!hasOutboundImageValid) {
+      setErrors(['La imagen de ida es obligatoria para la ruta.']);
+      return;
+    }
+    if (!hasReturnImageValid) {
+      setErrors(['La imagen de vuelta es obligatoria para la ruta.']);
+      return;
+    }
+
     console.log(completeData.totalDistance)
 
     setIsLoading(true);
     setErrors([]);
     try {
-      await onSave(completeData);
+      // Pasar los flags de eliminación si estamos en modo edición
+      if (mode === 'edit') {
+        await onSave(completeData, deleteOutboundImage, deleteReturnImage);
+      } else {
+        await onSave(completeData);
+      }
+
+      // After successful update in edit mode, reload route data to update local state
+      if (mode === 'edit' && id) {
+        // Reset image states immediately to prevent showing deleted images during reload
+        setHasOutboundImage(false);
+        setHasReturnImage(false);
+        // Reset delete flags
+        setDeleteOutboundImage(false);
+        setDeleteReturnImage(false);
+
+        const res = await getRouteById(parseInt(id), 'WAYPOINT');
+        if (res.data) {
+          setInitialData(res.data);
+          // Update image states based on the updated route data
+          setHasOutboundImage(res.data.hasOutboundImage);
+          setHasReturnImage(res.data.hasReturnImage);
+        }
+      }
+
       setShowSuccessModal(true);
     } catch (error) {
       console.error('Error saving route:', error);
@@ -157,95 +242,272 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
 
           {/* Images */}
           <div className="bg-muted/30 p-4 rounded-lg border border-border">
-            <h2 className="text-xl font-semibold mb-4 text-foreground">Imágenes de Referencia</h2>
+            <h2 className="text-xl font-semibold mb-4 text-foreground">
+              Imágenes de Referencia <span className="text-destructive">*</span>
+            </h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Ambas imágenes (de ida y vuelta) son obligatorias para la ruta.
+            </p>
 
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-muted-foreground mb-2">
-                  Imagen de Ida
+                  Imagen de Ida <span className="text-destructive">*</span>
                 </label>
-                <div className="border-2 border-dashed border-border rounded-lg p-4 text-center bg-card">
+                <div className="border-2 border-dashed border-border rounded-xl p-6 text-center min-h-[200px] flex flex-col justify-center bg-accent/10 hover:bg-accent/20 transition-colors">
                   {formData.outboundImage ? (
-                    <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground">{formData.outboundImage.name}</p>
-                      {mode !== 'view' && (
-                        <button
+                    <div className="space-y-4">
+                      {/* Vista previa de la nueva imagen seleccionada */}
+                      <div className="flex justify-center">
+                        <img
+                          src={URL.createObjectURL(formData.outboundImage)}
+                          alt="Vista previa imagen de ida"
+                          className="max-h-40 max-w-full object-contain rounded-lg shadow-sm"
+                          onLoad={(e) => {
+                            // Liberar el objeto URL después de cargar la imagen
+                            URL.revokeObjectURL((e.target as HTMLImageElement).src);
+                          }}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground font-medium break-all">
+                          {formData.outboundImage.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Tamaño: {(formData.outboundImage.size / 1024).toFixed(1)} KB
+                        </p>
+                      </div>
+                      {(mode === 'create' || mode === 'edit') && (
+                        <Button
+                          type="button"
+                          variant="outline"
                           onClick={() => handleFileChange('outboundImage', null)}
-                          className="text-destructive hover:text-destructive/80 text-sm"
+                          className="text-destructive border-destructive/50 hover:bg-destructive/10"
+                          size="sm"
                         >
-                          Remover
-                        </button>
+                          Remover imagen
+                        </Button>
                       )}
                     </div>
+                  ) : mode === 'edit' && hasOutboundImage ? (
+                    // Mostrar imagen existente con botón eliminar
+                    <div className="space-y-4">
+                      <div className="flex justify-center">
+                        <img
+                          src={`http://localhost:8080/api/v1/routes/${id}/images/outbound?t=${Date.now()}`}
+                          alt="Imagen actual de ida"
+                          className="max-h-40 max-w-full object-contain rounded-lg shadow-sm"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            // Show fallback icon when image fails
+                            const parent = target.parentElement;
+                            if (parent && !parent.querySelector('.fallback-icon')) {
+                              const fallbackDiv = document.createElement('div');
+                              fallbackDiv.className = 'fallback-icon w-20 h-20 flex items-center justify-center bg-primary/10 rounded-lg border border-border';
+                              fallbackDiv.innerHTML = '<svg class="h-7 w-7 text-primary" fill="currentColor" viewBox="0 0 20 20"><path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"/></svg>';
+                              parent.appendChild(fallbackDiv);
+                            }
+                          }}
+                        />
+                      </div>
+                      <div className="space-y-3">
+                        <p className="text-sm text-muted-foreground font-medium">
+                          Imagen actual de ida
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Puedes seleccionar una nueva imagen para reemplazarla
+                        </p>
+                        {mode === 'edit' && (
+                          <div className="flex justify-center">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="border-destructive text-destructive hover:bg-destructive/10"
+                              size="sm"
+                              onClick={() => handleRemoveImage('outbound')}
+                            >
+                              <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                              Remover imagen
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   ) : (
-                    <>
-                      <Upload className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
-                      <p className="text-sm text-muted-foreground mb-2">Subir imagen de ida</p>
-                      {mode !== 'view' && (
+                    <div className="space-y-4">
+                      <Upload className="mx-auto h-10 w-10 text-muted-foreground" />
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground font-medium">
+                          Subir imagen de ida
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Formatos soportados: JPG, PNG, WebP
+                        </p>
+                      </div>
+                      {(mode === 'create' || mode === 'edit') && (
                         <input
                           type="file"
                           accept="image/*"
-                          onChange={(e) => handleFileChange('outboundImage', e.target.files?.[0] || null)}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            handleFileChange(
+                              'outboundImage',
+                              e.target.files?.[0] || null
+                            );
+                          }}
                           className="hidden"
                           id="outbound-image"
                         />
                       )}
                       <Button
-                        asChild
-                        variant={mode === 'view' ? 'secondary' : 'default'}
-                        disabled={mode === 'view'}
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                        type="button"
+                        variant="outline"
+                        className="border-border text-foreground hover:bg-accent"
+                        size="sm"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          document.getElementById('outbound-image')?.click();
+                        }}
                       >
-                        <label htmlFor="outbound-image" className="cursor-pointer">
-                          Seleccionar Archivo
-                        </label>
+                        <Upload className="h-4 w-4" />
+                        Seleccionar archivo
                       </Button>
-                    </>
+                    </div>
                   )}
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-muted-foreground mb-2">
-                  Imagen de Vuelta
+                  Imagen de Vuelta <span className="text-destructive">*</span>
                 </label>
-                <div className="border-2 border-dashed border-border rounded-lg p-4 text-center bg-card">
+                <div className="border-2 border-dashed border-border rounded-xl p-6 text-center min-h-[200px] flex flex-col justify-center bg-accent/10 hover:bg-accent/20 transition-colors">
                   {formData.returnImage ? (
-                    <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground">{formData.returnImage.name}</p>
-                      {mode !== 'view' && (
-                        <button
+                    <div className="space-y-4">
+                      {/* Vista previa de la nueva imagen seleccionada */}
+                      <div className="flex justify-center">
+                        <img
+                          src={URL.createObjectURL(formData.returnImage)}
+                          alt="Vista previa imagen de vuelta"
+                          className="max-h-40 max-w-full object-contain rounded-lg shadow-sm"
+                          onLoad={(e) => {
+                            // Liberar el objeto URL después de cargar la imagen
+                            URL.revokeObjectURL((e.target as HTMLImageElement).src);
+                          }}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground font-medium break-all">
+                          {formData.returnImage.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Tamaño: {(formData.returnImage.size / 1024).toFixed(1)} KB
+                        </p>
+                      </div>
+                      {(mode === 'create' || mode === 'edit') && (
+                        <Button
+                          type="button"
+                          variant="outline"
                           onClick={() => handleFileChange('returnImage', null)}
-                          className="text-destructive hover:text-destructive/80 text-sm"
+                          className="text-destructive border-destructive/50 hover:bg-destructive/10"
+                          size="sm"
                         >
-                          Remover
-                        </button>
+                          Remover imagen
+                        </Button>
                       )}
                     </div>
+                  ) : mode === 'edit' && hasReturnImage ? (
+                    // Mostrar imagen existente con botón eliminar
+                    <div className="space-y-4">
+                      <div className="flex justify-center">
+                        <img
+                          src={`http://localhost:8080/api/v1/routes/${id}/images/return?t=${Date.now()}`}
+                          alt="Imagen actual de vuelta"
+                          className="max-h-40 max-w-full object-contain rounded-lg shadow-sm"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            // Show fallback icon when image fails
+                            const parent = target.parentElement;
+                            if (parent && !parent.querySelector('.fallback-icon')) {
+                              const fallbackDiv = document.createElement('div');
+                              fallbackDiv.className = 'fallback-icon w-20 h-20 flex items-center justify-center bg-primary/10 rounded-lg border border-border';
+                              fallbackDiv.innerHTML = '<svg class="h-7 w-7 text-primary" fill="currentColor" viewBox="0 0 20 20"><path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"/></svg>';
+                              parent.appendChild(fallbackDiv);
+                            }
+                          }}
+                        />
+                      </div>
+                      <div className="space-y-3">
+                        <p className="text-sm text-muted-foreground font-medium">
+                          Imagen actual de vuelta
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Puedes seleccionar una nueva imagen para reemplazarla
+                        </p>
+                        {mode === 'edit' && (
+                          <div className="flex justify-center">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="border-destructive text-destructive hover:bg-destructive/10"
+                              size="sm"
+                              onClick={() => handleRemoveImage('return')}
+                            >
+                              <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                              Eliminar imagen
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   ) : (
-                    <>
-                      <Upload className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
-                      <p className="text-sm text-muted-foreground mb-2">Subir imagen de vuelta</p>
-                      {mode !== 'view' && (
+                    <div className="space-y-4">
+                      <Upload className="mx-auto h-10 w-10 text-muted-foreground" />
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground font-medium">
+                          Subir imagen de vuelta
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Formatos soportados: JPG, PNG, WebP
+                        </p>
+                      </div>
+                      {(mode === 'create' || mode === 'edit') && (
                         <input
                           type="file"
                           accept="image/*"
-                          onChange={(e) => handleFileChange('returnImage', e.target.files?.[0] || null)}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            handleFileChange(
+                              'returnImage',
+                              e.target.files?.[0] || null
+                            );
+                          }}
                           className="hidden"
                           id="return-image"
                         />
                       )}
                       <Button
-                        asChild
-                        variant={mode === 'view' ? 'secondary' : 'default'}
-                        disabled={mode === 'view'}
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                        type="button"
+                        variant="outline"
+                        className="border-border text-foreground hover:bg-accent"
+                        size="sm"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          document.getElementById('return-image')?.click();
+                        }}
                       >
-                        <label htmlFor="return-image" className="cursor-pointer">
-                          Seleccionar Archivo
-                        </label>
+                        <Upload className="h-4 w-4" />
+                        Seleccionar archivo
                       </Button>
-                    </>
+                    </div>
                   )}
                 </div>
               </div>
@@ -312,7 +574,7 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
           )}
 
           {/* Actions */}
-          {mode !== 'view' && (
+          {(mode === 'create' || mode === 'edit') && (
             <div className="flex gap-3">
               <Button
                 onClick={onClose}
@@ -375,7 +637,9 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
             <MapEditor
               mode={mode === 'view' ? 'view' : currentView === 'both' ? 'view' : 'edit'}
               routeType={currentView}
-              initialWaypoints={[...outboundRoute.waypoints, ...returnRoute.waypoints]}
+              initialWaypoints={currentView === 'outbound' ? outboundRoute.waypoints :
+                               currentView === 'return' ? returnRoute.waypoints :
+                               [...outboundRoute.waypoints, ...returnRoute.waypoints]}
               initialGeometry={currentView === 'outbound' ? (outboundRoute.geometry ?? undefined) :
                               currentView === 'return' ? (returnRoute.geometry ?? undefined) : undefined}
               onSave={(waypoints, geometry) => {

@@ -4,8 +4,6 @@ export interface ApiError {
   errors?: Record<string, string[]>;
 }
 
-const token = localStorage.getItem("token");
-
 export class ApiClient {
   private baseURL: string;
 
@@ -87,10 +85,11 @@ export class ApiClient {
   async putFormData<T>(endpoint: string, formData: FormData): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
 
+    const currentToken = localStorage.getItem("token");
     const config: RequestInit = {
       method: "PUT",
       headers: {
-        Authorization: token ? `Bearer ${token}` : "",
+        Authorization: currentToken ? `Bearer ${currentToken}` : "",
       },
       body: formData,
     };
@@ -128,10 +127,11 @@ export class ApiClient {
   async postFormData<T>(endpoint: string, formData: FormData): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
 
+    const currentToken = localStorage.getItem("token");
     const config: RequestInit = {
       method: "POST",
       headers: {
-        Authorization: token ? `Bearer ${token}` : "",
+        Authorization: currentToken ? `Bearer ${currentToken}` : "",
       },
       body: formData,
     };
