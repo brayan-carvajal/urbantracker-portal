@@ -53,7 +53,7 @@ export const ParkingAlerts: React.FC<ParkingAlertsProps> = ({ onAlertClick }) =>
 
   // URLs desde variables de entorno
   const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8080';
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+  const API_BASE_URL = 'http://localhost:8080';
 
   const connectWebSocket = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
