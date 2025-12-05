@@ -117,11 +117,6 @@ const menuItems: MenuItem[] = [
       },
     ],
   },
-  {
-    title: "Monitoreo de Estacionamiento",
-    href: "/Dashboard/parking",
-    icon: ParkingCircle,
-  },
 ];
 
 export default function DashboardLayout({
@@ -185,7 +180,7 @@ export default function DashboardLayout({
                 className="flex items-center gap-3 rounded-xl px-4 py-3 text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-300 group hover:shadow-lg hover:scale-105 transform"
               >
                 <BarChart3 className="h-5 w-5 group-hover:scale-110 transition-transform text-sidebar-foreground/60 group-hover:text-sidebar-accent-foreground" />
-                <span className="font-medium">Dashboard</span>
+                <span className="font-medium">Panel de Control</span>
               </Link>
             </div>
 

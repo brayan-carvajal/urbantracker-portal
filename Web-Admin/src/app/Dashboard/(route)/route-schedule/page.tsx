@@ -51,7 +51,7 @@ export default function RouteSchedulePage() {
   // Modal states
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [editingSchedules, setEditingSchedules] = useState<RouteScheduleResponse[]>([]);
-  const [isFormLoading, setIsFormLoading] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const handleCreateSchedule = () => {
     setEditingSchedules([]);
@@ -69,25 +69,27 @@ export default function RouteSchedulePage() {
   };
 
   const handleSaveSchedule = async (data: BulkRouteScheduleRequest) => {
-    setIsFormLoading(true);
-    try {
-      if (editingSchedules.length > 0) {
-        // Para edición: eliminar horarios existentes de la ruta y crear los nuevos
-        const routeId = editingSchedules[0].routeId;
-        await routeScheduleService.updateRouteSchedules(routeId, data);
-      } else {
-        console.log('datos de los horarios a crear:', data); // Debug log
-        // Para creación: crear nuevos horarios
-        await routeScheduleService.createRouteSchedules(data);
+    if (editingSchedules.length > 0) {
+      // Para edición: eliminar horarios existentes de la ruta y crear los nuevos
+      const routeId = editingSchedules[0].routeId;
+      await routeScheduleService.updateRouteSchedules(routeId, data);
+    } else {
+      // Para creación: crear nuevos horarios
+
+      // Validar que la ruta no tenga horarios existentes
+      const routeId = data.schedules[0]?.routeId;
+      if (routeId) {
+        const existingRouteSchedules = routesWithSchedules.find(rws => rws.route.id === routeId);
+        if (existingRouteSchedules) {
+          throw new Error('Esta ruta ya tiene un horario asignado. Para modificar el horario, edite el horario existente de la ruta.');
+        }
       }
-      await fetchRouteSchedules();
-      handleCloseFormModal();
-    } catch (error) {
-      console.error('Error saving schedules:', error);
-      throw error;
-    } finally {
-      setIsFormLoading(false);
+
+      await routeScheduleService.createRouteSchedules(data);
     }
+    await fetchRouteSchedules();
+    setRefreshKey(prev => prev + 1);
+    handleCloseFormModal();
   };
 
   useEffect(() => {
@@ -159,7 +161,7 @@ export default function RouteSchedulePage() {
           </div>
         ) : (
           <>
-            <div className="grid gap-6">
+            <div key={refreshKey} className="grid gap-6">
               {paginatedRoutesWithSchedules.map((routeWithSchedules) => (
                 <RouteScheduleCard
                   key={routeWithSchedules.route.id}
@@ -188,6 +190,7 @@ export default function RouteSchedulePage() {
           </SheetTitle>
           <RouteScheduleFormManager
             onSave={handleSaveSchedule}
+            onCancel={handleCloseFormModal}
             editingSchedules={editingSchedules}
             mode={editingSchedules.length > 0 ? 'edit' : 'create'}
           />

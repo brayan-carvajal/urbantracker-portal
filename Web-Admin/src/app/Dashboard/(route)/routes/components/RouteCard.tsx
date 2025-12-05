@@ -26,55 +26,61 @@ export function RouteCard({ route, onEdit, onDelete }: RouteCardProps) {
           {/* Route Images */}
           <div className="flex-shrink-0 flex gap-2">
             {/* Outbound Image */}
-            <div className="w-16 h-16">
-              {route.hasOutboundImage ? (
-                <img
-                  src={`http://localhost:8080/api/v1/routes/${route.id}/images/outbound?t=${Date.now()}`}
-                  alt="Imagen de ida"
-                  className="w-full h-full object-cover rounded-lg border border-border"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                    const parent = target.parentElement;
-                    if (parent && !parent.querySelector('.fallback-icon')) {
-                      const fallbackDiv = document.createElement('div');
-                      fallbackDiv.className = 'fallback-icon w-full h-full bg-primary/10 rounded-lg border border-border flex items-center justify-center';
-                      fallbackDiv.innerHTML = '<svg class="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 20 20"><path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"/></svg>';
-                      parent.appendChild(fallbackDiv);
-                    }
-                  }}
-                />
-              ) : (
-                <div className="w-full h-full bg-primary/10 rounded-lg border border-border flex items-center justify-center">
-                  <Route className="h-5 w-5 text-primary" />
-                </div>
-              )}
+            <div className="flex flex-col items-center gap-1">
+              <span className="text-xs text-muted-foreground font-medium">Ida</span>
+              <div className="w-16 h-16">
+                {route.hasOutboundImage ? (
+                  <img
+                    src={`http://localhost:8080/api/v1/routes/${route.id}/images/outbound?t=${Date.now()}`}
+                    alt="Imagen de ida"
+                    className="w-full h-full object-cover rounded-lg border border-border"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const parent = target.parentElement;
+                      if (parent && !parent.querySelector('.fallback-icon')) {
+                        const fallbackDiv = document.createElement('div');
+                        fallbackDiv.className = 'fallback-icon w-full h-full bg-primary/10 rounded-lg border border-border flex items-center justify-center';
+                        fallbackDiv.innerHTML = '<svg class="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 20 20"><path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"/></svg>';
+                        parent.appendChild(fallbackDiv);
+                      }
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full bg-primary/10 rounded-lg border border-border flex items-center justify-center">
+                    <Route className="h-5 w-5 text-primary" />
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Return Image */}
-            <div className="w-16 h-16">
-              {route.hasReturnImage ? (
-                <img
-                  src={`http://localhost:8080/api/v1/routes/${route.id}/images/return?t=${Date.now()}`}
-                  alt="Imagen de vuelta"
-                  className="w-full h-full object-cover rounded-lg border border-border"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                    const parent = target.parentElement;
-                    if (parent && !parent.querySelector('.fallback-icon')) {
-                      const fallbackDiv = document.createElement('div');
-                      fallbackDiv.className = 'fallback-icon w-full h-full bg-primary/10 rounded-lg border border-border flex items-center justify-center';
-                      fallbackDiv.innerHTML = '<svg class="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 20 20"><path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"/></svg>';
-                      parent.appendChild(fallbackDiv);
-                    }
-                  }}
-                />
-              ) : (
-                <div className="w-full h-full bg-primary/10 rounded-lg border border-border flex items-center justify-center">
-                  <Route className="h-5 w-5 text-primary" />
-                </div>
-              )}
+            <div className="flex flex-col items-center gap-1">
+              <span className="text-xs text-muted-foreground font-medium">Vuelta</span>
+              <div className="w-16 h-16">
+                {route.hasReturnImage ? (
+                  <img
+                    src={`http://localhost:8080/api/v1/routes/${route.id}/images/return?t=${Date.now()}`}
+                    alt="Imagen de vuelta"
+                    className="w-full h-full object-cover rounded-lg border border-border"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const parent = target.parentElement;
+                      if (parent && !parent.querySelector('.fallback-icon')) {
+                        const fallbackDiv = document.createElement('div');
+                        fallbackDiv.className = 'fallback-icon w-full h-full bg-primary/10 rounded-lg border border-border flex items-center justify-center';
+                        fallbackDiv.innerHTML = '<svg class="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 20 20"><path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"/></svg>';
+                        parent.appendChild(fallbackDiv);
+                      }
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full bg-primary/10 rounded-lg border border-border flex items-center justify-center">
+                    <Route className="h-5 w-5 text-primary" />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
