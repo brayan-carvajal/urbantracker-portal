@@ -85,7 +85,7 @@ export function useNearbyRoutes() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 segundos timeout
 
-      const response = await fetch('http://localhost:8080/api/v1/public/route', {
+      const response = await fetch('http://3.142.222.206:8080/api/v1/public/route', {
         signal: controller.signal
       });
 
@@ -124,7 +124,7 @@ export function useNearbyRoutes() {
             const geometryTimeoutId = setTimeout(() => geometryController.abort(), 5000);
 
             const geometryResponse = await fetch(
-              `http://localhost:8080/api/v1/public/route/${route.id}/GEOMETRY`,
+              `http://3.142.222.206:8080/api/v1/public/route/${route.id}/GEOMETRY`,
               { signal: geometryController.signal }
             );
 
