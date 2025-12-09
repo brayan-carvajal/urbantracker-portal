@@ -70,7 +70,7 @@ export function ParkingProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false); // Cambiado a false para evitar loading infinito
   const [error, setError] = useState<string | null>(null);
 
-  const API_BASE_URL = 'http://localhost:8080';
+  const API_BASE_URL = 'http://3.142.222.206';
 
   const refreshStats = async () => {
     try {

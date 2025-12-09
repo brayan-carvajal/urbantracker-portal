@@ -49,7 +49,7 @@ export function RouteProvider({ children }: { children: React.ReactNode }) {
     if (exists) return;
 
     try {
-      const resp = await fetch(`http://localhost:8080/api/v1/public/route/${routeId}/GEOMETRY`);
+      const resp = await fetch(`http://3.142.222.206/api/v1/public/route/${routeId}/GEOMETRY`);
       if (!resp.ok) throw new Error('Error al cargar geometría de ruta');
       let data: any;
       try {

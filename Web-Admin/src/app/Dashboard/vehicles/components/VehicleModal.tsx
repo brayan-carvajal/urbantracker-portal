@@ -461,7 +461,7 @@ export const VehicleModal: React.FC<VehicleModalProps> = ({
                           {/* Mostrar imagen existente del vehículo */}
                           <div className="flex justify-center">
                             <img
-                              src={`http://localhost:8080/api/v1/vehicles/${editingVehicle.id}/images/outbound?t=${Date.now()}-${editingVehicle.hasOutboundImage}`}
+                              src={`http://3.142.222.206/api/v1/vehicles/${editingVehicle.id}/images/outbound?t=${Date.now()}-${editingVehicle.hasOutboundImage}`}
                               alt="Imagen actual del vehículo"
                               className="max-h-40 max-w-full object-contain rounded-lg shadow-sm"
                               onError={(e) => {

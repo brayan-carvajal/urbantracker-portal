@@ -52,8 +52,8 @@ export const ParkingAlerts: React.FC<ParkingAlertsProps> = ({ onAlertClick }) =>
   const baseReconnectDelay = 3000; // 3 segundos
 
   // URLs desde variables de entorno
-  const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8080';
-  const API_BASE_URL = 'http://localhost:8080';
+  const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://3.142.222.206';
+  const API_BASE_URL = 'http://3.142.222.206';
 
   const connectWebSocket = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
