@@ -55,7 +55,6 @@ export default function MapLayout({
   return (
     <VehicleProvider>
       <RouteProvider>
-<<<<<<< HEAD
         <SearchProvider>
           <PanelActiveProvider>
             <PanelCollapseProvider>
@@ -65,15 +64,6 @@ export default function MapLayout({
             </PanelCollapseProvider>
           </PanelActiveProvider>
         </SearchProvider>
-=======
-        <PanelActiveProvider>
-          <PanelCollapseProvider>
-            <ThemeWrapper>
-              <MapLayoutContent>{children}</MapLayoutContent>
-            </ThemeWrapper>
-          </PanelCollapseProvider>
-        </PanelActiveProvider>
->>>>>>> 3875d8517a1b40b03f0b5291e2efa1301caa1e0e
       </RouteProvider>
     </VehicleProvider>
   );
