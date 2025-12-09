@@ -11,23 +11,26 @@ export interface Vehicle {
     companyId: number;
     vehicleTypeId: number;
     inService: boolean;
+    // Image availability flags (for performance - don't send BLOB data in lists)
+    hasOutboundImage?: boolean;
+    // Legacy URL fields for backward compatibility
     outboundImageUrl?: string;
     returnImageUrl?: string;
 }
 
 export interface VehiculeFormData {
-    licencePlate: string;
-    brand: string;
-    model: string;
-    year: number;
-    color: string;
-    passengerCapacity: number;
-    status: string;
-    companyId: number;
-    vehicleTypeId: number;
-    inService: boolean;
-    outboundImage: File | null;
-    returnImage: File | null;
+  licencePlate: string;
+  brand: string;
+  model: string;
+  year: number;
+  color: string;
+  passengerCapacity: number;
+  status: string;
+  companyId: number | null;
+  vehicleTypeId: number | null;
+  inService: boolean;
+  outboundImage: File | null;
+  deleteOutboundImage?: boolean;
 }
 
 

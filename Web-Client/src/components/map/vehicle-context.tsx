@@ -17,6 +17,28 @@ export function VehicleProvider({ children }: { children: React.ReactNode }) {
     setMounted(true);
   }, []);
 
+  // Limpiar vehículos inactivos cada 30 segundos
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setVehiclePositions(prev => {
+        const now = Date.now();
+        const newMap = new Map();
+        prev.forEach((vehicle, vehicleId) => {
+          const vehicleTime = new Date(vehicle.timestamp).getTime();
+          // Mantener vehículos con datos de los últimos 5 minutos
+          if (now - vehicleTime < 5 * 60 * 1000) {
+            newMap.set(vehicleId, vehicle);
+          } else {
+            console.log(`Removing inactive vehicle: ${vehicleId}`);
+          }
+        });
+        return newMap;
+      });
+    }, 30000); // Cada 30 segundos
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <VehicleContext.Provider value={{ vehiclePositions, setVehiclePositions }}>
       {children}

@@ -23,14 +23,14 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
   useEffect(() => {
     const fetchRoutes = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/v1/public/route');
+        const response = await fetch('http://3.142.222.206/api/v1/public/route');
         if (!response.ok) throw new Error('Error al cargar rutas');
         const data = await response.json();
         
         const routesWithDetails = await Promise.all(data.data.map(async (r: RouteResDto) => {
           try {
             // Obtener geometría para cada ruta
-            const geometryResponse = await fetch(`http://localhost:8080/api/v1/public/route/${r.id}/GEOMETRY`);
+            const geometryResponse = await fetch(`http://3.142.222.206/api/v1/public/route/${r.id}/GEOMETRY`);
             let startPoint = 'Cargando...';
             let endPoint = 'Cargando...';
             
@@ -129,7 +129,7 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
               // Tarjeta resumen de cada ruta
               <div
                 key={route.id}
-                className={`bg-background text-foreground p-4 rounded-xl w-full font-sans flex flex-col shadow-sm transition-all duration-200 hover:shadow-xl hover:scale-[1.02] cursor-pointer ${
+                className={`bg-background text-foreground p-4 rounded-xl w-full font-sans flex flex-col shadow-sm transition-all duration-200 hover:shadow-xl hover:scale-[1.02] cursor-pointer border${
                   isSelected ? 'bg-accent'  : ''
                 }`}
                 onClick={async (e) => {
@@ -203,13 +203,13 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
                <div className="flex flex-col gap-1">
                  {/* Línea de información de inicio */}
                  <div className="flex items-center gap-2">
-                   <div className="w-3 h-3 bg-primary rounded-full" />
+                   <div className="w-3 h-3 bg-red-500 rounded-full" />
                    <span className="text-xs text-muted-foreground font-medium">Ida:</span>
                    <span className="text-xs text-card-foreground">{route.start || 'Cargando...'}</span>
                  </div>
                  {/* Línea de información de fin */}
                  <div className="flex items-center gap-2">
-                   <div className="w-3 h-3 bg-secondary rounded-full" />
+                   <div className="w-3 h-3 bg-green-500 rounded-full" />
                    <span className="text-xs text-muted-foreground font-medium">Vuelta:</span>
                    <span className="text-xs text-card-foreground">{route.end || 'Cargando...'}</span>
                  </div>

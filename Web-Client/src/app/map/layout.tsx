@@ -4,6 +4,7 @@ import { PanelActiveProvider } from "components/panels/panel-active-context";
 import { PanelCollapseProvider } from "components/panels/panel-collapse-context";
 import { VehicleProvider } from "components/map/vehicle-context";
 import { RouteProvider } from "components/map/route-context";
+import { SearchProvider } from "components/map/search-context";
 import { Sidebar } from "components/sidebar/sidebar";
 import MapView from "components/map/map-view";
 import { MapControls } from "components/map/map-controls";
@@ -54,13 +55,15 @@ export default function MapLayout({
   return (
     <VehicleProvider>
       <RouteProvider>
-        <PanelActiveProvider>
-          <PanelCollapseProvider>
-            <ThemeWrapper>
-              <MapLayoutContent>{children}</MapLayoutContent>
-            </ThemeWrapper>
-          </PanelCollapseProvider>
-        </PanelActiveProvider>
+        <SearchProvider>
+          <PanelActiveProvider>
+            <PanelCollapseProvider>
+              <ThemeWrapper>
+                <MapLayoutContent>{children}</MapLayoutContent>
+              </ThemeWrapper>
+            </PanelCollapseProvider>
+          </PanelActiveProvider>
+        </SearchProvider>
       </RouteProvider>
     </VehicleProvider>
   );

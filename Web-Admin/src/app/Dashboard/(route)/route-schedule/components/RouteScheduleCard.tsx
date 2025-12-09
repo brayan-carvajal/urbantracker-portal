@@ -15,13 +15,13 @@ export function RouteScheduleCard({ routeWithSchedules, onEdit, onDelete }: Rout
 
   const getDayName = (dayOfWeek: string) => {
     const days = {
-      'MONDAY': 'L',
-      'TUESDAY': 'M',
-      'WEDNESDAY': 'X',
-      'THURSDAY': 'J',
-      'FRIDAY': 'V',
-      'SATURDAY': 'S',
-      'SUNDAY': 'D'
+      'MONDAY': 'Lunes',
+      'TUESDAY': 'Martes',
+      'WEDNESDAY': 'Miércoles',
+      'THURSDAY': 'Jueves',
+      'FRIDAY': 'Viernes',
+      'SATURDAY': 'Sábado',
+      'SUNDAY': 'Domingo'
     }
     return days[dayOfWeek.toUpperCase() as keyof typeof days] || dayOfWeek
   }

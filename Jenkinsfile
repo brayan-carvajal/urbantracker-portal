@@ -185,14 +185,12 @@ pipeline {
           def adminEnv = """
             -e NODE_ENV=production
             -e NEXT_PUBLIC_ENVIRONMENT=${env.ENVIRONMENT}
-            -e NEXT_PUBLIC_API_URL=${env.BACKEND_URL}
             -e NEXT_PUBLIC_BACKEND_URL=${env.BACKEND_URL}
           """
-          
+
           def clientEnv = """
             -e NODE_ENV=production
             -e NEXT_PUBLIC_ENVIRONMENT=${env.ENVIRONMENT}
-            -e NEXT_PUBLIC_API_URL=${env.BACKEND_URL}
             -e NEXT_PUBLIC_BACKEND_URL=${env.BACKEND_URL}
           """
           

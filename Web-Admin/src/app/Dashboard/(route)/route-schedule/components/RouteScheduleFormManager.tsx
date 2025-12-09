@@ -9,6 +9,7 @@ import { RoutesApi } from '../../routes/services/api/routeApi';
 
 interface RouteScheduleFormManagerProps {
   onSave: (data: BulkRouteScheduleRequest) => Promise<void>;
+  onCancel?: () => void;
   editingSchedules?: RouteScheduleResponse[];
   mode?: 'create' | 'edit';
 }
@@ -23,11 +24,11 @@ interface DaySchedule {
 
 const RouteScheduleFormManager: React.FC<RouteScheduleFormManagerProps> = ({
   onSave,
+  onCancel,
   editingSchedules = [],
   mode = 'create'
 }) => {
   const [selectedRouteId, setSelectedRouteId] = useState<number>(0);
-  const [useGlobalSchedule, setUseGlobalSchedule] = useState(true);
   const [globalStartTime, setGlobalStartTime] = useState('08:00');
   const [globalEndTime, setGlobalEndTime] = useState('18:00');
   const [daySchedules, setDaySchedules] = useState<DaySchedule[]>([
@@ -66,38 +67,27 @@ const RouteScheduleFormManager: React.FC<RouteScheduleFormManagerProps> = ({
       const firstSchedule = editingSchedules[0];
       setSelectedRouteId(firstSchedule.routeId);
 
-      // Marcar días seleccionados y sus horarios
+      // Marcar días seleccionados
       const updatedDaySchedules = daySchedules.map(daySchedule => {
         const matchingSchedule = editingSchedules.find(s => s.dayOfWeek.toUpperCase() === daySchedule.day);
         if (matchingSchedule) {
           return {
             ...daySchedule,
-            selected: true,
-            startTime: matchingSchedule.startTime.substring(0, 5),
-            endTime: matchingSchedule.endTime.substring(0, 5)
+            selected: true
           };
         }
-        return daySchedule;
+        return {
+          ...daySchedule,
+          selected: false
+        };
       });
 
       setDaySchedules(updatedDaySchedules);
 
-      // Verificar si todos los días tienen el mismo horario
-      const selectedSchedules = editingSchedules;
-      if (selectedSchedules.length > 1) {
-        const firstStartTime = selectedSchedules[0].startTime;
-        const firstEndTime = selectedSchedules[0].endTime;
-        const allSame = selectedSchedules.every(s =>
-          s.startTime === firstStartTime && s.endTime === firstEndTime
-        );
-
-        if (allSame) {
-          setUseGlobalSchedule(true);
-          setGlobalStartTime(firstStartTime.substring(0, 5));
-          setGlobalEndTime(firstEndTime.substring(0, 5));
-        } else {
-          setUseGlobalSchedule(false);
-        }
+      // Establecer el horario global basado en el primer horario
+      if (editingSchedules.length > 0) {
+        setGlobalStartTime(editingSchedules[0].startTime.substring(0, 5));
+        setGlobalEndTime(editingSchedules[0].endTime.substring(0, 5));
       }
     }
   }, [editingSchedules, mode]);
@@ -127,22 +117,11 @@ const RouteScheduleFormManager: React.FC<RouteScheduleFormManagerProps> = ({
     }
 
     // Validar horarios
-    if (useGlobalSchedule) {
-      if (!globalStartTime) {
-        newErrors.push('Debe seleccionar la hora de inicio');
-      }
-      if (!globalEndTime) {
-        newErrors.push('Debe seleccionar la hora de fin');
-      }
-    } else {
-      selectedDays.forEach(day => {
-        if (!day.startTime) {
-          newErrors.push(`Debe seleccionar la hora de inicio para ${day.label}`);
-        }
-        if (!day.endTime) {
-          newErrors.push(`Debe seleccionar la hora de fin para ${day.label}`);
-        }
-      });
+    if (!globalStartTime) {
+      newErrors.push('Debe seleccionar la hora de inicio');
+    }
+    if (!globalEndTime) {
+      newErrors.push('Debe seleccionar la hora de fin');
     }
 
     if (newErrors.length > 0) {
@@ -155,32 +134,24 @@ const RouteScheduleFormManager: React.FC<RouteScheduleFormManagerProps> = ({
     try {
       const schedules: RouteScheduleRequest[] = [];
 
-      if (useGlobalSchedule) {
-        // Crear un horario para cada día seleccionado con el horario global
-        selectedDays.forEach(day => {
-          schedules.push({
-            routeId: selectedRouteId,
-            dayOfWeek: day.day,
-            startTime: globalStartTime + ':00',
-            endTime: globalEndTime + ':00'
-          });
+      // Crear un horario para cada día seleccionado con el horario global
+      selectedDays.forEach(day => {
+        schedules.push({
+          routeId: selectedRouteId,
+          dayOfWeek: day.day,
+          startTime: globalStartTime + ':00',
+          endTime: globalEndTime + ':00'
         });
-      } else {
-        // Crear un horario para cada día con su horario individual
-        selectedDays.forEach(day => {
-          schedules.push({
-            routeId: selectedRouteId,
-            dayOfWeek: day.day,
-            startTime: day.startTime + ':00',
-            endTime: day.endTime + ':00'
-          });
-        });
-      }
+      });
 
       await onSave({ schedules });
-    } catch (error) {
-      console.error('Error saving schedules:', error);
-      setErrors(['Error al guardar los horarios']);
+    } catch (error: unknown) {
+      const message = (error as any)?.message || 'Error al guardar los horarios';
+      // Only log actual API errors, not validation errors
+      if (!message.includes('ya tiene un horario asignado') && !message.includes('ya tiene un horario')) {
+        console.error('Error saving schedules:', message);
+      }
+      setErrors([message]);
     } finally {
       setIsLoading(false);
     }
@@ -220,32 +191,6 @@ const RouteScheduleFormManager: React.FC<RouteScheduleFormManagerProps> = ({
           </Select>
         </div>
 
-        {/* Schedule Type Selection */}
-        <div>
-          <Label className="text-muted-foreground">Tipo de Horario</Label>
-          <div className="flex gap-4 mt-2">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="scheduleType"
-                checked={useGlobalSchedule}
-                onChange={() => setUseGlobalSchedule(true)}
-                className="mr-2"
-              />
-              <span className="text-sm text-foreground">Horario global para todos los días</span>
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="scheduleType"
-                checked={!useGlobalSchedule}
-                onChange={() => setUseGlobalSchedule(false)}
-                className="mr-2"
-              />
-              <span className="text-sm text-foreground">Horario individual por día</span>
-            </label>
-          </div>
-        </div>
 
         {/* Day Selection */}
         <div>
@@ -298,59 +243,26 @@ const RouteScheduleFormManager: React.FC<RouteScheduleFormManagerProps> = ({
         </div>
 
         {/* Time Selection */}
-        {useGlobalSchedule ? (
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label className="text-muted-foreground">Hora de Inicio Global *</Label>
-              <Input
-                type="time"
-                value={globalStartTime}
-                onChange={(e) => setGlobalStartTime(e.target.value)}
-                className="bg-card border-border text-card-foreground"
-              />
-            </div>
-            <div>
-              <Label className="text-muted-foreground">Hora de Fin Global *</Label>
-              <Input
-                type="time"
-                value={globalEndTime}
-                onChange={(e) => setGlobalEndTime(e.target.value)}
-                className="bg-card border-border text-card-foreground"
-              />
-            </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label className="text-muted-foreground">Hora de Inicio *</Label>
+            <Input
+              type="time"
+              value={globalStartTime}
+              onChange={(e) => setGlobalStartTime(e.target.value)}
+              className="bg-card border-border text-card-foreground"
+            />
           </div>
-        ) : (
-          <div className="space-y-4">
-            <Label className="text-muted-foreground">Horarios Individuales *</Label>
-            {daySchedules.filter(d => d.selected).map((daySchedule, index) => (
-              <div key={daySchedule.day} className="grid grid-cols-3 gap-4 items-center p-3 bg-muted rounded-lg">
-                <span className="text-sm font-medium text-foreground">{daySchedule.label}</span>
-                <Input
-                  type="time"
-                  value={daySchedule.startTime}
-                  onChange={(e) => handleDayTimeChange(
-                    daySchedules.findIndex(d => d.day === daySchedule.day),
-                    'startTime',
-                    e.target.value
-                  )}
-                  className="bg-card border-border text-card-foreground"
-                  placeholder="Inicio"
-                />
-                <Input
-                  type="time"
-                  value={daySchedule.endTime}
-                  onChange={(e) => handleDayTimeChange(
-                    daySchedules.findIndex(d => d.day === daySchedule.day),
-                    'endTime',
-                    e.target.value
-                  )}
-                  className="bg-card border-border text-card-foreground"
-                  placeholder="Fin"
-                />
-              </div>
-            ))}
+          <div>
+            <Label className="text-muted-foreground">Hora de Fin *</Label>
+            <Input
+              type="time"
+              value={globalEndTime}
+              onChange={(e) => setGlobalEndTime(e.target.value)}
+              className="bg-card border-border text-card-foreground"
+            />
           </div>
-        )}
+        </div>
 
         {/* Errors */}
         {errors.length > 0 && (
@@ -387,6 +299,7 @@ const RouteScheduleFormManager: React.FC<RouteScheduleFormManagerProps> = ({
           <Button
             variant="outline"
             className="flex-1 border-border text-foreground hover:bg-accent"
+            onClick={onCancel}
           >
             Cancelar
           </Button>

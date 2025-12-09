@@ -40,7 +40,8 @@ export const vehicleService = {
       console.error("Error eliminando vehículo:", result.message);
       throw new Error(result.message || "No se pudo eliminar el vehículo");
     }
-  }
+  },
+
 };
 
 

@@ -67,8 +67,8 @@ export const RouteFormProvider: React.FC<RouteFormProviderProps> = ({ children }
     setFormData({
       numberRoute: data.numberRoute,
       description: data.description || '',
-      outboundImage: data.outboundImage || null,
-      returnImage: data.returnImage || null,
+      outboundImage: null, // Images are handled separately in RouteFormManager
+      returnImage: null,
     })
     setOutboundRoute({
       waypoints: data.waypoints.filter(w => w.destine === 'OUTBOUND').map(w => ({ ...w })),

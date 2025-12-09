@@ -33,6 +33,7 @@ export interface VehicleTelemetryMessage {
 
 // Componente que muestra el detalle de una ruta seleccionada
 export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => void }) {
+  console.log('Route id:', route.id);
   const [fullRoute, setFullRoute] = useState<Route | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,7 +69,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
     const fetchDetail = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:8080/api/v1/public/route/${route.id}/GEOMETRY`);
+        const response = await fetch(`http://3.142.222.206/api/v1/public/route/${route.id}/GEOMETRY`);
         if (!response.ok) throw new Error('Error al cargar detalle de ruta');
         let data: any;
         try {
@@ -133,19 +134,42 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
     setVehiclePositions(new Map());
 
     const client = new Client({
-      webSocketFactory: () => new SockJS('http://localhost:8080/ws/connect'),
+      webSocketFactory: () => new SockJS('http://3.142.222.206/ws/connect'),
       onConnect: () => {
         console.log('Connected to WebSocket');
+        console.log('Subscribing to /topic/route/' + route.id + '/telemetry');
         client.subscribe(`/topic/route/${route.id}/telemetry`, (message) => {
-          console.log('Received telemetry:', message.body);
+          console.log('Received telemetry for route:', message.body);
           setTelemetry(message.body);
           try {
             const telemetryData: VehicleTelemetryMessage = JSON.parse(message.body);
-            setVehiclePositions(prev => new Map(prev.set(telemetryData.vehicleId, telemetryData)));
+            console.log('Parsed telemetry data:', telemetryData);
+            console.log('Setting vehicle positions for', telemetryData.vehicleId);
+            setVehiclePositions(prev => {
+              const newMap = new Map(prev.set(telemetryData.vehicleId, telemetryData));
+              console.log('New vehicle positions:', newMap);
+              return newMap;
+            });
             setParseError(null); // Limpiar error si se parsea correctamente
           } catch (err) {
             console.error('Error parsing telemetry JSON:', err);
             setParseError('Error al parsear mensaje de telemetría: formato JSON inválido');
+          }
+        });
+
+        // También suscribirse a telemetría de vehículos sin ruta asignada
+        console.log('Subscribing to /topic/vehicles/+/telemetry');
+        client.subscribe('/topic/vehicles/+/telemetry', (message) => {
+          console.log('Received vehicle telemetry:', message.body);
+          setTelemetry(message.body);
+          try {
+            const telemetryData: VehicleTelemetryMessage = JSON.parse(message.body);
+            console.log('Parsed vehicle telemetry data:', telemetryData);
+            setVehiclePositions(prev => new Map(prev.set(telemetryData.vehicleId, telemetryData)));
+            setParseError(null); // Limpiar error si se parsea correctamente
+          } catch (err) {
+            console.error('Error parsing vehicle telemetry JSON:', err);
+            setParseError('Error al parsear mensaje de telemetría de vehículo: formato JSON inválido');
           }
         });
       },
@@ -185,7 +209,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
   return (
     <div className="space-y-4 overflow-y-auto hide-scrollbar p-1">
       {/* Tarjeta resumen de la ruta */}
-      <div className="bg-background rounded-xl p-4 flex flex-col gap-2 shadow-sm transition-all duration-200 hover:shadow-xl hover:scale-[1.02]">
+      <div className="bg-background rounded-xl p-4 flex flex-col gap-2 shadow-sm transition-all duration-200 hover:shadow-xl hover:scale-[1.02] border">
         <div className="flex items-center justify-between mb-2">
           <div className="flex flex-col">
             <h4 className="text-base font-semibold leading-tight text-foreground">{fullRoute.name}</h4>
@@ -199,22 +223,64 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
           {/* Imagen y datos de inicio */}
           <div className="flex flex-col items-center">
-            <div className="w-24 h-24 flex items-center justify-center bg-muted rounded-lg">
-              <Bus className="h-8 w-8 text-muted-foreground" />
+            <div className="w-24 h-24">
+              {fullRoute.imageStart ? (
+                <img
+                  src={`http://3.142.222.206/api/v1/route/${fullRoute.id}/images/outbound?t=${Date.now()}`}
+                  alt="Imagen de ida"
+                  className="w-full h-full object-cover rounded-lg border border-border"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    const parent = target.parentElement;
+                    if (parent && !parent.querySelector('.fallback-icon')) {
+                      const fallbackDiv = document.createElement('div');
+                      fallbackDiv.className = 'fallback-icon w-full h-full bg-muted rounded-lg border border-border flex items-center justify-center';
+                      fallbackDiv.innerHTML = '<svg class="h-8 w-8 text-muted-foreground" fill="currentColor" viewBox="0 0 20 20"><path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"/></svg>';
+                      parent.appendChild(fallbackDiv);
+                    }
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full bg-muted rounded-lg border border-border flex items-center justify-center">
+                  <Bus className="h-8 w-8 text-muted-foreground" />
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-1 mt-2">
-              <span className="bg-primary w-3 h-3 rounded-full" />
+              <span className="bg-red-500 w-3 h-3 rounded-full" />
               <span className="text-xs text-muted-foreground font-semibold">Ida</span>
             </div>
             <span className="text-xs text-foreground text-center">{fullRoute.start}</span>
           </div>
           {/* Imagen y datos de fin */}
           <div className="flex flex-col items-center">
-            <div className="w-24 h-24 flex items-center justify-center bg-muted rounded-lg">
-              <Bus className="h-8 w-8 text-muted-foreground" />
+            <div className="w-24 h-24">
+              {fullRoute.imageEnd ? (
+                <img
+                  src={`http://3.142.222.206/api/v1/route/${fullRoute.id}/images/return?t=${Date.now()}`}
+                  alt="Imagen de vuelta"
+                  className="w-full h-full object-cover rounded-lg border border-border"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    const parent = target.parentElement;
+                    if (parent && !parent.querySelector('.fallback-icon')) {
+                      const fallbackDiv = document.createElement('div');
+                      fallbackDiv.className = 'fallback-icon w-full h-full bg-muted rounded-lg border border-border flex items-center justify-center';
+                      fallbackDiv.innerHTML = '<svg class="h-8 w-8 text-muted-foreground" fill="currentColor" viewBox="0 0 20 20"><path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"/></svg>';
+                      parent.appendChild(fallbackDiv);
+                    }
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full bg-muted rounded-lg border border-border flex items-center justify-center">
+                  <Bus className="h-8 w-8 text-muted-foreground" />
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-1 mt-2">
-              <span className="bg-secondary w-3 h-3 rounded-full" />
+              <span className="bg-green-500 w-3 h-3 rounded-full" />
               <span className="text-xs text-muted-foreground font-semibold">Vuelta</span>
             </div>
             <span className="text-xs text-foreground text-center">{fullRoute.end}</span>
@@ -222,13 +288,13 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
         </div>
       </div>
       {/* Tarjeta de detalles del recorrido */}
-      <div className="bg-background rounded-xl p-4 max-w-full overflow-hidden shadow-sm transition-all duration-200 hover:shadow-xl hover:scale-[1.02]">
+      <div className="bg-background rounded-xl p-4 max-w-full overflow-hidden shadow-sm transition-all duration-200 hover:shadow-xl hover:scale-[1.02] border">
         <h4 className="font-semibold text-foreground mb-2">Recorrido</h4>
         <div className="border-t border-border/50 my-2" />
         <div className="flex flex-col gap-2">
           {/* Detalle de inicio */}
           <div className="flex gap-2 mb-1 items-start">
-            <span className="bg-primary w-3 h-3 rounded-full flex-shrink-0 mt-1" />
+            <span className="bg-red-500 w-3 h-3 rounded-full flex-shrink-0 mt-1" />
             <div className="flex flex-col min-w-0 max-w-full">
               <span className="text-xs text-muted-foreground font-medium flex-shrink-0">Ida:</span>
               <span className="text-xs text-card-foreground break-words whitespace-pre-line overflow-hidden max-w-full" style={{ display: 'block', whiteSpace: 'pre-line', wordBreak: 'break-word' }}>{fullRoute.startDetail}</span>
@@ -236,7 +302,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
           </div>
           {/* Detalle de fin */}
           <div className="flex gap-2 items-start">
-            <span className="bg-secondary w-3 h-3 rounded-full flex-shrink-0 mt-1" />
+            <span className="bg-green-500 w-3 h-3 rounded-full flex-shrink-0 mt-1" />
             <div className="flex flex-col min-w-0 max-w-full">
               <span className="text-xs text-muted-foreground font-medium flex-shrink-0">Vuelta:</span>
               <span className="text-xs text-card-foreground break-words whitespace-pre-line overflow-hidden max-w-full" style={{ display: 'block', whiteSpace: 'pre-line', wordBreak: 'break-word' }}>{fullRoute.endDetail}</span>
