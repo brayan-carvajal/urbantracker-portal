@@ -30,7 +30,7 @@ const script = `
   try {
     console.log('Iniciando migración de URLs de imágenes de rutas...');
 
-    const response = await fetch('http://3.142.222.206/api/v1/route/migrate-image-urls-public', {
+    const response = await fetch('http://18.119.92.101/api/v1/route/migrate-image-urls-public', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'

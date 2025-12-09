@@ -69,7 +69,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
     const fetchDetail = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`http://3.142.222.206:8080/api/v1/public/route/${route.id}/GEOMETRY`);
+        const response = await fetch(`http://18.119.92.101:8080/api/v1/public/route/${route.id}/GEOMETRY`);
         if (!response.ok) throw new Error('Error al cargar detalle de ruta');
         let data: any;
         try {
@@ -134,7 +134,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
     setVehiclePositions(new Map());
 
     const client = new Client({
-      webSocketFactory: () => new SockJS('http://3.142.222.206:8080/ws/connect'),
+      webSocketFactory: () => new SockJS('http://18.119.92.101:8080/ws/connect'),
       onConnect: () => {
         console.log('Connected to WebSocket');
         console.log('Subscribing to /topic/route/' + route.id + '/telemetry');
@@ -226,7 +226,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
             <div className="w-24 h-24">
               {fullRoute.imageStart ? (
                 <img
-                  src={`http://3.142.222.206:8080/api/v1/route/${fullRoute.id}/images/outbound?t=${Date.now()}`}
+                  src={`http://18.119.92.101:8080/api/v1/route/${fullRoute.id}/images/outbound?t=${Date.now()}`}
                   alt="Imagen de ida"
                   className="w-full h-full object-cover rounded-lg border border-border"
                   onError={(e) => {
@@ -258,7 +258,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
             <div className="w-24 h-24">
               {fullRoute.imageEnd ? (
                 <img
-                  src={`http://3.142.222.206:8080/api/v1/route/${fullRoute.id}/images/return?t=${Date.now()}`}
+                  src={`http://18.119.92.101:8080/api/v1/route/${fullRoute.id}/images/return?t=${Date.now()}`}
                   alt="Imagen de vuelta"
                   className="w-full h-full object-cover rounded-lg border border-border"
                   onError={(e) => {

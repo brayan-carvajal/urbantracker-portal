@@ -3,7 +3,7 @@ import { RouteScheduleRequest, RouteScheduleResponse, BulkRouteScheduleRequest }
 import { API_ENDPOINTS } from './config';
 import type { CrudResponse } from '../../../routes/services/api/types';
 
-const apiClient = new ApiClient("http://3.142.222.206:8080");
+const apiClient = new ApiClient("http://18.119.92.101:8080");
 
 export class RouteScheduleApi {
   static async getAll(): Promise<CrudResponse<RouteScheduleResponse[]>> {
