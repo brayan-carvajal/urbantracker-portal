@@ -3,7 +3,7 @@ import { ApiClient } from '../../../utils/apiClient';
 import { API_ENDPOINTS } from './config';
 import type { CrudResponse } from './types';
 
-const apiClient = new ApiClient('http://3.142.222.206');
+const apiClient = new ApiClient('http://3.142.222.206:8080');
 
 export class VehiclesApi {
   static async getAllVehicles(): Promise<CrudResponse<Vehicle[]>> {
