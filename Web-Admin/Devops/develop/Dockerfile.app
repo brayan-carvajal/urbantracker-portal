@@ -10,7 +10,7 @@ COPY . .
 RUN npm run build
 
 # ---- Run stage ----
-FROM node:20-alpine
+FROM node:20
 
 WORKDIR /app
 
