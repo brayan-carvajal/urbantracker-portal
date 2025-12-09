@@ -23,14 +23,14 @@ export function RoutesPanel({ showTitle = false, selected, setSelected }: { show
   useEffect(() => {
     const fetchRoutes = async () => {
       try {
-        const response = await fetch('http://3.142.222.206/api/v1/public/route');
+        const response = await fetch('http://3.142.222.206:8080/api/v1/public/route');
         if (!response.ok) throw new Error('Error al cargar rutas');
         const data = await response.json();
         
         const routesWithDetails = await Promise.all(data.data.map(async (r: RouteResDto) => {
           try {
             // Obtener geometría para cada ruta
-            const geometryResponse = await fetch(`http://3.142.222.206/api/v1/public/route/${r.id}/GEOMETRY`);
+            const geometryResponse = await fetch(`http://3.142.222.206:8080/api/v1/public/route/${r.id}/GEOMETRY`);
             let startPoint = 'Cargando...';
             let endPoint = 'Cargando...';
             
