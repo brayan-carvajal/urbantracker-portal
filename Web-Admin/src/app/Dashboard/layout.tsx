@@ -12,7 +12,6 @@ import {
   Route,
   Shuffle,
   Users,
-  ParkingCircle,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -22,7 +21,6 @@ import { useState, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
 import { DashboardHeader } from "./components/DashboardHeader";
-import { DriverProvider } from "./drivers/context/DriverContext";
 import { useTheme } from "@/hooks/useTheme";
 import "../globals.css";
 

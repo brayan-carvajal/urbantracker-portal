@@ -146,7 +146,7 @@ const RouteScheduleFormManager: React.FC<RouteScheduleFormManagerProps> = ({
 
       await onSave({ schedules });
     } catch (error: unknown) {
-      const message = (error as any)?.message || 'Error al guardar los horarios';
+      const message = error instanceof Error ? error.message : 'Error al guardar los horarios';
       // Only log actual API errors, not validation errors
       if (!message.includes('ya tiene un horario asignado') && !message.includes('ya tiene un horario')) {
         console.error('Error saving schedules:', message);
