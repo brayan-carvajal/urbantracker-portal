@@ -25,7 +25,7 @@ export default function DriverSchedulePage() {
   // Modal states
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [editingSchedules, setEditingSchedules] = useState<DriverScheduleResponse[]>([]);
-  const [isFormLoading, setIsFormLoading] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const {
     driversWithSchedules,
@@ -71,58 +71,51 @@ export default function DriverSchedulePage() {
   };
 
   const handleSaveSchedule = async (data: BulkDriverScheduleRequest) => {
-    setIsFormLoading(true);
-    try {
-      console.log('Starting to save schedules...', JSON.stringify(data, null, 2));
-      console.log('Editing schedules:', JSON.stringify(editingSchedules, null, 2));
 
-      if (editingSchedules.length > 0) {
-        // Para edición: eliminar horarios existentes del conductor y crear los nuevos
-        const driverId = editingSchedules[0]?.driverId;
-        if (!driverId) {
-          throw new Error('No se pudo encontrar el ID del conductor');
-        }
-        console.log('Updating schedules for driver:', driverId);
-        
-        // Validar la estructura de los datos antes de enviar
-        if (!data.schedules || !Array.isArray(data.schedules) || data.schedules.length === 0) {
-          throw new Error('Los datos del horario no son válidos');
-        }
-
-        await driverScheduleService.updateDriverSchedules(driverId, {
-          schedules: data.schedules.map(schedule => ({
-            ...schedule,
-            driverId: driverId
-          }))
-        });
-      } else {
-        console.log('Creating new schedules:', JSON.stringify(data, null, 2));
-        
-        // Validar la estructura de los datos antes de enviar
-        if (!data.schedules || !Array.isArray(data.schedules) || data.schedules.length === 0) {
-          throw new Error('Los datos del horario no son válidos');
-        }
-
-        await driverScheduleService.createDriverSchedules(data);
+    if (editingSchedules.length > 0) {
+      // Para edición: eliminar horarios existentes del conductor y crear los nuevos
+      const driverId = editingSchedules[0]?.driverId;
+      if (!driverId) {
+        throw new Error('No se pudo encontrar el ID del conductor');
       }
-      
-      console.log('Successfully saved schedules, refreshing data...');
-      await fetchDriverSchedules();
-      console.log('Data refreshed successfully');
-      handleCloseFormModal();
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Error desconocido';
-      console.error('Error saving schedules:', {
-        error,
-        message,
-        stack: error instanceof Error ? error.stack : undefined,
-        data: JSON.stringify(data, null, 2)
+      console.log('Updating schedules for driver:', driverId);
+
+      // Validar la estructura de los datos antes de enviar
+      if (!data.schedules || !Array.isArray(data.schedules) || data.schedules.length === 0) {
+        throw new Error('Los datos del horario no son válidos');
+      }
+
+      await driverScheduleService.updateDriverSchedules(driverId, {
+        schedules: data.schedules.map(schedule => ({
+          ...schedule,
+          driverId: driverId
+        }))
       });
-      // Mostrar el error al usuario en lugar de lanzarlo
-      alert(`Error al guardar los horarios: ${message}`);
-    } finally {
-      setIsFormLoading(false);
+    } else {
+      console.log('Creating new schedules:', JSON.stringify(data, null, 2));
+
+      // Validar la estructura de los datos antes de enviar
+      if (!data.schedules || !Array.isArray(data.schedules) || data.schedules.length === 0) {
+        throw new Error('Los datos del horario no son válidos');
+      }
+
+      // Validar que el conductor no tenga horarios existentes
+      const driverId = data.schedules[0]?.driverId;
+      if (driverId) {
+        const existingDriverSchedules = driversWithSchedules.find(dws => dws.driver.id === driverId);
+        if (existingDriverSchedules) {
+          throw new Error('Este conductor ya tiene un horario asignado. Para modificar el horario, edite el horario existente del conductor.');
+        }
+      }
+
+      await driverScheduleService.createDriverSchedules(data);
     }
+
+    console.log('Successfully saved schedules, refreshing data...');
+    await fetchDriverSchedules();
+    setRefreshKey(prev => prev + 1);
+    console.log('Data refreshed successfully');
+    handleCloseFormModal();
   };
 
   useEffect(() => {
@@ -194,7 +187,7 @@ export default function DriverSchedulePage() {
           </div>
         ) : (
           <>
-            <div className="grid gap-6">
+            <div key={refreshKey} className="grid gap-6">
               {paginatedDriversWithSchedules.map((driverWithSchedules) => (
                 <DriverScheduleCard
                   key={driverWithSchedules.driver.id}
@@ -231,6 +224,7 @@ export default function DriverSchedulePage() {
             </SheetTitle>
             <DriverScheduleFormManager
               onSave={handleSaveSchedule}
+              onCancel={handleCloseFormModal}
               editingSchedules={editingSchedules}
               mode={editingSchedules.length > 0 ? 'edit' : 'create'}
             />

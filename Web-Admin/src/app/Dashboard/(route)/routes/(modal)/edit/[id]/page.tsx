@@ -15,14 +15,18 @@ export default function EditRoutePage() {
     router.push("/Dashboard/routes");
   };
 
+  const handleSuccess = () => {
+    router.push("/Dashboard/routes?refresh=true");
+  };
+
   const { updateRoute } = useRouteService();
 
 
-  const handleSave = async (data: CompleteRouteData) => {
+  const handleSave = async (data: CompleteRouteData, deleteOutboundImage?: boolean, deleteReturnImage?: boolean) => {
     try {
-      await updateRoute(parseInt(id as string), data);
+      await updateRoute(parseInt(id as string), data, deleteOutboundImage, deleteReturnImage);
     } catch (err) {
-      console.error('Error creando ruta', err);
+      console.error('Error actualizando ruta', err);
       alert('Error al actualizar la ruta');
     }
   };
@@ -31,7 +35,7 @@ export default function EditRoutePage() {
     <div className="min-h-screen bg-background p-4">
       <RouteFormManager
         onSave={handleSave}
-        onSuccess={() => router.push("/Dashboard/routes")}
+        onSuccess={handleSuccess}
         onClose={handleClose}
         mode="edit"
         id={id as string}

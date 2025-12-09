@@ -24,6 +24,7 @@ export const useRouteService = () => {
   };
 
   const getAllRoutes = async (): Promise<CrudResponse<RouteResponse[]>> => {
+    console.log('[RouteServices] getAllRoutes called');
     return handleApiCall(() => RoutesApi.getAllRoutes());
   };
 
@@ -37,13 +38,22 @@ export const useRouteService = () => {
 
   const updateRoute = async (
     id: number,
-    route: CompleteRouteData
+    route: CompleteRouteData,
+    deleteOutboundImage?: boolean,
+    deleteReturnImage?: boolean
   ): Promise<CrudResponse<RouteResponse>> => {
-    return handleApiCall(() => RoutesApi.updateRoute(id, route));
+    return handleApiCall(() => RoutesApi.updateRoute(id, route, deleteOutboundImage, deleteReturnImage));
   };
 
   const deleteRoute = async (id: number): Promise<CrudResponse<void>> => {
     return handleApiCall(() => RoutesApi.deleteRoute(id));
+  };
+
+  const deleteRouteImage = async (
+    routeId: number,
+    imageType: "outbound" | "return"
+  ): Promise<CrudResponse<void>> => {
+    return handleApiCall(() => RoutesApi.deleteRouteImage(routeId, imageType));
   };
 
   const createRouteWithImages = async (
@@ -60,6 +70,7 @@ export const useRouteService = () => {
     createRoute,
     updateRoute,
     deleteRoute,
+    deleteRouteImage,
     createRouteWithImages,
   };
 };

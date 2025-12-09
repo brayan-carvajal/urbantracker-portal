@@ -1,6 +1,6 @@
 export async function validateToken(token: string): Promise<boolean> {
   try {
-    const response = await fetch("http://localhost:8080/api/v1/public/auth/validate-token", {
+    const response = await fetch("http://3.142.222.206/api/v1/public/auth/validate-token", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

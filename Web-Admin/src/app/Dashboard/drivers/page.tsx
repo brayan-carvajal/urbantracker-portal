@@ -13,21 +13,6 @@ import { DeleteConfirmationModal } from "./components/DeleteConfirmationModal";
 import { Driver } from "./types/driverTypes";
 import type { ApiError } from "./services/api/types";
 
-"use client";
-
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Plus, Loader2, AlertTriangle, RefreshCw } from "lucide-react";
-import { useDrivers } from "./hooks/useDrivers";
-import { DriverCard } from "./components/DriverCard";
-import { StatisticsCards } from "./components/StatisticsCards";
-import { DriverFilters } from "./components/DriverFilters";
-import { DriverModal } from "./components/DriverModal";
-import { Pagination } from "./components/Pagination";
-import { DeleteConfirmationModal } from "./components/DeleteConfirmationModal";
-import { Driver } from "./types/driverTypes";
-import type { ApiError } from "./services/api/types";
-
 
 export default function DriversPage() {
   const {
@@ -272,6 +257,5 @@ export default function DriversPage() {
         apiError={apiError} // Pasamos el error de API al modal
       />
     </div>
-  );
   );
 }

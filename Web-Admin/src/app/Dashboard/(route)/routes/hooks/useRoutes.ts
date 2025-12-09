@@ -16,13 +16,19 @@ export const useRoutes = (): UseRoutesReturn => {
   });
 
   const fetchRoutes = useCallback(async () => {
+    console.log('[useRoutes] fetchRoutes called');
     try {
+      console.log('[useRoutes] Calling getAllRoutes...');
       const response = await getAllRoutes();
+      console.log('[useRoutes] getAllRoutes response:', response);
       if (response.success && response.data) {
+        console.log('[useRoutes] Setting routes:', response.data.length, 'routes');
         setRoutes(response.data);
+      } else {
+        console.warn('[useRoutes] Response not successful:', response);
       }
     } catch (err) {
-      console.error('Error fetching routes:', err);
+      console.error('[useRoutes] Error fetching routes:', err);
     }
   }, [getAllRoutes]);
 

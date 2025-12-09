@@ -3,7 +3,7 @@ import { ApiClient } from '../../../utils/apiClient';
 import { API_ENDPOINTS } from './config';
 import type { CrudResponse, DriverApiResponse } from './types';
 
-const apiClient = new ApiClient('http://localhost:8080');
+const apiClient = new ApiClient('http://3.142.222.206');
 
 export class DriversApi {
   static async getAllDrivers(): Promise<CrudResponse<DriverApiResponse[]>> {

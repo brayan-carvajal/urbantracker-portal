@@ -1,9 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Plus, Loader2 } from "lucide-react"
 import { Plus, Loader2 } from "lucide-react"
 import { useVehicles } from "./hooks/useVehicles"
 import { VehicleCard } from "./components/VehicleCard"
@@ -13,36 +11,21 @@ import { VehicleModal } from "./components/VehicleModal"
 import { Pagination } from "./components/Pagination"
 import { DeleteConfirmationModal } from "./components/DeleteConfirmationModal"
 import { Vehicle } from "./types/vehiculeTypes"
-import { Pagination } from "./components/Pagination"
-import { DeleteConfirmationModal } from "./components/DeleteConfirmationModal"
-import { Vehicle } from "./types/vehiculeTypes"
 
 export default function VehiclesPage() {
   const {
     paginatedVehicles,
-    paginatedVehicles,
     filteredVehicles,
-    pagination,
-    searchTerm,
     pagination,
     searchTerm,
     statusFilter,
     statistics,
-    statistics,
     isDialogOpen,
-    isDeleteModalOpen,
-    openDeleteModal,
     isDeleteModalOpen,
     openDeleteModal,
     editingVehicle,
     vehicleToDelete,
-    vehicleToDelete,
     formData,
-    isLoading,
-    isDeleting,
-    isSaving,
-    companies,
-    vehicleTypes,
     isLoading,
     isDeleting,
     isSaving,
@@ -52,16 +35,12 @@ export default function VehiclesPage() {
     setStatusFilter,
     setPage,
     setItemsPerPage,
-    setPage,
-    setItemsPerPage,
     openCreateModal,
     openEditModal,
     closeModal,
     closeDeleteModal,
-    closeDeleteModal,
     updateFormData,
     saveVehicle,
-    confirmDeleteVehicle,
     confirmDeleteVehicle,
   } = useVehicles()
 
@@ -72,9 +51,21 @@ export default function VehiclesPage() {
     try {
       await saveVehicle()
     } catch (error) {
+      console.error("Error en handleSaveDriver:", error)
+      
+      // Handle different error types
+      let errorMessage = "Error desconocido al guardar vehículo";
+      
       if (error instanceof Error) {
-        setFormErrors({ general: error.message })
+        errorMessage = error.message;
+      } else if (error && typeof error === 'object' && 'message' in error) {
+        // Handle API errors or other objects
+        errorMessage = (error as { message: string }).message || errorMessage;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
       }
+      
+      setFormErrors({ general: errorMessage })
     }
   }
 
@@ -117,7 +108,6 @@ export default function VehiclesPage() {
         >
           <Plus className="h-4 w-4 mr-2" />
           Nuevo vehículo
-          Nuevo vehículo
         </Button>
       </header>
 
@@ -128,7 +118,6 @@ export default function VehiclesPage() {
       <VehicleFilters
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        statusFilter={statusFilter}
         statusFilter={statusFilter}
         onStatusFilterChange={setStatusFilter}
       />
@@ -143,13 +132,11 @@ export default function VehiclesPage() {
                 : "No vehicles registered"}
             </div>
             {!searchTerm && (
-            {!searchTerm && (
               <Button
                 onClick={openCreateModal}
                 className="mt-4 bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Agregar primer vehículo
                 Agregar primer vehículo
               </Button>
             )}
@@ -161,25 +148,8 @@ export default function VehiclesPage() {
                 <VehicleCard
                   key={vehicle.id}
                   vehicle={vehicle}
-                  onEdit={openEditModal}
-                  onDelete={() => handleDeleteClick(vehicle.id)}
-                />
-              ))}
-            </div>
-            {/* Pagination component */}
-            <Pagination
-              pagination={pagination}
-              onPageChange={setPage}
-              onItemsPerPageChange={setItemsPerPage}
-              isLoading={isLoading}
-            />
-          </>
-          <>
-            <div className="grid gap-6">
-              {paginatedVehicles.map((vehicle) => (
-                <VehicleCard
-                  key={vehicle.id}
-                  vehicle={vehicle}
+                  companies={companies}
+                  vehicleTypes={vehicleTypes}
                   onEdit={openEditModal}
                   onDelete={() => handleDeleteClick(vehicle.id)}
                 />
@@ -200,10 +170,9 @@ export default function VehiclesPage() {
       <VehicleModal
         isOpen={isDialogOpen}
         isEditing={isEditing}
-        isEditing={isEditing}
+        editingVehicle={editingVehicle}
         formData={formData}
         onClose={closeModal}
-        onSave={handleSaveDriver}
         onSave={handleSaveDriver}
         onFormChange={updateFormData}
         isSaving={isSaving}
@@ -218,20 +187,7 @@ export default function VehiclesPage() {
         onConfirm={confirmDeleteVehicle}
         vehicle={vehicleToDelete}
         isDeleting={isDeleting}
-        isSaving={isSaving}
-        errors={formErrors}
-        companies={companies}
-        vehicleTypes={vehicleTypes}
-      />
-      {/* Delete Confirmation Modal */}
-      <DeleteConfirmationModal
-        isOpen={isDeleteModalOpen}
-        onClose={closeDeleteModal}
-        onConfirm={confirmDeleteVehicle}
-        vehicle={vehicleToDelete}
-        isDeleting={isDeleting}
       />
     </div>
-  );
   );
 }
