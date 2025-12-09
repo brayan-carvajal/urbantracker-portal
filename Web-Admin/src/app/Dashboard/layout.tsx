@@ -23,7 +23,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
 import { DashboardHeader } from "./components/DashboardHeader";
 import { DriverProvider } from "./drivers/context/DriverContext";
-import { ParkingProvider } from "./parking/context/ParkingContext";
 import { useTheme } from "@/hooks/useTheme";
 import "../globals.css";
 
@@ -301,11 +300,6 @@ export default function DashboardLayout({
 
           {/* Page content */}
           <main className="p-8 bg-background">
-            <DriverProvider>
-              <ParkingProvider>
-                {children}
-              </ParkingProvider>
-            </DriverProvider>
           </main>
         </div>
         

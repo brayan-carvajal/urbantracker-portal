@@ -2,9 +2,7 @@ version: "3.9"
 
 services:
   web-admin:
-    build:
-      context: ../..   # raíz del proyecto
-      dockerfile: Devops/develop/Dockerfile.app
+    image: viegofn/web-admin:latest
     container_name: web-admin
     env_file:
       - .env.develop

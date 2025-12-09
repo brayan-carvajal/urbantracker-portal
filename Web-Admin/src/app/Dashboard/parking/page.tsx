@@ -33,7 +33,7 @@ export default function ParkingDashboard() {
   const [saving, setSaving] = React.useState(false);
   const [validationErrors, setValidationErrors] = React.useState<string[]>([]);
 
-  const validateConfig = (config: any) => {
+  const validateConfig = (config: ParkingConfig) => {
     const errors: string[] = [];
 
     if (config.minTimeMinutes < 1 || config.minTimeMinutes > 480) {
