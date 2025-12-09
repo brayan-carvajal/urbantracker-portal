@@ -3,7 +3,7 @@ import type { DriverScheduleRequest, DriverScheduleResponse, BulkDriverScheduleR
 import type { CrudResponse } from './types';
 import { API_ENDPOINTS } from './config';
 
-const apiClient = new ApiClient("http://3.142.222.206");
+const apiClient = new ApiClient("http://3.142.222.206:8080");
 
 export class DriverScheduleApi {
   static async getAll(): Promise<CrudResponse<DriverScheduleResponse[]>> {

@@ -1,6 +1,8 @@
+import { API_ENDPOINTS } from "../app/auth/login/services/api/config";
+
 export async function validateToken(token: string): Promise<boolean> {
   try {
-    const response = await fetch("http://3.142.222.206/api/v1/public/auth/validate-token", {
+    const response = await fetch(API_ENDPOINTS.validateToken, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

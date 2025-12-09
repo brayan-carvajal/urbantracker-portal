@@ -22,7 +22,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
 import { DashboardHeader } from "./components/DashboardHeader";
 import { useTheme } from "@/hooks/useTheme";
-import "../globals.css";
+import { DriverProvider } from "./drivers/context/DriverContext";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -148,7 +148,8 @@ export default function DashboardLayout({
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen bg-background">
+      <DriverProvider>
+        <div className="min-h-screen bg-background">
         {/* Sidebar */}
         <div className="fixed inset-y-0 left-0 z-50 w-72 bg-sidebar border-r border-sidebar-border shadow-2xl">
           <div className="flex h-20 items-center px-8 border-b border-sidebar-border">
@@ -298,8 +299,11 @@ export default function DashboardLayout({
 
           {/* Page content */}
           <main className="p-8 bg-background">
+            {children}
           </main>
         </div>
+
+        
         
         {/* Toast Notifications */}
         <Toaster
@@ -323,6 +327,7 @@ export default function DashboardLayout({
           }}
         />
       </div>
+      </DriverProvider>
     </QueryClientProvider>
   );
 }
