@@ -294,7 +294,7 @@ const RouteFormManagerContent: React.FC<RouteFormManagerProps> = ({
                     <div className="space-y-4">
                       <div className="flex justify-center">
                         <img
-                          src={`http://3.142.222.206/api/v1/routes/${id}/images/outbound?t=${Date.now()}`}
+                          src={`http://localhost:8080/api/v1/routes/${id}/images/outbound?t=${Date.now()}`}
                           alt="Imagen actual de ida"
                           className="max-h-40 max-w-full object-contain rounded-lg shadow-sm"
                           onError={(e) => {

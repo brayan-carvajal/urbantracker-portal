@@ -124,7 +124,7 @@ export function useNearbyRoutes() {
             const geometryTimeoutId = setTimeout(() => geometryController.abort(), 5000);
 
             const geometryResponse = await fetch(
-              `http://3.142.222.206/api/v1/public/route/${route.id}/GEOMETRY`,
+              `http://localhost:8080/api/v1/public/route/${route.id}/GEOMETRY`,
               { signal: geometryController.signal }
             );
 

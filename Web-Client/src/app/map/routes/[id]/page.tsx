@@ -26,7 +26,7 @@ export default function RouteDetailPage() {
 
   const loadRouteGeometry = async (routeId: number) => {
     try {
-      const response = await fetch(`http://3.142.222.206/api/v1/public/route/${routeId}/GEOMETRY`);
+      const response = await fetch(`http://localhost:8080/api/v1/public/route/${routeId}/GEOMETRY`);
       if (!response.ok) throw new Error('Error al cargar geometría de ruta');
       const data = await response.json();
       const detail = data.data;

@@ -31,7 +31,7 @@ export function RouteCard({ route, onEdit, onDelete }: RouteCardProps) {
               <div className="w-16 h-16">
                 {route.hasOutboundImage ? (
                   <img
-                    src={`http://3.142.222.206/api/v1/routes/${route.id}/images/outbound?t=${Date.now()}`}
+                    src={`http://localhost:8080/api/v1/routes/${route.id}/images/outbound?t=${Date.now()}`}
                     alt="Imagen de ida"
                     className="w-full h-full object-cover rounded-lg border border-border"
                     onError={(e) => {
@@ -60,7 +60,7 @@ export function RouteCard({ route, onEdit, onDelete }: RouteCardProps) {
               <div className="w-16 h-16">
                 {route.hasReturnImage ? (
                   <img
-                    src={`http://3.142.222.206/api/v1/routes/${route.id}/images/return?t=${Date.now()}`}
+                    src={`http://localhost:8080/api/v1/routes/${route.id}/images/return?t=${Date.now()}`}
                     alt="Imagen de vuelta"
                     className="w-full h-full object-cover rounded-lg border border-border"
                     onError={(e) => {
