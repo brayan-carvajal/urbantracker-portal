@@ -231,12 +231,22 @@ const MapViewComponent = ({ children }: { children?: React.ReactNode }) => {
   const vehicleMarkers = useMemo(() => {
     console.log('Vehicle positions in map-view:', vehiclePositions);
     if (!vehiclePositions) return [];
-    const markers = Array.from(vehiclePositions.values()).map((vehicle) => (
+
+    // Filtrar vehículos con datos válidos y key definida
+    const validVehicles = Array.from(vehiclePositions.values()).filter(vehicle =>
+      vehicle &&
+      vehicle.vehicleId &&
+      typeof vehicle.latitude === 'number' &&
+      typeof vehicle.longitude === 'number' &&
+      !isNaN(vehicle.latitude) &&
+      !isNaN(vehicle.longitude)
+    );
+
+    const markers = validVehicles.map((vehicle) => (
       <VehicleMarker key={vehicle.vehicleId} vehicle={vehicle} />
     ));
     return markers;
   }, [vehiclePositions]);
-
   const userLocationMarker = useMemo(() => {
     if (!userLocation) return null;
     return (

@@ -8,6 +8,18 @@ interface VehicleMarkerProps {
 
 export function VehicleMarker({ vehicle }: VehicleMarkerProps) {
   console.log('Rendering marker for vehicle:', vehicle.vehicleId, 'at', vehicle.latitude, vehicle.longitude);
+
+  // Validar coordenadas antes de renderizar
+  const isValidPosition = typeof vehicle.latitude === 'number' &&
+                         typeof vehicle.longitude === 'number' &&
+                         !isNaN(vehicle.latitude) &&
+                         !isNaN(vehicle.longitude);
+
+  if (!isValidPosition) {
+    console.error('❌ Coordenadas inválidas para vehicle:', vehicle.vehicleId, vehicle.latitude, vehicle.longitude);
+    return null;
+  }
+
   return (
     <Marker
       longitude={vehicle.longitude}

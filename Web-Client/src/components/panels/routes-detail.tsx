@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Bus } from "lucide-react";
-import { Client } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
 import { useVehiclePositions } from '../map/vehicle-context';
 import { useRoutePoints, useRoute } from '../map/route-context';
 
@@ -37,10 +35,7 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
   const [fullRoute, setFullRoute] = useState<Route | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [telemetry, setTelemetry] = useState<string | null>(null);
-  const [parseError, setParseError] = useState<string | null>(null);
-  const { setVehiclePositions } = useVehiclePositions();
-    const { addRoute, routes: contextRoutes, setFocusedRoute } = useRoute();
+  const { addRoute, routes: contextRoutes, setFocusedRoute } = useRoute();
 
   useEffect(() => {
     // Establecer ruta básica
@@ -123,70 +118,6 @@ export function RoutesDetail({ route, onBack }: { route: Route; onBack: () => vo
     };
     fetchDetail();
   }, [route.id, addRoute, contextRoutes]);
-
-  useEffect(() => {
-    if (!fullRoute) {
-      // No limpiar los puntos para mantener las rutas visibles
-      return;
-    }
-
-    // Limpiar posiciones anteriores al cambiar de ruta
-    setVehiclePositions(new Map());
-
-    const client = new Client({
-      webSocketFactory: () => new SockJS('http://localhost:8080/ws/connect'),
-      onConnect: () => {
-        console.log('Connected to WebSocket');
-        console.log('Subscribing to /topic/route/' + route.id + '/telemetry');
-        client.subscribe(`/topic/route/${route.id}/telemetry`, (message) => {
-          console.log('Received telemetry for route:', message.body);
-          setTelemetry(message.body);
-          try {
-            const telemetryData: VehicleTelemetryMessage = JSON.parse(message.body);
-            console.log('Parsed telemetry data:', telemetryData);
-            console.log('Setting vehicle positions for', telemetryData.vehicleId);
-            setVehiclePositions(prev => {
-              const newMap = new Map(prev.set(telemetryData.vehicleId, telemetryData));
-              console.log('New vehicle positions:', newMap);
-              return newMap;
-            });
-            setParseError(null); // Limpiar error si se parsea correctamente
-          } catch (err) {
-            console.error('Error parsing telemetry JSON:', err);
-            setParseError('Error al parsear mensaje de telemetría: formato JSON inválido');
-          }
-        });
-
-        // También suscribirse a telemetría de vehículos sin ruta asignada
-        console.log('Subscribing to /topic/vehicles/+/telemetry');
-        client.subscribe('/topic/vehicles/+/telemetry', (message) => {
-          console.log('Received vehicle telemetry:', message.body);
-          setTelemetry(message.body);
-          try {
-            const telemetryData: VehicleTelemetryMessage = JSON.parse(message.body);
-            console.log('Parsed vehicle telemetry data:', telemetryData);
-            setVehiclePositions(prev => new Map(prev.set(telemetryData.vehicleId, telemetryData)));
-            setParseError(null); // Limpiar error si se parsea correctamente
-          } catch (err) {
-            console.error('Error parsing vehicle telemetry JSON:', err);
-            setParseError('Error al parsear mensaje de telemetría de vehículo: formato JSON inválido');
-          }
-        });
-      },
-      onStompError: (frame) => {
-        console.error('STOMP error:', frame);
-      },
-    });
-
-    client.activate();
-
-    return () => {
-      client.deactivate();
-      // Limpiar posiciones al desmontar
-      setVehiclePositions(new Map());
-      
-    };
-  }, [fullRoute, setVehiclePositions]);
 
   // Mantener el foco en esta ruta mientras el componente esta montado
   useEffect(() => {
