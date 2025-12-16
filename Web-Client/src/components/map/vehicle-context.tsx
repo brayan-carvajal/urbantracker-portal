@@ -2,6 +2,15 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import mqtt, { MqttClient } from 'mqtt';
 import { VehicleTelemetryMessage } from '../panels/routes-detail';
+import { setupWebSocketConnection, subscribeToWebSocketTopic } from '@/lib/websocket';
+
+interface MQTTMessage {
+  type?: string;
+  data?: number[];
+  topic?: string;
+  qos?: number;
+  [key: string]: any;
+}
 
 interface VehicleContextType {
   vehiclePositions: Map<string, VehicleTelemetryMessage>;
@@ -39,6 +48,7 @@ export function VehicleProvider({ children }: { children: React.ReactNode }) {
         connectTimeout: 4000,
       });
 
+
       client.on('connect', () => {
         console.log('✅ Conectado a MQTT');
         setIsConnected(true);
@@ -63,7 +73,7 @@ export function VehicleProvider({ children }: { children: React.ReactNode }) {
         });
 
         // Manejar mensajes entrantes
-        client.on('message', (topic, message) => {
+        client.on('message', (topic, message: MQTTMessage | Buffer | Uint8Array) => {
           console.log('🎉 🎉 🎉 MENSAJE MQTT RECIBIDO 🎉 🎉 🎉');
           console.log('📥 Mensaje MQTT recibido - Topic:', topic);
           console.log('📥 Contenido del mensaje:', message);
@@ -78,19 +88,25 @@ export function VehicleProvider({ children }: { children: React.ReactNode }) {
               let messageStr: string;
               if (message instanceof Buffer) {
                 messageStr = message.toString('utf-8');
-              } else if (typeof message === 'object') {
+              } else if (message instanceof Uint8Array) {
+                // Manejar Uint8Array como un Buffer
+                messageStr = new TextDecoder().decode(message);
+              } else if (typeof message === 'object' && message !== null) {
                 // Si es un objeto, puede ser el payload real o metadata
-                if (Array.isArray(message) && message.length > 0 && message[0].hasOwnProperty('topic')) {
+                if (Array.isArray(message) && message.length > 0 && 'hasOwnProperty' in message[0] && message[0].hasOwnProperty('topic')) {
                   // Este es un array que contiene metadata, no el payload real
                   console.error('❌ Mensaje MQTT es un array que contiene metadata en lugar de datos de ubicación');
                   console.error('📥 Mensaje completo:', message);
                   console.error('📥 Primer elemento:', message[0]);
                   return;
-                } else if (message.hasOwnProperty('topic') || message.hasOwnProperty('qos')) {
+                } else if ('hasOwnProperty' in message && (message.hasOwnProperty('topic') || message.hasOwnProperty('qos'))) {
                   // Este es un objeto de metadata, no el payload real
                   console.error('❌ Mensaje MQTT contiene metadata en lugar de datos de ubicación');
                   console.error('📥 Mensaje completo:', message);
                   return;
+                } else if ('type' in message && message.type === 'Buffer' && Array.isArray(message.data)) {
+                  // Manejar el caso donde el mensaje es un objeto con tipo 'Buffer' y datos en un array
+                  messageStr = new TextDecoder().decode(new Uint8Array(message.data));
                 } else {
                   // Este es el payload real
                   messageStr = JSON.stringify(message);
@@ -107,9 +123,15 @@ export function VehicleProvider({ children }: { children: React.ReactNode }) {
               let telemetryData: VehicleTelemetryMessage;
 
               if (parsedData && typeof parsedData === 'object') {
+                // Validar que los datos contengan las propiedades esperadas
+                if (!parsedData.vehicleId || !parsedData.latitude || !parsedData.longitude) {
+                  console.error('❌ Datos de telemetría de ruta incompletos:', parsedData);
+                  return;
+                }
+
                 // Manejar formato alternativo del móvil (lat/lon en lugar de latitude/longitude)
                 telemetryData = {
-                  vehicleId: parsedData.vehicleId || parsedData.vehicleId,
+                  vehicleId: parsedData.vehicleId,
                   timestamp: parsedData.timestamp || new Date().toISOString(),
                   latitude: parsedData.latitude || parsedData.lat,
                   longitude: parsedData.longitude || parsedData.lon,
@@ -257,24 +279,6 @@ export function VehicleProvider({ children }: { children: React.ReactNode }) {
           }
         });
 
-        // Añadir algunos datos de prueba para verificación
-        console.log('🚀 Inicializando datos de prueba para verificación...');
-        setTimeout(() => {
-          console.log('📍 Añadiendo datos de prueba...');
-          const testData: VehicleTelemetryMessage = {
-            vehicleId: 'TEST-VEHICLE-001',
-            timestamp: new Date().toISOString(),
-            latitude: 4.60971,
-            longitude: -74.08175,
-            source: 'MOVILE'
-          };
-          console.log('📍 Datos de prueba:', testData);
-          setVehiclePositions(prev => {
-            const newMap = new Map(prev.set(testData.vehicleId, testData));
-            console.log('📍 Posiciones de vehículos actualizadas con datos de prueba:', newMap.size, 'vehicles');
-            return newMap;
-          });
-        }, 5000);
 
         // Suscribirse a actualizaciones de trayectos activos
         client.subscribe('trips/active', (topic, message) => {
